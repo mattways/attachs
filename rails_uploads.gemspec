@@ -7,11 +7,11 @@ require "rails_uploads/version"
 Gem::Specification.new do |s|
   s.name        = "rails-uploads"
   s.version     = RailsUploads::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of RailsUploads."
-  s.description = "TODO: Description of RailsUploads."
+  s.authors     = ["Mattways"]
+  s.email       = ["contact@mattways.com"]
+  s.homepage    = "https://github.com/mattways/rails-uploads"
+  s.summary     = "Toolkit for Rails uploads."
+  s.description = "Adds models and migrations to deal with audio, image and video uploads."
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
