@@ -1,3 +1,26 @@
-= RailsUploads
+= Rails Pagination
 
-This project rocks and uses MIT-LICENSE.
+Adds models and migrations to deal with audio, image and video uploads.
+
+= Install
+
+Put this line in your Gemfile:
+  gem 'rails-uploads', :git => 'git@github.com:mattways/rails-uploads.git'
+  
+Then bundle:
+  $ bundle
+  
+= Usage
+
+Generate the image and migration using the image, audio or video generator:
+  rails g image
+  rails g audio
+  rails g video
+  
+Update your db:
+  rake db:migrate
+  
+Finally add the assocations to your models:
+  has_one :image, :as => :imageable
+  has_one :audio, :as => :audible
+  has_one :video, :as => :videable
