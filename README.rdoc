@@ -12,7 +12,7 @@ Then bundle:
   
 = Usage
 
-Generate the image and migration using the image, audio or video generator:
+Generate the model and migration using the image, audio or video generator:
   rails g image
   rails g audio
   rails g video
@@ -24,3 +24,5 @@ Finally add the assocations to your models:
   has_one :image, :as => :imageable
   has_one :audio, :as => :audible
   has_one :video, :as => :videable
+  
+(Videos use youtube urls not actually files)
