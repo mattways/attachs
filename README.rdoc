@@ -1,4 +1,4 @@
-= Rails Pagination
+= Rails Uploads
 
 Adds models and migrations to deal with audio, image and video uploads.
 
