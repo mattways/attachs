@@ -1,6 +1,6 @@
 = Rails Uploads
 
-Adds models and migrations to deal with audio, image and video uploads.
+Wouldn't be great to don't need a table and a model for each upload? That it's exactly what this plugin does.
 
 = Install
 
@@ -12,17 +12,16 @@ Then bundle:
   
 = Usage
 
-Generate the model and migration using the image, audio or video generator:
-  rails g image
-  rails g audio
-  rails g video
+Add the column to your table:
+  create_table :models do |t|
+    t.attachment :prop, :multiple => true # By default false
+  end
+
+Define your attribute as attachment:
+  class Model < ActiveRecord::Base
+    attr_accessible :prop
+    attached_files :prop # Use attached_file for a single attachment
+  end
   
-Update your db:
-  rake db:migrate
-  
-Finally add the assocations to your models:
-  has_one :image, :as => :imageable
-  has_one :audio, :as => :audible
-  has_one :video, :as => :videable
-  
-(Videos use youtube urls not actually files)
+Then in your forms:
+  = f.file_field :prop, :multiple => true

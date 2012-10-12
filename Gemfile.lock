@@ -36,6 +36,14 @@ GEM
       multi_json (~> 1.0)
     arel (3.0.2)
     builder (3.0.0)
+    columnize (0.3.6)
+    debugger (1.2.0)
+      columnize (>= 0.3.1)
+      debugger-linecache (~> 1.1.1)
+      debugger-ruby_core_source (~> 1.1.3)
+    debugger-linecache (1.1.2)
+      debugger-ruby_core_source (>= 1.1.1)
+    debugger-ruby_core_source (1.1.3)
     erubis (2.7.0)
     hike (1.2.1)
     i18n (0.6.1)
@@ -92,6 +100,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  debugger
   jquery-rails
   rails-uploads!
   sqlite3
