@@ -8,7 +8,7 @@ class ImageUploadTest < ActiveSupport::TestCase
   test "should save/destory main image and thumbs" do
 
     assert_equal 58841, @image.size
-    assert_equal 86802, @image.size(:big)
+    assert_equal 89314, @image.size(:big)
     assert_equal 11971, @image.size(:small)
     
     original = @image.realpath
