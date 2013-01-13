@@ -9,7 +9,7 @@ class ImageUploadTest < ActiveSupport::TestCase
 
     assert_equal 58841, @image.size
     assert_equal 89314, @image.size(:big)
-    assert_equal 11971, @image.size(:small)
+    assert_equal 12057, @image.size(:small)
     
     original = @image.realpath
     big = @image.realpath(:big)
