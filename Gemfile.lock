@@ -3,7 +3,6 @@ PATH
   specs:
     rails-uploads (0.0.1)
       rails (>= 3.2.8)
-      rmagick
 
 GEM
   remote: http://rubygems.org/
@@ -77,7 +76,6 @@ GEM
     rake (10.0.3)
     rdoc (3.12)
       json (~> 1.4)
-    rmagick (2.13.1)
     sprockets (2.2.2)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -97,5 +95,4 @@ PLATFORMS
 DEPENDENCIES
   jquery-rails
   rails-uploads!
-  rmagick
   sqlite3

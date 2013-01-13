@@ -19,11 +19,9 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", ">= 3.2.8"
 
   if RUBY_PLATFORM == "java"
-    s.add_dependency "rmagick4j"
     s.add_development_dependency "activerecord-jdbcsqlite3-adapter"
     s.add_development_dependency "jruby-openssl"
   else
-    s.add_dependency "rmagick"
     s.add_development_dependency "sqlite3"
   end
 end

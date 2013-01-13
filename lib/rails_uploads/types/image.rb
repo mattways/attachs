@@ -22,19 +22,18 @@ module RailsUploads
       def store
         super() do
           if @options[:presets]
-            image = ::Magick::Image.read(realpath).first
             @options[:presets].each do |name, settings|
+              image = RailsUploads::Magick::Image.new(realpath, realpath(name))
               if settings.is_a? Proc
-                thumbnail = settings.call
+                thumbnail = settings.call(image)
               else
                 case settings[:method]
                 when :fit
                   thumbnail = image.resize_to_fit(settings[:width], settings[:height])
                 else
-                  thumbnail = image.crop_resized(settings[:width], settings[:height])                          
+                  thumbnail = image.resize_to_fill(settings[:width], settings[:height])                          
                 end
               end
-              thumbnail.write realpath(name)
             end   
           end       
         end
