@@ -3,6 +3,7 @@ PATH
   specs:
     rails-uploads (0.0.1)
       rails (>= 3.2.8)
+      rmagick
 
 GEM
   remote: http://rubygems.org/
