@@ -78,9 +78,8 @@ module RailsUploads
       end
 
       def run(tokens)
-        cmd = tokens.join(' ')
-        output = IO.popen(cmd) { |o| o.read }
-        success = $?.exitstatus == 0
+        output = `#{tokens.join(' ')}`
+        success = $?.exitstatus == 0 
         [success, output]
       end 
 
