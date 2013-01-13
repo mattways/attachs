@@ -10,7 +10,7 @@ module RailsUploads
       
       def iterate_attachments(record, attribute, value)
         multiple = record.class.instance_variable_get('@attachments')[attribute][:multiple]
-        (multiple ? value : [value]).each {|v| yield v } if value    
+        (multiple ? value : [value]).each { |v| yield v }
       end
       
     end

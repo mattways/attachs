@@ -11,11 +11,29 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121008185044) do
+ActiveRecord::Schema.define(:version => 20130113130419) do
 
-  create_table "comments", :force => true do |t|
-    t.text     "body"
+  create_table "multiples", :force => true do |t|
     t.text     "files"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "single_validations", :force => true do |t|
+    t.string   "doc_presence"
+    t.string   "doc_content_type"
+    t.string   "doc_size"
+    t.string   "doc_all"
+    t.string   "image_presence"
+    t.string   "image_content_type"
+    t.string   "image_size"
+    t.string   "image_all"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+  end
+
+  create_table "singles", :force => true do |t|
+    t.string   "file"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end

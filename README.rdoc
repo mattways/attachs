@@ -1,3 +1,5 @@
+{<img src="https://codeclimate.com/badge.png" />}[https://codeclimate.com/github/mattways/rails-uploads] {<img src="https://travis-ci.org/mattways/rails-uploads.png?branch=master" alt="Build Status" />}[https://travis-ci.org/mattways/rails-uploads] {<img src="https://gemnasium.com/mattways/rails-uploads.png" alt="Dependency Status" />}[https://gemnasium.com/mattways/rails-uploads]
+
 = Rails Uploads
 
 Wouldn't be great to don't need a table and a model for each upload? That it's exactly what this plugin does.

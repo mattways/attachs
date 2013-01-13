@@ -3,54 +3,71 @@ module RailsUploads
     class File
       
       def initialize(source, options={})       
-        if source.class == ActionDispatch::Http::UploadedFile
+        if source.is_a? ActionDispatch::Http::UploadedFile or source.is_a? Rack::Test::UploadedFile
           @file = source          
-          @created = false
+          @stored = false
         elsif source.is_a? String
           @filename = source
-          @created = true
+          @stored = true
         end
+        @deleted = false        
         @options = options
       end
 
       def exists?
-        ::File.exists? realpath
+        @deleted ? false : ::File.exists?(realpath)
       end
 
       def size
-        exists? ? ::File.size(realpath) : 0
+        return 0 if @deleted
+        @size ||= (exists? ? ::File.size(realpath) : 0)
       end
 
       def extname
+        return nil if @deleted 
         @extname ||= ::File.extname(filename)
       end   
       
       def path
-        @path ||= "/#{::File.join(Rails.application.config.uploads.path, filename)}"
+        return nil if @deleted
+        @path ||= ::File.join('', Rails.application.config.uploads.path, filename)
       end
       
       def realpath
-        @realpath ||= Rails.root.join('public', Rails.application.config.uploads.path, filename)
+        return nil if @deleted
+        @stored ? uploads_path : @file.path
       end
       
       def filename
-        @filename ||= "#{(Time.now.to_f * 10000000).to_i}#{::File.extname @file.original_filename}"
+        return nil if @deleted
+        @filename ||= "#{(Time.now.to_f * 10000000).to_i}#{::File.extname @file.original_filename}".downcase
       end
       
-      def create
-        unless @created
-          ::File.open(realpath, 'wb') do |file|
+      def store
+        if not @stored and @file
+          ::File.open(uploads_path, 'wb') do |file|
             file.write(@file.read)
           end
+          @stored = true
           yield if block_given?
-          @created = true
         end
       end      
       
       def delete
-        ::File.delete realpath if exists?
+        if @stored and exists?
+          ::File.delete realpath
+          yield if block_given?
+          @stored = false
+          @deleted = true
+        end
       end
        
+      protected
+
+      def uploads_path
+        Rails.root.join('public', Rails.application.config.uploads.path, filename)
+      end
+
     end
   end 
 end
