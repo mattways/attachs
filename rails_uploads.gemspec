@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Mattways"]
   s.email       = ["contact@mattways.com"]
   s.homepage    = "https://github.com/mattways/rails-uploads"
-  s.summary     = "Toolkit for Rails uploads."
-  s.description = "Adds models and migrations to deal with audio, image and video uploads."
+  s.summary     = "Toolkit for Rails Uploads."
+  s.description = "Minimalistic toolkit to handle file and images uploads in rails using ActiveRecord."
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]

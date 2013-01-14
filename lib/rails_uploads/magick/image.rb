@@ -34,7 +34,7 @@ module RailsUploads
 
       def dimensions
         identify(:format => '%wx%h') do |success, output|
-          success ? output.chomp.split('x').map(&:to_i) : 0
+          success ? output.chomp.split('x').map(&:to_i) : []
         end
       end
 

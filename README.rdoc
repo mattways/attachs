@@ -2,12 +2,12 @@
 
 = Rails Uploads
 
-Wouldn't be great to don't need a table and a model for each upload? That it's exactly what this plugin does.
+Minimalistic toolkit to handle file and images uploads in rails using ActiveRecord.
 
 = Install
 
 Put this line in your Gemfile:
-  gem 'rails-uploads', :git => 'git@github.com:mattways/rails-uploads.git'
+  gem 'rails-uploads'
   
 Then bundle:
   $ bundle
@@ -16,14 +16,28 @@ Then bundle:
 
 Add the column to your table:
   create_table :models do |t|
-    t.attachment :prop, :multiple => true # By default false
+    t.attachment :prop
   end
 
-Define your attribute as attachment:
+If you need a file:
   class Model < ActiveRecord::Base
     attr_accessible :prop
-    attached_files :prop # Use attached_file for a single attachment
+    attached_file :prop
   end
+
+If you need a image:
+  class Model < ActiveRecord::Base
+    attr_accessible :prop
+    attached_image :prop, :presets => { :big => { :method => :fit, :width => 1024, :height => 768 }, :small => { :method => :fill, :width => 120, :height => :120 } }
+  end
+
+(Fill will scale the image to fill all the space and then crop and fit will scale the image until it fit in the space without cropping)
   
+You can use proc, will receive an ImageMagick object wrapper, with it you can do whatever you want to the image using convert method:
+  class Model < ActiveRecord::Base
+    attr_accessible :prop
+    attached_image :prop, :presets => { :big => proc { |image| image.convert :resize => '100x100' } }
+  end
+
 Then in your forms:
-  = f.file_field :prop, :multiple => true
+  = f.file_field :prop
