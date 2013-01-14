@@ -2,7 +2,7 @@
 
 = Rails Uploads
 
-Minimalistic toolkit to handle file and images uploads in rails using ActiveRecord.
+Minimalistic toolkit to handle file and images uploads using ActiveRecord.
 
 = Install
 
