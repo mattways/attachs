@@ -11,13 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130113130419) do
-
-  create_table "multiples", :force => true do |t|
-    t.text     "files"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
+ActiveRecord::Schema.define(:version => 20130110194721) do
 
   create_table "single_validations", :force => true do |t|
     t.string   "doc_presence"

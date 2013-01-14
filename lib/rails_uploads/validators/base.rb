@@ -8,11 +8,6 @@ module RailsUploads
         record.errors[attribute] << (options[:message] || I18n.t(type, options))        
       end
       
-      def iterate_attachments(record, attribute, value)
-        multiple = record.class.instance_variable_get('@attachments')[attribute][:multiple]
-        (multiple ? value : [value]).each { |v| yield v }
-      end
-      
     end
   end
 end

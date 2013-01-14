@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ValidatorsSingleTest < ActiveSupport::TestCase
+class ValidatorsTest < ActiveSupport::TestCase
   include ActionDispatch::TestProcess
 
   setup :create_record

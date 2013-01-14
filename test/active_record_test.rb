@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ActiveRecordSingleTest < ActiveSupport::TestCase
+class ActiveRecordTest < ActiveSupport::TestCase
   
   test "should save/update/destroy from the database and save/destroy the file" do
 

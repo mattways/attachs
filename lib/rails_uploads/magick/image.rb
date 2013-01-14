@@ -32,6 +32,12 @@ module RailsUploads
         end
       end
 
+      def dimensions
+        identify(:format => '%wx%h') do |success, output|
+          success ? output.chomp.split('x').map(&:to_i) : 0
+        end
+      end
+
       def width
         dimensions[0]
       end
@@ -49,11 +55,7 @@ module RailsUploads
       def resize_to_fit(max_width, max_height)
         width, height = dimensions
         ratios = [max_width/width.to_f, max_height/height.to_f]
-        if max_width < width or max_height < height
-          scale = ratios.max
-        else
-          scale = ratios.min
-        end
+        scale = ratios.send((max_width < width or max_height < height) ? :max : :min)
         convert :resize => "#{scale*width}x#{scale*height}", :gravity => 'center'
       end
 
@@ -61,12 +63,6 @@ module RailsUploads
 
       def convert?
         not (@output.nil? and ::File.exists?(@output))
-      end
-
-      def dimensions
-        identify(:format => '%wx%h') do |success, output|
-          success ? output.chomp.split('x').map(&:to_i) : 0
-        end
       end
   
       def file_to_tokens(tokens)
