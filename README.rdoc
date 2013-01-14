@@ -33,11 +33,31 @@ If you need a image:
 
 (Fill will scale the image to fill all the space and then crop and fit will scale the image until it fit in the space without cropping)
   
-You can use proc, will receive an ImageMagick object wrapper, with it you can do whatever you want to the image using convert method:
+You can use proc, will receive an ImageMagick object wrapper, with it you can do whatever you want using convert method:
   class Model < ActiveRecord::Base
     attr_accessible :prop
     attached_image :prop, :presets => { :big => proc { |image| image.convert :resize => '100x100' } }
   end
 
-Then in your forms:
+The validation works very similar to paperclip:
+  class Model < ActiveRecord::Base
+    attr_accessible :prop
+    attached_file :prop
+    validates :prop, :attachment_presence => true, :attachment_size => { :in => 0..4.megabytes }, :attachment_content_type => { :in => ['jpg'] }
+  end
+
+If you want to translate the errores the keys are:
+  errors.messages.attachment_presence
+  errors.messages.attachment_size_in
+  errors.messages.attachment_size_less_than
+  errors.messages.attachment_size_greater_than
+  errors.messages.attachment_content_type
+
+In your views:
+  a{ :href => file_record.path } # To get the file
+  a{ :href => image_record.path } # To get the original image
+  a{ :href => image_record.path(:big) } # To get the thumb
+
+In your forms:
   = f.file_field :prop
+
