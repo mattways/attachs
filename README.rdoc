@@ -54,9 +54,9 @@ If you want to translate the errores the keys are:
   errors.messages.attachment_content_type
 
 In your views:
-  a{ :href => file_record.path } # To get the file
-  a{ :href => image_record.path } # To get the original image
-  a{ :href => image_record.path(:big) } # To get the thumb
+  a{ :href => record.file.path } # To get the file
+  a{ :href => record.image.path } # To get the original image
+  a{ :href => record.image.path(:big) } # To get the thumb
 
 In your forms:
   = f.file_field :prop
