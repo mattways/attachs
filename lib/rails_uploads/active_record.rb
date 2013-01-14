@@ -79,8 +79,8 @@ module RailsUploads
         @deleted_attachments = []
         self.class.instance_variable_get('@attachments').each do |attr, options|
           if changed_attributes.has_key? attr.to_s
-            @stored_attachments << get_attachment_instance(attributes[attr.to_s], options) unless attributes[attr.to_s].nil?
-            @deleted_attachments << get_attachment_instance(changed_attributes[attr.to_s], options) unless changed_attributes[attr.to_s].nil?
+            add_changed_attachment attributes[attr.to_s], options, :stored
+            add_changed_attachment changed_attributes[attr.to_s], options, :deleted
           end
         end
       end
@@ -90,6 +90,10 @@ module RailsUploads
           next unless value = send(attr)
           yield value
         end        
+      end
+      
+      def add_changed_attachment(value, options, type)
+        (type == :stored ? @stored_attachments : @deleted_attachments) << get_attachment_instance(value, options) unless value.nil?
       end
       
       def store_attachments
