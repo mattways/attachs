@@ -7,9 +7,9 @@ class PresetsTest < ActiveSupport::TestCase
 
   test "should save/destory main image and thumbs" do
 
-    assert_equal 58841, @image.size
-    assert_equal 89314, @image.size(:big)
-    assert_equal 12057, @image.size(:small)
+    assert_equal 58841, @record.image.size
+    assert_equal 89314, @record.image.size(:big)
+    assert_equal 12057, @record.image.size(:small)
     
     original = @record.image.realpath
     big = @record.image.realpath(:big)
