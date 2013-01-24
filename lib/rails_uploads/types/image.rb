@@ -50,7 +50,7 @@ module RailsUploads
       protected
       
       def preset_path(path, preset)
-        (preset and @options[:presets][preset]) ? path.to_s.reverse.sub('.', "-#{preset.to_s.gsub('_', '-')}.").reverse : path         
+        (preset and @options[:presets][preset]) ? path.to_s.reverse.sub('.', "-#{preset.to_s.gsub('_', '-')}.".reverse).reverse : path         
       end
       
     end
