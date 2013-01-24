@@ -10,8 +10,8 @@ module RailsUploads
       def convert(args)
         tokens = [convert? ? 'convert' : 'mogrify']
         file_to_tokens tokens
-        args_to_tokens args, tokens        
-        tokens << @output if convert?
+        args_to_tokens args, tokens
+        tokens << "\"#{@output}\"" if convert?
         success, output = run(tokens)
         if block_given? 
           yield success, output
@@ -49,14 +49,14 @@ module RailsUploads
       def resize_to_fill(max_width, max_height)
         width, height = dimensions
         scale = [max_width/width.to_f, max_height/height.to_f].max
-        convert :resize => "#{scale*width}x#{scale*height}", :gravity => 'center', :crop => "#{max_width}x#{max_height}" 
+        convert :resize => "#{(scale*width).to_i}x#{(scale*height).to_i}", :gravity => 'center', :crop => "#{max_width}x#{max_height}+0+0" 
       end
 
       def resize_to_fit(max_width, max_height)
         width, height = dimensions
         ratios = [max_width/width.to_f, max_height/height.to_f]
         scale = ratios.send((max_width < width or max_height < height) ? :max : :min)
-        convert :resize => "#{scale*width}x#{scale*height}", :gravity => 'center'
+        convert :resize => "#{(scale*width).to_i}x#{(scale*height).to_i}", :gravity => 'center'
       end
 
       protected
@@ -66,7 +66,7 @@ module RailsUploads
       end
   
       def file_to_tokens(tokens)
-        tokens << (convert? ? @source : @output)
+        tokens << (convert? ? "\"#{@source}\"" : @output)
       end
     
       def args_to_tokens(args, tokens)
