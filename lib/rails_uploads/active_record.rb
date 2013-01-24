@@ -73,7 +73,7 @@ module RailsUploads
       protected
 
       def get_attachment_instance(source, options)
-        klass = options.respond_to?(:type) ? options[:type].to_s.classify : 'File'      
+        klass = options.has_key?(:type) ? options[:type].to_s.classify : 'File'
         RailsUploads::Types.const_get(klass).new(source, options)  
       end
       
