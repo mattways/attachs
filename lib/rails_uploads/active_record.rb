@@ -3,15 +3,18 @@ module RailsUploads
     module NonAttachableMethods
   
       def self.extended(base)
-        ['image'].each do |type|
+        [:image].each do |type|
           base.send(:define_singleton_method, "attached_#{type}") do |*args|
-            attached_file *args.append(:type => type)             
+            options = args.extract_options!
+            options[:type] = type
+            attached_file *args.append(options)
           end
         end       
       end
 
       def attached_file(*args)
         options = args.extract_options!
+        options[:type] = :file
         define_attachment *args.append(options)
       end
 
@@ -70,7 +73,7 @@ module RailsUploads
       protected
 
       def get_attachment_instance(source, options)
-        klass = options.respond_to?(:type) ? options[:type].classify : 'File'      
+        klass = options.respond_to?(:type) ? options[:type].to_s.classify : 'File'      
         RailsUploads::Types.const_get(klass).new(source, options)  
       end
       
