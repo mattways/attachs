@@ -14,7 +14,7 @@ module RailsUploads
 
       def attached_file(*args)
         options = args.extract_options!
-        options[:type] = :file
+        options.reverse_merge! :type => :file
         define_attachment *args.append(options)
       end
 
