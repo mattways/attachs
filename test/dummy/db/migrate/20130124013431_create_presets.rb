@@ -2,7 +2,7 @@ class CreatePresets < ActiveRecord::Migration
   def change
     
     create_table :presets do |t|
-      t.attachment :image
+      t.string :image
       t.timestamps
     end
 

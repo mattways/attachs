@@ -2,14 +2,14 @@ class CreateSingleValidations < ActiveRecord::Migration
   def change
 
     create_table :single_validations do |t|
-      t.attachment :doc_presence
-      t.attachment :doc_content_type
-      t.attachment :doc_size
-      t.attachment :doc_all
-      t.attachment :image_presence
-      t.attachment :image_content_type
-      t.attachment :image_size
-      t.attachment :image_all
+      t.string :doc_presence
+      t.string :doc_content_type
+      t.string :doc_size
+      t.string :doc_all
+      t.string :image_presence
+      t.string :image_content_type
+      t.string :image_size
+      t.string :image_all
       t.timestamps
     end
 
