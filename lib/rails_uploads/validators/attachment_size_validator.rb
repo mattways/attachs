@@ -2,8 +2,8 @@ class AttachmentSizeValidator < RailsUploads::Validators::Base
   
   # validates :prop, :attachment_size => { :in => 0..4.megabytes }
   
-  def validate_each(record, attribute, value)  
-    if !options.has_key?(:default) and value 
+  def validate_each(record, attribute, value)
+    if !has_default?(record, attribute) and value 
       if options.has_key? :in
         unless options[:in].include? value.size
           add_error record, attribute, 'attachment_size_in', :begin => options[:in].begin, :end => options[:in].end

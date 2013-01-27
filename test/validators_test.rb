@@ -66,11 +66,9 @@ class ValidatorsTest < ActiveSupport::TestCase
     assert !@record.valid?
     assert_equal [], @record.errors[:image_all]
 
-    @record.file_default = fixture_file_upload('/file.txt', 'text/plain')
     assert !@record.valid?
     assert_equal [], @record.errors[:file_default]
 
-    @record.image_default = fixture_file_upload('/image.jpg', 'image/jpeg')
     assert !@record.valid?
     assert_equal [], @record.errors[:image_default]
 
