@@ -12,9 +12,9 @@ class ImageStringTest < ActiveSupport::TestCase
     
     @image.delete
     
-    assert !::File.exists?(original)
-    assert !::File.exists?(big)
-    assert !::File.exists?(small)
+    assert !File.exists?(original)
+    assert !File.exists?(big)
+    assert !File.exists?(small)
   
   end
 

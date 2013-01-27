@@ -2,13 +2,19 @@ module RailsUploads
   module Types
     class File
       
-      def initialize(source, options={})       
+      def initialize(source, options={})
         if source.is_a? ActionDispatch::Http::UploadedFile or source.is_a? Rack::Test::UploadedFile
           @file = source          
           @stored = false
+          @default = false
         elsif source.is_a? String
           @filename = source
           @stored = true
+          @default = false
+        elsif options.has_key? :default
+          @filename = options[:default]
+          @stored = true
+          @default = true
         end
         @deleted = false        
         @options = options
@@ -30,12 +36,12 @@ module RailsUploads
       
       def path
         return nil if @deleted
-        @path ||= ::File.join('', Rails.application.config.uploads.path, filename)
+        @path ||= ::File.join('', public_path)
       end
       
       def realpath
         return nil if @deleted
-        @stored ? uploads_path : @file.path
+        @stored ? destination_path : @file.path
       end
       
       def filename
@@ -45,7 +51,7 @@ module RailsUploads
       
       def store
         if not @stored and @file
-          ::File.open(uploads_path, 'wb') do |file|
+          ::File.open(destination_path, 'wb') do |file|
             file.write(@file.read)
           end
           @stored = true
@@ -54,7 +60,7 @@ module RailsUploads
       end      
       
       def delete
-        if @stored and exists?
+        if not @default and @stored and exists?
           ::File.delete realpath
           yield if block_given?
           @stored = false
@@ -64,8 +70,12 @@ module RailsUploads
        
       protected
 
-      def uploads_path
-        Rails.root.join('public', Rails.application.config.uploads.path, filename)
+      def destination_path
+        Rails.root.join('public', public_path)
+      end
+
+      def public_path
+        @default ? @options[:default] : ::File.join(Rails.application.config.uploads.path, filename)
       end
 
     end

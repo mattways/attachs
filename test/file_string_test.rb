@@ -18,7 +18,7 @@ class FileStringTest < ActiveSupport::TestCase
 
     uploads_path = Rails.root.join('public', 'uploads', @file.filename)
     @file.delete
-    assert !::File.exists?(uploads_path)
+    assert !File.exists?(uploads_path)
     assert !@file.exists?
 
   end
@@ -26,7 +26,7 @@ class FileStringTest < ActiveSupport::TestCase
   protected
 
   def create_file
-    filename = 'doc.txt'
+    filename = 'file.txt'
     FileUtils.cp File.join(ActiveSupport::TestCase.fixture_path, filename), Rails.root.join('public', 'uploads', filename)
     @file = RailsUploads::Types::File.new(filename)
   end

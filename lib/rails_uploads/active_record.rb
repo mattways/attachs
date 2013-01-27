@@ -51,7 +51,7 @@ module RailsUploads
       def define_attachable_attribute_method_set(attr, options)
         define_method "#{attr}=" do |value|
           @attachments = {} if defined?(@attachments).nil?
-          if value.is_a? ActionDispatch::Http::UploadedFile or value.is_a? Rack::Test::UploadedFile or value.is_a? String
+          if value.is_a? ActionDispatch::Http::UploadedFile or value.is_a? Rack::Test::UploadedFile
             @attachments[attr] = get_attachment_instance(value, options)
             super(@attachments[attr].filename)
           end
@@ -62,8 +62,8 @@ module RailsUploads
         define_method attr do
           @attachments = {} if defined?(@attachments).nil?
           return @attachments[attr] if @attachments.has_key? attr
-          return nil unless super()
-          @attachments[attr] = get_attachment_instance(super(), options)          
+          return nil if super().nil? and not options.has_key? :default
+          @attachments[attr] = get_attachment_instance(super(), options)
         end 
       end
 

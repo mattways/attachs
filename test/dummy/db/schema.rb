@@ -13,29 +13,31 @@
 
 ActiveRecord::Schema.define(:version => 20130124013431) do
 
-  create_table "presets", :force => true do |t|
+  create_table "file_uploads", :force => true do |t|
+    t.string   "file"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "image_uploads", :force => true do |t|
     t.string   "image"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
 
-  create_table "single_validations", :force => true do |t|
-    t.string   "doc_presence"
-    t.string   "doc_content_type"
-    t.string   "doc_size"
-    t.string   "doc_all"
+  create_table "validation_uploads", :force => true do |t|
+    t.string   "file_presence"
+    t.string   "file_content_type"
+    t.string   "file_size"
+    t.string   "file_all"
+    t.string   "file_default"
     t.string   "image_presence"
     t.string   "image_content_type"
     t.string   "image_size"
     t.string   "image_all"
+    t.string   "image_default"
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
-  end
-
-  create_table "singles", :force => true do |t|
-    t.string   "file"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
   end
 
 end
