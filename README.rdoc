@@ -1,5 +1,7 @@
 === NOTE: Attachment method has been removed just use a regular string from version 0.0.5
 
+---
+
 {<img src="https://codeclimate.com/badge.png" />}[https://codeclimate.com/github/mattways/rails-uploads] {<img src="https://travis-ci.org/mattways/rails-uploads.png?branch=master" alt="Build Status" />}[https://travis-ci.org/mattways/rails-uploads] {<img src="https://gemnasium.com/mattways/rails-uploads.png" alt="Dependency Status" />}[https://gemnasium.com/mattways/rails-uploads]
 
 = Rails Uploads
