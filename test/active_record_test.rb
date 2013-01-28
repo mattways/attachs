@@ -46,9 +46,9 @@ class ActiveRecordTest < ActiveSupport::TestCase
     # Image
 
     record = ImageUpload.create
-    assert_equal record.image.path, '/image.jpg'
-    assert_equal record.image.path(:small), '/image-small.jpg'
-    assert_equal record.image.path(:big), '/image-big.jpg'
+    assert_equal record.image.path, '/assets/image.jpg'
+    assert_equal record.image.path(:small), '/assets/image-small.jpg'
+    assert_equal record.image.path(:big), '/assets/image-big.jpg'
 
   end
 
