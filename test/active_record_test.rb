@@ -41,14 +41,14 @@ class ActiveRecordTest < ActiveSupport::TestCase
     # File
 
     record = FileUpload.create
-    assert_equal record.file.path, '/files/file.txt'
+    assert_equal record.file.path, '/file.txt'
   
     # Image
 
     record = ImageUpload.create
-    assert_equal record.image.path, '/images/image.jpg'
-    assert_equal record.image.path(:small), '/images/image-small.jpg'
-    assert_equal record.image.path(:big), '/images/image-big.jpg'
+    assert_equal record.image.path, '/image.jpg'
+    assert_equal record.image.path(:small), '/image-small.jpg'
+    assert_equal record.image.path(:big), '/image-big.jpg'
 
   end
 

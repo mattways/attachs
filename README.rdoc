@@ -43,6 +43,12 @@ You can use proc, will receive an ImageMagick object wrapper, with it you can do
     attached_image :prop, :presets => { :big => proc { |image| image.convert :resize => '100x100' } }
   end
 
+You can also specify a default file/image to use:
+  class Model < ActiveRecord::Base
+    attr_accessible :prop
+    attached_file :prop, :default => 'file.txt'
+  end
+
 The validation works very similar to paperclip:
   class Model < ActiveRecord::Base
     attr_accessible :prop
