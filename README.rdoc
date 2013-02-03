@@ -18,6 +18,9 @@ Then bundle:
   
 = Usage
 
+Set the engine at the end of you routes.rb:
+  mount RailsUploads::Engine => '/' (Will be use to generate on the fly missing image presets)
+
 Add the column to your table (just a string):
   create_table :models do |t|
     t.string :prop
@@ -26,34 +29,27 @@ Add the column to your table (just a string):
 If you need a file:
   class Model < ActiveRecord::Base
     attr_accessible :prop
-    attached_file :prop
+    attached_file :prop, :default => 'file.txt' # It's optional set a default file, the path it's relative to the public folder (used to generate the url)
   end
 
 If you need a image:
   class Model < ActiveRecord::Base
     attr_accessible :prop
-    attached_image :prop, :presets => { :big => { :method => :fit, :width => 1024, :height => 768 }, :small => { :method => :fill, :width => 120, :height => :120 } }
+    attached_image :prop, :presets => [:small, :big], :default => 'assets/image.jpg' # It's optional set a default image, the path it's relative to the publica folder (used to generate the url)
   end
 
-(Fill will scale the image to fill all the space and then crop and fit will scale the image until it fit in the space without cropping)
-  
-You can use proc, will receive an ImageMagick object wrapper, with it you can do whatever you want using convert method:
-  class Model < ActiveRecord::Base
-    attr_accessible :prop
-    attached_image :prop, :presets => { :big => proc { |image| image.convert :resize => '100x100' } }
-  end
-
-You can also specify a default file/image to use:
-  class Model < ActiveRecord::Base
-    attr_accessible :prop
-    attached_file :prop, :default => 'file.txt'
-  end
+Define presets in your application.rb
+  config.uploads.presets = {
+    :big => { :method => :fit, :width => 1024, :height => 768 }, # Fit will scale the image until it fit in the space without cropping
+    :small => { :method => :fill, :width => 120, :height => :120 }, # Fill will scale the image to fill all the space and then crop
+    :custom => proc { |image| image.convert :resize => '100x100' } # ImageMagick wrapper to do whatever you want
+  }
 
 The validation works very similar to paperclip:
   class Model < ActiveRecord::Base
     attr_accessible :prop
     attached_file :prop
-    validates :prop, :attachment_presence => true, :attachment_size => { :in => 0..4.megabytes }, :attachment_content_type => { :in => ['jpg'] }
+    validates :prop, :attachment_presence => true, :attachment_size => { :in => 0..4.megabytes }, :attachment_content_type => { :in => ['txt'] }
   end
 
 If you want to translate the errores the keys are:

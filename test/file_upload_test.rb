@@ -12,7 +12,7 @@ class FileUploadTest < ActiveSupport::TestCase
     assert @file.exists?
     assert_equal 58841, @file.size
     assert_equal '.jpg', @file.extname
-    assert_equal File.join('', 'uploads', @file.filename), @file.path
+    assert_equal File.join('', 'uploads', 'files', @file.filename), @file.path
 
     # Delete test
     
@@ -22,7 +22,7 @@ class FileUploadTest < ActiveSupport::TestCase
     # Store and delete tests
     
     @file.store
-    uploads_path = Rails.root.join('public', 'uploads', @file.filename)
+    uploads_path = Rails.root.join('public', 'uploads', 'files', @file.filename).to_s
     assert File.exists?(uploads_path)
     assert_equal uploads_path, @file.realpath
     

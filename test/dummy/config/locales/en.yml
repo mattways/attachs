@@ -3,10 +3,3 @@
 
 en:
   hello: "Hello world"
-  errors:
-    messages:
-      attachment_presence: "File not found"
-      attachment_content_type: "File content type invalid only: %{types}"
-      attachment_size_less_than: "File size to big max: %{limit}"
-      attachment_size_greater_than: "File size to small min: %{limit}"
-      attachment_size_in: "File size not in range %{begin} - %{end}"

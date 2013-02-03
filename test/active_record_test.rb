@@ -6,7 +6,7 @@ class ActiveRecordTest < ActiveSupport::TestCase
 
     # Save
 
-    image_fixture_path = "#{ActiveSupport::TestCase.fixture_path}/image.jpg"
+    image_fixture_path = ::File.join(ActiveSupport::TestCase.fixture_path, 'image.jpg')
     record = FileUpload.create(:file => Rack::Test::UploadedFile.new(image_fixture_path, 'image/jpeg'))
 
     image_filename = record.file.filename
@@ -17,7 +17,7 @@ class ActiveRecordTest < ActiveSupport::TestCase
 
     # Update
 
-    doc_fixture_path = "#{ActiveSupport::TestCase.fixture_path}/file.txt"
+    doc_fixture_path = ::File.join(ActiveSupport::TestCase.fixture_path, 'file.txt')
     record.update_attributes :file => Rack::Test::UploadedFile.new(doc_fixture_path, 'text/plain')
 
     doc_filename = record.file.filename 
@@ -41,14 +41,14 @@ class ActiveRecordTest < ActiveSupport::TestCase
     # File
 
     record = FileUpload.create
-    assert_equal record.file.path, '/file.txt'
+    assert_equal ::File.join('', 'file.txt'), record.file.path
   
     # Image
 
     record = ImageUpload.create
-    assert_equal record.image.path, '/assets/image.jpg'
-    assert_equal record.image.path(:small), '/assets/image-small.jpg'
-    assert_equal record.image.path(:big), '/assets/image-big.jpg'
+    assert_equal ::File.join('', 'assets', 'image.jpg'), record.image.path
+    assert_equal ::File.join('', 'assets', 'image-small.jpg'), record.image.path(:small)
+    assert_equal ::File.join('', 'assets', 'image-big.jpg'), record.image.path(:big)
 
   end
 

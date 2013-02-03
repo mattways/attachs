@@ -25,7 +25,7 @@ class ImageStringTest < ActiveSupport::TestCase
     FileUtils.cp File.join(ActiveSupport::TestCase.fixture_path, filename), Rails.root.join('public', 'uploads', filename)
     FileUtils.cp File.join(ActiveSupport::TestCase.fixture_path, filename), Rails.root.join('public', 'uploads', filename.gsub('.', '-big.'))
     FileUtils.cp File.join(ActiveSupport::TestCase.fixture_path, filename), Rails.root.join('public', 'uploads', filename.gsub('.', '-small.'))
-    @options = { :presets => { :big => { :method => :fit, :width => 1024, :height => 768  }, :small => { :method => :center, :width => 120, :height => 120 } } }
+    @options = { :presets => [:small, :big] }
     @image = RailsUploads::Types::Image.new(filename, @options)
   end
 

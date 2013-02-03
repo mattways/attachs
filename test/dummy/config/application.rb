@@ -54,6 +54,13 @@ module Dummy
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+
+    config.uploads.default_presets = [:small]
+    config.uploads.presets = {
+      :small => { :method => :fit, :width => 120, :height => 120 },
+      :big => { :method => :fill, :width => 1024, :height => 768 }
+    }
+
   end
 end
 
