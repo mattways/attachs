@@ -6,15 +6,15 @@ class ControllerTest < ActionDispatch::IntegrationTest
   setup :create_image
 
   test "should generate preset" do
-    Rails.application.config.uploads.presets[:other] = { :width => 300, :height => 300 }
-    path = ::File.join('', 'uploads', 'images', 'other', @image.filename)
+    ::File.delete @image.realpath(:small)
+    path = ::File.join('', 'uploads', 'images', 'small', @image.filename)
 
     get path
     assert_redirected_to path
 
-    realpath = Rails.root.join('public', 'uploads', 'images', 'other', @image.filename)
+    realpath = Rails.root.join('public', 'uploads', 'images', 'small', @image.filename)
     assert ::File.exists?(realpath)
-    ::File.delete realpath
+    @image.delete
   end
 
   protected

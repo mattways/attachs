@@ -7,7 +7,7 @@ module RailsUploads
       end
 
       def presets
-        (Rails.application.config.uploads.default_presets | (@options[:presets] || []))
+        (Rails.application.config.uploads.default_presets | (@options[:presets] or []))
       end
 
       def default_path(*args)
@@ -27,7 +27,7 @@ module RailsUploads
       def delete
         super() do
           if has_presets?
-            @options[:presets].each do |name|
+            presets.each do |name|
               ::File.delete realpath(name) if exists? name
             end
           end
