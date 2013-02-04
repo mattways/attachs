@@ -32,11 +32,11 @@ class ValidatorsTest < ActiveSupport::TestCase
 
     @record.file_size = fixture_file_upload(::File.join('', 'file_big.txt'), 'text/plain')
     assert !@record.valid?
-    assert_equal [I18n.t('errors.messages.attachment_size_less_than', :limit => 15.kilobytes)], @record.errors[:file_size]
+    assert_equal [I18n.t('errors.messages.attachment_size_less_than', :less_than => 15.kilobytes)], @record.errors[:file_size]
 
     @record.file_size = fixture_file_upload(::File.join('', 'file_empty.txt'), 'text/plain')
     assert !@record.valid?
-    assert_equal [I18n.t('errors.messages.attachment_size_greater_than', :limit => 10.bytes)], @record.errors[:file_size]
+    assert_equal [I18n.t('errors.messages.attachment_size_greater_than', :greater_than => 10.bytes)], @record.errors[:file_size]
 
     @record.file_size = fixture_file_upload(::File.join('', 'file.txt'), 'text/plain')
     assert !@record.valid?
@@ -44,11 +44,11 @@ class ValidatorsTest < ActiveSupport::TestCase
 
     @record.image_size = fixture_file_upload(::File.join('', 'image_big.jpg'), 'image/jpeg')
     assert !@record.valid?
-    assert_equal [I18n.t('errors.messages.attachment_size_in', :begin => 2.kilobytes, :end => 60.kilobytes)], @record.errors[:image_size]
+    assert_equal [I18n.t('errors.messages.attachment_size_in', :greater_than => 2.kilobytes, :less_than => 60.kilobytes)], @record.errors[:image_size]
 
     @record.image_size = fixture_file_upload(::File.join('', 'image_empty.jpg'), 'image/jpeg')
     assert !@record.valid?
-    assert_equal [I18n.t('errors.messages.attachment_size_in', :begin => 2.kilobytes, :end => 60.kilobytes)], @record.errors[:image_size]
+    assert_equal [I18n.t('errors.messages.attachment_size_in', :greater_than => 2.kilobytes, :less_than => 60.kilobytes)], @record.errors[:image_size]
 
     @record.image_size = fixture_file_upload(::File.join('', 'image.jpg'), 'image/jpeg')
     assert !@record.valid?

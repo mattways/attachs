@@ -6,14 +6,14 @@ class AttachmentSizeValidator < RailsUploads::Validators::Base
     if !has_default?(record, attribute) and value 
       if options.has_key? :in
         unless options[:in].include? value.size
-          add_error record, attribute, 'attachment_size_in', :begin => options[:in].begin, :end => options[:in].end
+          add_error record, attribute, 'attachment_size_in', :greater_than => options[:in].begin, :less_than => options[:in].end
         end          
       else    
         if options.has_key? :less_than and value.size > options[:less_than]
-          add_error record, attribute, 'attachment_size_less_than', :limit => options[:less_than]
+          add_error record, attribute, 'attachment_size_less_than', :less_than => options[:less_than]
         end         
         if options.has_key? :greater_than and value.size < options[:greater_than]
-          add_error record, attribute, 'attachment_size_greater_than', :limit => options[:greater_than]
+          add_error record, attribute, 'attachment_size_greater_than', :greater_than => options[:greater_than]
         end         
       end      
     end

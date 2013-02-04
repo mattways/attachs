@@ -55,10 +55,10 @@ The validation works very similar to paperclip:
 
 If you want to translate the errores the keys are:
   errors.messages.attachment_presence
-  errors.messages.attachment_size_in (:begin, :end)
-  errors.messages.attachment_size_less_than (:limit)
-  errors.messages.attachment_size_greater_than (:limit)
-  errors.messages.attachment_content_type (:types)
+  errors.messages.attachment_size_in # :less_than and :greater_than
+  errors.messages.attachment_size_less_than  # :less_than
+  errors.messages.attachment_size_greater_than # :greater_than
+  errors.messages.attachment_content_type # :types
 
 In your views:
   a{ :href => record.file.path } # To get the file
