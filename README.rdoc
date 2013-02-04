@@ -1,6 +1,4 @@
 === NOTE: Presets must be defined in your application.rb and referenced in your models from 0.1.0
----
-=== NOTE: Attachment method has been removed just use a regular string from version 0.0.5
 
 ---
 
