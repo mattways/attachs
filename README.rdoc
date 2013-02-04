@@ -1,4 +1,5 @@
 === NOTE: Presets must be defined in your application.rb and referenced in your models from 0.1.0
+---
 === NOTE: Attachment method has been removed just use a regular string from version 0.0.5
 
 ---
@@ -19,7 +20,7 @@ Then bundle:
   
 = Usage
 
-Set the engine at the end of you routes.rb:
+Mount the engine at the end of you routes.rb:
   mount RailsUploads::Engine => '/' (Will be use to generate on the fly missing image presets)
 
 Add the column to your table (just a string):
@@ -45,6 +46,7 @@ Define presets in your application.rb
     :small => { :method => :fill, :width => 120, :height => :120 }, # Fill will scale the image to fill all the space and then crop
     :custom => proc { |image| image.convert :resize => '100x100' } # ImageMagick wrapper to do whatever you want
   }
+  config.uploads.default_presets = [:small] # Define the default presets for all models with attached images
 
 The validation works very similar to paperclip:
   class Model < ActiveRecord::Base
