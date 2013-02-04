@@ -19,7 +19,7 @@ Then bundle:
 = Usage
 
 Mount the engine at the end of you routes.rb:
-  mount RailsUploads::Engine => '/' (Will be use to generate on the fly missing image presets)
+  mount RailsUploads::Engine => '/' # Will be use to generate on the fly missing image presets
 
 Add the column to your table (just a string):
   create_table :models do |t|
