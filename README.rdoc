@@ -1,7 +1,3 @@
-=== NOTE: Presets must be defined in your application.rb and referenced in your models from 0.1.0
-
----
-
 {<img src="https://codeclimate.com/github/mattways/rails-uploads.png" />}[https://codeclimate.com/github/mattways/rails-uploads] {<img src="https://travis-ci.org/mattways/rails-uploads.png?branch=master" alt="Build Status" />}[https://travis-ci.org/mattways/rails-uploads] {<img src="https://gemnasium.com/mattways/rails-uploads.png" alt="Dependency Status" />}[https://gemnasium.com/mattways/rails-uploads]
 
 = Rails Uploads
@@ -68,3 +64,7 @@ In your views:
 In your forms:
   = f.file_field :prop
 
+---
+
+To migrate from versions before 0.1.0 you need to reorganize uploads with this task after define your presets in your application.rb:
+  rake uploads:migrate
