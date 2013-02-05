@@ -54,8 +54,7 @@ module RailsUploads
 
       def resize_to_fit(max_width, max_height)
         width, height = dimensions
-        ratios = [max_width/width.to_f, max_height/height.to_f]
-        scale = ratios.send((max_width < width or max_height < height) ? :max : :min)
+        scale = [max_width/width.to_f, max_height/height.to_f].min
         convert :resize => "#{(scale*width).to_i}x#{(scale*height).to_i}", :gravity => 'center'
       end
 
