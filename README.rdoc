@@ -64,7 +64,19 @@ In your views:
 In your forms:
   = f.file_field :prop
 
----
+= FAQ
+
+== How can I use a cdn with this plugin?
+
+Just define a base url in your application.rb:
+  config.uploads.base_url = 'http://example.com'
+  
+== How I clean a preset?
+
+Just remove the corresponding folder in uploads/images:
+  rake uploads:preset:clean[preset]
+
+== How to migrate from versions before 0.1.0?
 
 To migrate from versions before 0.1.0 you need to reorganize uploads with this task after define your presets in your application.rb:
   rake uploads:migrate
