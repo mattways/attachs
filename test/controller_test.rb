@@ -6,6 +6,9 @@ class ControllerTest < ActionDispatch::IntegrationTest
   setup :create_image
 
   test "should generate preset" do
+    
+    puts @image.url
+    
     ::File.delete @image.realpath(:small)
     path = ::File.join('', 'uploads', 'images', 'small', @image.filename)
 

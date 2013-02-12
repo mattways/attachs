@@ -3,7 +3,7 @@ module RailsUploads
     class File
       
       def initialize(source, options={})
-        if source.is_a? ActionDispatch::Http::UploadedFile or source.is_a? Rack::Test::UploadedFile
+        if source.is_a? ::ActionDispatch::Http::UploadedFile or source.is_a? ::Rack::Test::UploadedFile
           @upload = source          
           @stored = false
           @default = false
@@ -64,6 +64,11 @@ module RailsUploads
       def path(*args)
         return nil if is_deleted?
         ::File.join('', public_path(*args))
+      end
+
+      def url(*args)
+        return nil if is_deleted?
+        ::File.join(Rails.application.config.uploads.base_url, path(*args))
       end
       
       def realpath(*args)

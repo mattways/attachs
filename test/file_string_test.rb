@@ -13,7 +13,7 @@ class FileStringTest < ActiveSupport::TestCase
     assert_equal '.txt', @file.extname
     assert_equal ::File.join('', 'uploads', 'files', @file.filename), @file.path
     assert_equal Rails.root.join('public', 'uploads', 'files', @file.filename).to_s, @file.realpath
-    
+
     # Delete tests
 
     uploads_path = Rails.root.join('public', 'uploads', 'files', @file.filename).to_s
