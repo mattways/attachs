@@ -60,6 +60,7 @@ In your views:
   a{ :href => record.file.path } # To get the file
   a{ :href => record.image.path } # To get the original image
   a{ :href => record.image.path(:big) } # To get the thumb
+  a{ :href => record.image.url(:big) } # If you want to use a base url
 
 In your forms:
   = f.file_field :prop
@@ -68,12 +69,12 @@ In your forms:
 
 == How can I use a cdn with this plugin?
 
-Just define a base url in your application.rb:
+Just define a base url in your application.rb and use url method instead of path:
   config.uploads.base_url = 'http://example.com'
   
-== How I clean a preset?
+== How can I clean a preset?
 
-Just remove the corresponding folder in uploads/images:
+Just remove the corresponding folder in uploads/images manually or with rake task:
   rake uploads:preset:clean[preset]
 
 == How to migrate from versions before 0.1.0?
