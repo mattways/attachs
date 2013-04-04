@@ -5,7 +5,7 @@ class FileUploadTest < ActiveSupport::TestCase
 
   setup :create_file
 
-  test "methods should work properly" do
+  test 'methods should work properly' do
     
     # Basic tests
     
@@ -35,7 +35,7 @@ class FileUploadTest < ActiveSupport::TestCase
   protected
 
   def create_file
-    @file = RailsUploads::Types::File.new(fixture_file_upload('/image.jpg', 'image/jpeg'))
+    @file = Rails::Uploads::Types::File.new(fixture_file_upload('/image.jpg', 'image/jpeg'))
   end
 
 end

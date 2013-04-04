@@ -16,6 +16,7 @@ namespace :uploads do
       end
     end
   end
+
   namespace :presets do
     desc 'Clean preset'
     task :clean, [:preset] do |t, args|

@@ -5,7 +5,7 @@ class ImageUploadTest < ActiveSupport::TestCase
 
   setup :create_image
 
-  test "should save/destory main image and thumbs" do
+  test 'should save/destory main image and thumbs' do
 
     #assert_equal 58841, @image.size
     #assert_equal 89314, @image.size(:big)
@@ -27,7 +27,7 @@ class ImageUploadTest < ActiveSupport::TestCase
 
   def create_image
     @options = { :presets => [:small, :big] }
-    @image = RailsUploads::Types::Image.new(fixture_file_upload(::File.join('', 'image.jpg'), 'image/jpeg'), @options)
+    @image = Rails::Uploads::Types::Image.new(fixture_file_upload(::File.join('', 'image.jpg'), 'image/jpeg'), @options)
     @image.store
   end
 

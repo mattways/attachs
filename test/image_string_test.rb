@@ -4,7 +4,7 @@ class ImageStringTest < ActiveSupport::TestCase
 
   setup :create_image
 
-  test "should destory main image and thumbs" do
+  test 'should destory main image and thumbs' do
 
     original = @image.realpath
     big = @image.realpath(:big)
@@ -30,7 +30,7 @@ class ImageStringTest < ActiveSupport::TestCase
     FileUtils.cp fixture, Rails.root.join('public', 'uploads', 'images', 'big', filename)
     FileUtils.cp fixture, Rails.root.join('public', 'uploads', 'images', 'small', filename)
     @options = { :presets => [:small, :big] }
-    @image = RailsUploads::Types::Image.new(filename, @options)
+    @image = Rails::Uploads::Types::Image.new(filename, @options)
   end
 
 end

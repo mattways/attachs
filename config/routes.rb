@@ -1,5 +1,5 @@
-RailsUploads::Engine.routes.draw do
+Rails::Uploads::Engine.routes.draw do
 
-  match 'uploads/images/:preset/:image' => 'uploads#generate_image_preset', :status => 404
+  match 'uploads/images/:preset/:image' => 'presets#generate', :status => 404
 
 end

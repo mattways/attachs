@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
 
-  mount RailsUploads::Engine => '/'
+  mount Rails::Uploads::Engine => '/'
+
 end

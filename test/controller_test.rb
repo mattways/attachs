@@ -5,7 +5,7 @@ class ControllerTest < ActionDispatch::IntegrationTest
 
   setup :create_image
 
-  test "should generate preset" do
+  test 'should generate preset' do
     ::File.delete @image.realpath(:small)
     path = ::File.join('', 'uploads', 'images', 'small', @image.filename)
 
@@ -20,7 +20,7 @@ class ControllerTest < ActionDispatch::IntegrationTest
   protected
 
   def create_image
-    @image = RailsUploads::Types::Image.new(fixture_file_upload(::File.join('', 'image.jpg'), 'image/jpeg'))
+    @image = Rails::Uploads::Types::Image.new(fixture_file_upload(::File.join('', 'image.jpg'), 'image/jpeg'))
     @image.store
   end
 
