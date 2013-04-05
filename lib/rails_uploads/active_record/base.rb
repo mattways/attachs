@@ -1,6 +1,6 @@
-module Rails
-  module Uploads
-    module ActiveRecord
+module RailsUploads
+  module ActiveRecord
+    module Base
       module NonAttachable
     
         def self.extended(base)
@@ -35,7 +35,7 @@ module Rails
         end
 
         def make_attachable
-          send :include, Rails::Uploads::ActiveRecord::Attachable
+          send :include, RailsUploads::ActiveRecord::Base::Attachable
           before_save :store_attachments, :check_changed_attachments
           after_save :remove_deleted_attachments
           before_destroy :delete_attachments           
@@ -52,7 +52,7 @@ module Rails
         def define_attachable_attribute_method_set(attr, options)
           define_method "#{attr}=" do |value|
             @attachments = {} if defined?(@attachments).nil?
-            if value.is_a? ::ActionDispatch::Http::UploadedFile or value.is_a? ::Rack::Test::UploadedFile
+            if value.is_a? ActionDispatch::Http::UploadedFile or value.is_a? Rack::Test::UploadedFile
               @attachments[attr] = get_attachment_instance(value, options)
               super(@attachments[attr].filename)
             end
@@ -75,7 +75,7 @@ module Rails
 
         def get_attachment_instance(source, options)
           klass = options.has_key?(:type) ? options[:type].to_s.classify : 'File'
-          Rails::Uploads::Types.const_get(klass).new(source, options)  
+          RailsUploads::Types.const_get(klass).new(source, options)  
         end
         
         def check_changed_attachments

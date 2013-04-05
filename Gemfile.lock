@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails-uploads (0.1.3)
+    rails_uploads (0.1.4)
       rails (>= 3.2.8)
 
 GEM
@@ -94,5 +94,5 @@ PLATFORMS
 
 DEPENDENCIES
   jquery-rails
-  rails-uploads!
+  rails_uploads!
   sqlite3

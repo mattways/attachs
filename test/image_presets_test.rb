@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class PresetsTest < ActiveSupport::TestCase
+class ImagePresetsTest < ActiveSupport::TestCase
   include ActionDispatch::TestProcess
 
   setup :create_image

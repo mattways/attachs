@@ -1,4 +1,4 @@
-class AttachmentSizeValidator < Rails::Uploads::Validators::Base
+class AttachmentSizeValidator < RailsUploads::Validators::Base
   
   # validates :prop, :attachment_size => { :in => 0..4.megabytes }
   

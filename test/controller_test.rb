@@ -20,7 +20,7 @@ class ControllerTest < ActionDispatch::IntegrationTest
   protected
 
   def create_image
-    @image = Rails::Uploads::Types::Image.new(fixture_file_upload(::File.join('', 'image.jpg'), 'image/jpeg'))
+    @image = RailsUploads::Types::Image.new(fixture_file_upload(::File.join('', 'image.jpg'), 'image/jpeg'))
     @image.store
   end
 

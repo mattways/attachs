@@ -35,7 +35,7 @@ class FileUploadTest < ActiveSupport::TestCase
   protected
 
   def create_file
-    @file = Rails::Uploads::Types::File.new(fixture_file_upload('/image.jpg', 'image/jpeg'))
+    @file = RailsUploads::Types::File.new(fixture_file_upload('/image.jpg', 'image/jpeg'))
   end
 
 end

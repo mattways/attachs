@@ -1,4 +1,4 @@
-class AttachmentContentTypeValidator < Rails::Uploads::Validators::Base
+class AttachmentContentTypeValidator < RailsUploads::Validators::Base
   
   # validates :prop, :attachment_content_type => { :in => ['png', 'gif'] }
   

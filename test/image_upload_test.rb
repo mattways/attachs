@@ -27,7 +27,7 @@ class ImageUploadTest < ActiveSupport::TestCase
 
   def create_image
     @options = { :presets => [:small, :big] }
-    @image = Rails::Uploads::Types::Image.new(fixture_file_upload(::File.join('', 'image.jpg'), 'image/jpeg'), @options)
+    @image = RailsUploads::Types::Image.new(fixture_file_upload(::File.join('', 'image.jpg'), 'image/jpeg'), @options)
     @image.store
   end
 

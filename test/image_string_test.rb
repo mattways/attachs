@@ -30,7 +30,7 @@ class ImageStringTest < ActiveSupport::TestCase
     FileUtils.cp fixture, Rails.root.join('public', 'uploads', 'images', 'big', filename)
     FileUtils.cp fixture, Rails.root.join('public', 'uploads', 'images', 'small', filename)
     @options = { :presets => [:small, :big] }
-    @image = Rails::Uploads::Types::Image.new(filename, @options)
+    @image = RailsUploads::Types::Image.new(filename, @options)
   end
 
 end
