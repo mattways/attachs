@@ -1,6 +1,6 @@
 require 'test_helper'
  
-class ControllerTest < ActionDispatch::IntegrationTest
+class GenerateTest < ActionDispatch::IntegrationTest
   include ActionDispatch::TestProcess
 
   setup :create_image
