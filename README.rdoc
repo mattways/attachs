@@ -1,7 +1,3 @@
-=== NOTE: From version 0.1.3 and above RailsUploads::Engine renamed Rails::Uploads::Engine
-
----
-
 {<img src="https://codeclimate.com/github/mattways/rails_uploads.png" />}[https://codeclimate.com/github/mattways/rails_uploads] {<img src="https://travis-ci.org/mattways/rails_uploads.png?branch=master" alt="Build Status" />}[https://travis-ci.org/mattways/rails_uploads] {<img src="https://gemnasium.com/mattways/rails_uploads.png" alt="Dependency Status" />}[https://gemnasium.com/mattways/rails_uploads]
 
 = Rails Uploads
@@ -19,7 +15,7 @@ Then bundle:
 = Usage
 
 Mount the engine at the end of you routes.rb:
-  mount Rails::Uploads::Engine => '/' # Will be use to generate on the fly missing image presets
+  mount RailsUploads::Engine => '/' # Will be use to generate on the fly missing image presets
 
 Add the column to your table (just a string):
   create_table :models do |t|
