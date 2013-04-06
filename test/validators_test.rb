@@ -5,7 +5,7 @@ class ValidatorsTest < ActiveSupport::TestCase
 
   setup :create_record
 
-  test 'should check if file is present' do
+  test "should check if file is present" do
 
     assert !@record.valid?
     assert_equal [I18n.t('errors.messages.attachment_presence')], @record.errors[:file_presence]
@@ -16,7 +16,7 @@ class ValidatorsTest < ActiveSupport::TestCase
 
   end
 
-  test 'should check the file content type' do
+  test "should check the file content type" do
 
     @record.image_content_type = fixture_file_upload(::File.join('', 'file.txt'), 'text/plain')
     assert !@record.valid?
@@ -28,7 +28,7 @@ class ValidatorsTest < ActiveSupport::TestCase
 
   end
 
-  test 'should check the file size' do
+  test "should check the file size" do
 
     @record.file_size = fixture_file_upload(::File.join('', 'file_big.txt'), 'text/plain')
     assert !@record.valid?
@@ -56,7 +56,7 @@ class ValidatorsTest < ActiveSupport::TestCase
 
   end
 
-  test 'should check all the validations together' do
+  test "should check all the validations together" do
 
     @record.file_all = fixture_file_upload(::File.join('', 'file.txt'), 'text/plain')
     assert !@record.valid?

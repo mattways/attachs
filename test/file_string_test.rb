@@ -4,7 +4,7 @@ class FileStringTest < ActiveSupport::TestCase
 
   setup :create_file
 
-  test 'methods should work properly' do
+  test "methods should work properly" do
 
     # Basic tests
 
@@ -18,7 +18,7 @@ class FileStringTest < ActiveSupport::TestCase
 
     uploads_path = Rails.root.join('public', 'uploads', 'files', @file.filename).to_s
     @file.delete
-    assert !File.exists?(uploads_path)
+    assert !::File.exists?(uploads_path)
     assert !@file.exists?
 
   end

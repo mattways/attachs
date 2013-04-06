@@ -2,7 +2,7 @@ require 'test_helper'
 
 class RecordsTest < ActiveSupport::TestCase
   
-  test 'should save/update/destroy from the database and save/destroy the file' do
+  test "should save/update/destroy from the database and save/destroy the file" do
 
     # Save
 
@@ -13,7 +13,7 @@ class RecordsTest < ActiveSupport::TestCase
     assert_equal image_filename, FileUpload.first.file.filename
 
     image_upload_path = record.file.realpath
-    assert File.exists?(image_upload_path)
+    assert ::File.exists?(image_upload_path)
 
     # Update
 
@@ -25,18 +25,18 @@ class RecordsTest < ActiveSupport::TestCase
     assert_equal doc_filename, FileUpload.first.file.filename
     
     doc_upload_path = record.file.realpath
-    assert !File.exists?(image_upload_path)
-    assert File.exists?(doc_upload_path)
+    assert !::File.exists?(image_upload_path)
+    assert ::File.exists?(doc_upload_path)
 
     # Destroy
 
     record.destroy
     assert !FileUpload.first
-    assert !File.exists?(doc_upload_path)
+    assert !::File.exists?(doc_upload_path)
 
   end
 
-  test 'should take default file/image and shouldn\'t store/delete it' do
+  test "should take default file/image and shouldn't store/delete it" do
 
     # File
 

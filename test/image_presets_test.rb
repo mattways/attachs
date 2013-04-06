@@ -5,7 +5,7 @@ class ImagePresetsTest < ActiveSupport::TestCase
 
   setup :create_image
 
-  test 'should save/destory main image and thumbs' do
+  test "should save/destory main image and thumbs" do
 
     #assert_equal 58841, @record.image.size
     #assert_equal 89314, @record.image.size(:big)
@@ -17,9 +17,9 @@ class ImagePresetsTest < ActiveSupport::TestCase
     
     @record.destroy
    
-    assert !File.exists?(original)
-    assert !File.exists?(big)
-    assert !File.exists?(small)
+    assert !::File.exists?(original)
+    assert !::File.exists?(big)
+    assert !::File.exists?(small)
 
   end
 

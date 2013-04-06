@@ -5,7 +5,7 @@ class GenerateTest < ActionDispatch::IntegrationTest
 
   setup :create_image
 
-  test 'should generate preset' do
+  test "should generate preset" do
     ::File.delete @image.realpath(:small)
     path = ::File.join('', 'uploads', 'images', 'small', @image.filename)
 

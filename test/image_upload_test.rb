@@ -5,7 +5,7 @@ class ImageUploadTest < ActiveSupport::TestCase
 
   setup :create_image
 
-  test 'should save/destory main image and thumbs' do
+  test "should save/destory main image and thumbs" do
 
     #assert_equal 58841, @image.size
     #assert_equal 89314, @image.size(:big)
@@ -17,9 +17,9 @@ class ImageUploadTest < ActiveSupport::TestCase
     
     @image.delete
     
-    assert !File.exists?(original)
-    assert !File.exists?(big)
-    assert !File.exists?(small)
+    assert !::File.exists?(original)
+    assert !::File.exists?(big)
+    assert !::File.exists?(small)
 
   end
 

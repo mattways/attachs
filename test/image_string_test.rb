@@ -4,7 +4,7 @@ class ImageStringTest < ActiveSupport::TestCase
 
   setup :create_image
 
-  test 'should destory main image and thumbs' do
+  test "should destory main image and thumbs" do
 
     original = @image.realpath
     big = @image.realpath(:big)
@@ -12,9 +12,9 @@ class ImageStringTest < ActiveSupport::TestCase
     
     @image.delete
     
-    assert !File.exists?(original)
-    assert !File.exists?(big)
-    assert !File.exists?(small)
+    assert !::File.exists?(original)
+    assert !::File.exists?(big)
+    assert !::File.exists?(small)
   
   end
 
