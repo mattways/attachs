@@ -22,7 +22,7 @@ module RailsUploads
         @options = options
       end
 
-      def has_default?
+      def is_default?
         @default
       end
 
@@ -38,17 +38,14 @@ module RailsUploads
         @deleted
       end 
 
-      def default_path(*args)
-        @options[:default]
-      end
-
       def exists?(*args)
-        is_deleted? ? false : ::File.exists?(realpath(*args))
+        return false if is_deleted?
+        ::File.exists? realpath(*args)
       end
 
       def size(*args)
         return 0 if is_deleted?
-        (exists? ? ::File.size(realpath(*args)) : 0)
+        ::File.size realpath(*args)
       end
 
       def extname
@@ -63,12 +60,12 @@ module RailsUploads
 
       def path(*args)
         return nil if is_deleted?
-        ::File.join('', public_path(*args))
+        ::File.join '', public_path(*args)
       end
 
       def url(*args)
         return nil if is_deleted?
-        ::File.join(Rails.application.config.uploads.base_url, path(*args))
+        ::File.join Rails.application.config.uploads.base_url, path(*args)
       end
       
       def realpath(*args)
@@ -88,7 +85,7 @@ module RailsUploads
       end
       
       def delete
-        if not has_default? and is_stored? and exists?
+        if not is_default? and is_stored? and exists?
           ::File.delete realpath
           yield if block_given?
           @stored = false
@@ -104,11 +101,11 @@ module RailsUploads
       end
 
       def destination_path(*args)
-        Rails.root.join('public', public_path(*args))
+        Rails.root.join 'public', public_path(*args)
       end
 
       def public_path(*args)
-        has_default? ? default_path(*args) : ::File.join('uploads', store_path(*args), filename)
+        ::File.join 'uploads', store_path(*args), filename
       end
 
       def store_path(*args)

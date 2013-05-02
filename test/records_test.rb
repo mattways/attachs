@@ -41,14 +41,14 @@ class RecordsTest < ActiveSupport::TestCase
     # File
 
     record = FileUpload.create
-    assert_equal ::File.join('', 'file.txt'), record.file.path
+    assert_equal ::File.join('', 'uploads', 'files', 'default.txt'), record.file.path
   
     # Image
 
     record = ImageUpload.create
-    assert_equal ::File.join('', 'assets', 'image.jpg'), record.image.path
-    assert_equal ::File.join('', 'assets', 'image-small.jpg'), record.image.path(:small)
-    assert_equal ::File.join('', 'assets', 'image-big.jpg'), record.image.path(:big)
+    assert_equal ::File.join('', 'uploads', 'images', 'original', 'default.jpg'), record.image.path
+    assert_equal ::File.join('', 'uploads', 'images', 'small', 'default.jpg'), record.image.path(:small)
+    assert_equal ::File.join('', 'uploads', 'images', 'big', 'default.jpg'), record.image.path(:big)
 
   end
 

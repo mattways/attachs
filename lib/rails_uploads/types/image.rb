@@ -7,11 +7,7 @@ module RailsUploads
       end
 
       def presets
-        (Rails.application.config.uploads.default_presets | (@options[:presets] or []))
-      end
-
-      def default_path(*args)
-        args.any? ? super().reverse.sub('.', "-#{args[0].to_s.gsub('_', '-')}.".reverse).reverse : super()
+        Rails.application.config.uploads.default_presets | (@options[:presets] or [])
       end
       
       def store

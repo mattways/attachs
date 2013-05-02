@@ -1,3 +1,7 @@
+=== NOTE: From version 0.1.5 and above defaults must be put in public/uploads folder
+
+---
+
 {<img src="https://codeclimate.com/github/mattways/rails_uploads.png" />}[https://codeclimate.com/github/mattways/rails_uploads] {<img src="https://travis-ci.org/mattways/rails_uploads.png?branch=master" alt="Build Status" />}[https://travis-ci.org/mattways/rails_uploads] {<img src="https://gemnasium.com/mattways/rails_uploads.png" alt="Dependency Status" />}[https://gemnasium.com/mattways/rails_uploads]
 
 = Rails Uploads
@@ -25,13 +29,13 @@ Add the column to your table (just a string):
 If you need a file:
   class Model < ActiveRecord::Base
     attr_accessible :prop
-    attached_file :prop, :default => 'file.txt' # It's optional set a default file, the path it's relative to the public folder (used to generate the url)
+    attached_file :prop, :default => 'file.txt' # It's optional set a default file
   end
 
 If you need a image:
   class Model < ActiveRecord::Base
     attr_accessible :prop
-    attached_image :prop, :presets => [:small, :big], :default => 'assets/image.jpg' # It's optional set a default image, the path it's relative to the publica folder (used to generate the url)
+    attached_image :prop, :presets => [:small, :big], :default => 'assets/image.jpg' # It's optional set a default image
   end
 
 Define presets in your application.rb
