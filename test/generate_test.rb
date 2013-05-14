@@ -12,7 +12,7 @@ class GenerateTest < ActionDispatch::IntegrationTest
     get path
     assert_redirected_to path
 
-    realpath = Rails.root.join('public', 'uploads', 'images', 'small', @image.filename)
+    realpath = Rails.root.join('tmp', 'uploads', 'images', 'small', @image.filename)
     assert ::File.exists?(realpath)
     @image.delete
   end

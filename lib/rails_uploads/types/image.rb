@@ -33,7 +33,7 @@ module RailsUploads
       protected
 
       def generate_preset(name)
-        check_store_dir(name)
+        create_dir(name)
         image = RailsUploads::Magick::Image.new(realpath, realpath(name))
         settings = Rails.application.config.uploads.presets[name]
         if settings.is_a? Proc

@@ -21,14 +21,14 @@ class ImageStringTest < ActiveSupport::TestCase
   protected
 
   def create_image
-    FileUtils.mkdir_p Rails.root.join('public', 'uploads', 'images', 'original')
-    FileUtils.mkdir_p Rails.root.join('public', 'uploads', 'images', 'big')
-    FileUtils.mkdir_p Rails.root.join('public', 'uploads', 'images', 'small')
+    FileUtils.mkdir_p Rails.root.join('tmp', 'uploads', 'images', 'original')
+    FileUtils.mkdir_p Rails.root.join('tmp', 'uploads', 'images', 'big')
+    FileUtils.mkdir_p Rails.root.join('tmp', 'uploads', 'images', 'small')
     filename = 'image.jpg'
     fixture = ::File.join(ActiveSupport::TestCase.fixture_path, filename)
-    FileUtils.cp fixture, Rails.root.join('public', 'uploads', 'images', 'original', filename)
-    FileUtils.cp fixture, Rails.root.join('public', 'uploads', 'images', 'big', filename)
-    FileUtils.cp fixture, Rails.root.join('public', 'uploads', 'images', 'small', filename)
+    FileUtils.cp fixture, Rails.root.join('tmp', 'uploads', 'images', 'original', filename)
+    FileUtils.cp fixture, Rails.root.join('tmp', 'uploads', 'images', 'big', filename)
+    FileUtils.cp fixture, Rails.root.join('tmp', 'uploads', 'images', 'small', filename)
     @options = { :presets => [:small, :big] }
     @image = RailsUploads::Types::Image.new(filename, @options)
   end

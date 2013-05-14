@@ -12,11 +12,11 @@ class FileStringTest < ActiveSupport::TestCase
     assert_equal 11, @file.size
     assert_equal '.txt', @file.extname
     assert_equal ::File.join('', 'uploads', 'files', @file.filename), @file.path
-    assert_equal Rails.root.join('public', 'uploads', 'files', @file.filename).to_s, @file.realpath
+    assert_equal Rails.root.join('tmp', 'uploads', 'files', @file.filename).to_s, @file.realpath
 
     # Delete tests
 
-    uploads_path = Rails.root.join('public', 'uploads', 'files', @file.filename).to_s
+    uploads_path = Rails.root.join('tmp', 'uploads', 'files', @file.filename).to_s
     @file.delete
     assert !::File.exists?(uploads_path)
     assert !@file.exists?
@@ -27,7 +27,7 @@ class FileStringTest < ActiveSupport::TestCase
 
   def create_file
     filename = 'file.txt'
-    FileUtils.cp ::File.join(ActiveSupport::TestCase.fixture_path, filename), Rails.root.join('public', 'uploads', 'files', filename)
+    FileUtils.cp ::File.join(ActiveSupport::TestCase.fixture_path, filename), Rails.root.join('tmp', 'uploads', 'files', filename)
     @file = RailsUploads::Types::File.new(filename)
   end
 

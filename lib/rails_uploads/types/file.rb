@@ -75,9 +75,12 @@ module RailsUploads
 
       def store
         if not is_stored? and is_upload?
-          check_store_dir
+          create_dir
+          @upload.rewind # Hack to avoid empty files
           ::File.open(destination_path, 'wb') do |file|
-            file.write(@upload.read)
+            while chunk = @upload.read(16 * 1024)
+              file.write(chunk)
+            end
           end
           @stored = true
           yield if block_given?
@@ -95,13 +98,17 @@ module RailsUploads
        
       protected
 
-      def check_store_dir(*args)
-        dir = Rails.root.join('public', 'uploads', store_path(*args))
+      def base_path
+        Rails.root.join (Rails.env == 'test' and not is_default?) ? 'tmp' : 'public'
+      end
+
+      def create_dir(*args)
+        dir = base_path.join('uploads', store_path(*args))
         FileUtils.mkdir_p dir unless ::File.directory? dir
       end
 
       def destination_path(*args)
-        Rails.root.join 'public', public_path(*args)
+        base_path.join public_path(*args)
       end
 
       def public_path(*args)

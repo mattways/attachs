@@ -22,7 +22,7 @@ class FileUploadTest < ActiveSupport::TestCase
     # Store and delete tests
     
     @file.store
-    uploads_path = Rails.root.join('public', 'uploads', 'files', @file.filename).to_s
+    uploads_path = Rails.root.join('tmp', 'uploads', 'files', @file.filename).to_s
     assert ::File.exists?(uploads_path)
     assert_equal uploads_path, @file.realpath
     
