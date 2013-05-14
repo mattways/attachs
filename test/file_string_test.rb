@@ -26,6 +26,7 @@ class FileStringTest < ActiveSupport::TestCase
   protected
 
   def create_file
+    FileUtils.mkdir_p Rails.root.join('tmp', 'uploads', 'files')
     filename = 'file.txt'
     FileUtils.cp ::File.join(ActiveSupport::TestCase.fixture_path, filename), Rails.root.join('tmp', 'uploads', 'files', filename)
     @file = RailsUploads::Types::File.new(filename)
