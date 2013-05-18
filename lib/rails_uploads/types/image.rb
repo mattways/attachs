@@ -2,48 +2,32 @@ module RailsUploads
   module Types
     class Image < File
 
-      def has_presets?
-        presets.any?
-      end
-
       def presets
         Rails.application.config.uploads.default_presets | (@options[:presets] or [])
       end
       
       def store
-        super() do
-          if has_presets?
-            presets.each do |name|
-              generate_preset name
-            end   
-          end       
-        end
+        super { presets.each { |name| generate_preset name } if presets.any? }
       end
 
       def delete
-        super() do
-          if has_presets?
-            presets.each do |name|
-              ::File.delete realpath(name) if exists? name
-            end
-          end
-        end
+        super { presets.each { |name| storage.delete path(name) if exists?(name) } if presets.any? }
       end
       
       protected
 
       def generate_preset(name)
-        create_dir(name)
-        image = RailsUploads::Magick::Image.new(realpath, realpath(name))
-        settings = Rails.application.config.uploads.presets[name]
-        if settings.is_a? Proc
-          thumbnail = settings.call(image)
-        else
-          case settings[:method]
-          when :fit
-            thumbnail = image.resize_to_fit(settings[:width], settings[:height])
+        storage.magick destination_path, destination_path(name), @upload do |image|
+          settings = Rails.application.config.uploads.presets[name]
+          if settings.is_a? Proc
+            settings.call image
           else
-            thumbnail = image.resize_to_fill(settings[:width], settings[:height])                          
+            case settings[:method]
+            when :fit
+              image.resize_to_fit settings[:width], settings[:height]
+            else
+              image.resize_to_fill settings[:width], settings[:height]                        
+            end
           end
         end
       end

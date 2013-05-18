@@ -1,11 +1,9 @@
 class AttachmentContentTypeValidator < RailsUploads::Validators::Base
   
-  # validates :attr, :attachment_content_type => { :in => ['png', 'gif'] }
-  
   def validate_each(record, attribute, value)
-    if value.present? and not value.is_default?
+    if value.present? and not value.send(:is_default?)
       unless options[:in].include? value.extname.from(1)
-        add_error record, attribute, 'errors.messages.attachment_content_type', :types => options[:in].join(', ')
+        add_error record, attribute, 'errors.messages.attachment_content_type', types: options[:in].join(', ')
       end
     end
   end        

@@ -1,4 +1,5 @@
-=== NOTE: From version 0.1.5 and above defaults must be put in public/uploads folder
+=== NOTE: From version 0.1.5 and above defaults must be in public folder
+=== NOTE: From version 0.2.0 and above the use of path is deprecated
 
 ---
 
@@ -15,6 +16,9 @@ Put this line in your Gemfile:
   
 Then bundle:
   $ bundle
+
+ImageMagick must be install, you can install it with homebrew:
+  brew install imagemagick
   
 = Usage
 
@@ -45,6 +49,23 @@ Define presets in your application.rb
     :custom => proc { |image| image.convert :resize => '100x100' } # ImageMagick wrapper to do whatever you want
   }
   config.uploads.default_presets = [:small] # Define the default presets for all models with attached images
+  config.uploads.storage = :local # The default it's local, you can use :s3 as well
+
+If you want to use S3 create a s3.yml file in your config directory like this:
+  development:
+    bucket: development-bucket
+    access_key_id: development_access_key_id
+    secret_access_key: development_secret_access_key
+
+  test:
+    bucket: test-bucket
+    access_key_id: test_access_key_id
+    secret_access_key: test_secret_access_key
+
+  production:
+    bucket: production-bucket
+    access_key_id: production_access_key_id
+    secret_access_key: production_secret_access_key
 
 The validation works very similar to paperclip:
   class Model < ActiveRecord::Base
@@ -61,10 +82,9 @@ If you want to translate the errores the keys are:
   errors.messages.attachment_content_type # :types
 
 In your views:
-  a{ :href => record.file.path } # To get the file
-  a{ :href => record.image.path } # To get the original image
-  a{ :href => record.image.path(:big) } # To get the thumb
-  a{ :href => record.image.url(:big) } # If you want to use a base url
+  a{ :href => record.file.url } # To get the file url
+  a{ :href => record.image.url } # To get the original image
+  a{ :href => record.image.url(:big) } # To get the a thumb
 
 In your forms:
   = f.file_field :prop
@@ -73,15 +93,21 @@ In your forms:
 
 == How can I use a cdn with this plugin?
 
-Just define a base url in your application.rb and use url method instead of path:
-  config.uploads.base_url = 'http://example.com'
+Just define a base url in your application.rb:
+  config.uploads.base_url = 'http://cdn.example.com'
+
+== Can I automatically create buckets?
+
+Yes, use this rake task after create the s3.yml file:
+  rake uploads:s3:buckets:create
   
 == How can I clean a preset?
 
-Just remove the corresponding folder in uploads/images manually or with rake task:
-  rake uploads:preset:clean[preset]
+Just remove the corresponding folder in uploads/images manually or with this rake task:
+  rake uploads:preset:clean NAME=preset
 
 == How to migrate from versions before 0.1.0?
 
 To migrate from versions before 0.1.0 you need to reorganize uploads with this task after define your presets in your application.rb:
   rake uploads:migrate
+

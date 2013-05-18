@@ -1,5 +1,7 @@
 require 'rails_uploads/active_record/base'
 require 'rails_uploads/magick/image'
+require 'rails_uploads/storages/local'
+require 'rails_uploads/storages/s3'
 require 'rails_uploads/types/file'
 require 'rails_uploads/types/image'
 require 'rails_uploads/validators/base'

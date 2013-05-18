@@ -7,19 +7,84 @@ module RailsUploads
           @upload = source          
           @stored = false
           @default = false
+          @storage = build_storage(:local)
         elsif source.is_a? String
           @upload = false
           @filename = source
           @stored = true
           @default = false
+          @storage = build_storage
         elsif options.has_key? :default
           @upload = false
           @filename = options[:default]
           @stored = true
           @default = true
+          @storage = build_storage
         end
         @deleted = false        
         @options = options
+      end
+
+      def exists?(*args)
+        return false if is_deleted?
+        storage.exists? path(*args)
+      end
+
+      def size(*args)
+        return 0 if is_deleted?
+        storage.size path(*args)
+      end
+
+      def extname
+        return nil if is_deleted?
+        @extname ||= ::File.extname(filename)
+      end   
+
+      def filename
+        return nil if is_deleted?
+        @filename ||= "#{(Time.now.to_f * 10000000).to_i}#{::File.extname @upload.original_filename}".downcase
+      end      
+
+      def path(*args)
+        return nil if is_deleted?
+        is_stored? ? destination_path(*args) : @upload.path
+      end
+
+      def url(*args)
+        return nil if is_deleted? or not is_stored?
+        storage.url path(*args)
+      end
+
+      def store
+        if not is_stored? and is_upload?
+          @storage = build_storage
+          storage.store @upload, destination_path
+          yield if block_given?
+          @stored = true
+          @deleted = false
+        end
+      end
+      
+      def delete
+        if not is_default? and is_stored? and exists?
+          storage.delete path
+          yield if block_given?
+          @storage = build_storage(:local) if @upload.present?
+          @stored = false
+          @deleted = true
+        end
+      end
+       
+      protected
+
+      def build_storage(type=nil)
+        tmp = (Rails.env == 'test' and not is_default?)
+        type = (type or Rails.application.config.uploads.storage)
+        RailsUploads::Storages.const_get(type.to_s.classify).new(tmp)
+      end
+
+      def storage
+        @storage
       end
 
       def is_default?
@@ -36,82 +101,9 @@ module RailsUploads
 
       def is_deleted?
         @deleted
-      end 
-
-      def exists?(*args)
-        return false if is_deleted?
-        ::File.exists? realpath(*args)
-      end
-
-      def size(*args)
-        return 0 if is_deleted?
-        ::File.size realpath(*args)
-      end
-
-      def extname
-        return nil if is_deleted?
-        @extname ||= ::File.extname(filename)
-      end   
-
-      def filename
-        return nil if is_deleted?
-        @filename ||= "#{(Time.now.to_f * 10000000).to_i}#{::File.extname @upload.original_filename}".downcase
-      end      
-
-      def path(*args)
-        return nil if is_deleted?
-        ::File.join '', public_path(*args)
-      end
-
-      def url(*args)
-        return nil if is_deleted?
-        ::File.join Rails.application.config.uploads.base_url, path(*args)
-      end
-      
-      def realpath(*args)
-        return nil if is_deleted?
-        ::File.expand_path(is_stored? ? destination_path(*args) : @upload.path)
-      end
-
-      def store
-        if not is_stored? and is_upload?
-          create_dir
-          @upload.rewind # Hack to avoid empty files
-          ::File.open(destination_path, 'wb') do |file|
-            while chunk = @upload.read(16 * 1024)
-              file.write(chunk)
-            end
-          end
-          @stored = true
-          yield if block_given?
-        end
-      end
-      
-      def delete
-        if not is_default? and is_stored? and exists?
-          ::File.delete realpath
-          yield if block_given?
-          @stored = false
-          @deleted = true
-        end
-      end
-       
-      protected
-
-      def base_path
-        Rails.root.join (Rails.env == 'test' and not is_default?) ? 'tmp' : 'public'
-      end
-
-      def create_dir(*args)
-        dir = base_path.join('uploads', store_path(*args))
-        FileUtils.mkdir_p dir unless ::File.directory? dir
       end
 
       def destination_path(*args)
-        base_path.join public_path(*args)
-      end
-
-      def public_path(*args)
         ::File.join 'uploads', store_path(*args), filename
       end
 
