@@ -4,8 +4,8 @@ module RailsUploads
       
       cattr_accessor :config
 
-      def initialize(test)
-        config = self.class.config[test ? 'test' : 'production']
+      def initialize(default)
+        config = self.class.config[default ? Rails.env : 'production']
         AWS.config access_key_id: config['access_key_id'], secret_access_key: config['secret_access_key']
         @bucket = AWS::S3.new.buckets[config['bucket']]
         @tmp = {}

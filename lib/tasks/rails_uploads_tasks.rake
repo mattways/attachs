@@ -34,6 +34,7 @@ namespace :uploads do
       task :create do
         config = YAML.load_file(Rails.root.join('config', 's3.yml'))
         config.each do |env, options|
+          require 'aws-sdk'
           AWS.config access_key_id: options['access_key_id'], secret_access_key: options['secret_access_key']
           bucket = options['bucket']
           begin

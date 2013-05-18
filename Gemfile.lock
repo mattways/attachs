@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_uploads (0.2.0)
+    rails_uploads (0.2.1)
       aws-sdk
       rails (>= 3.2.8)
 
