@@ -2,8 +2,8 @@ module RailsUploads
   module Storages
     class Local
 
-      def initialize(tmp)
-        @tmp = tmp
+      def initialize(default)
+        @tmp = (Rails.env == 'test' and not default)
       end
 
       def exists?(path)

@@ -8,7 +8,7 @@ module RailsUploads
         image = RailsUploads::Types::Image.new(filename)
         if image.exists? and !image.exists?(preset)
           image.send :generate_preset, preset
-          redirect_to request.url, :cb => Random.rand(100000)
+          redirect_to image.url(params[:preset]).to_s, :cb => Random.rand(100000)
         end
       end
     end

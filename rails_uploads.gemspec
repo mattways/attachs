@@ -17,9 +17,8 @@ Gem::Specification.new do |s|
   s.test_files = Dir['test/**/*']
 
   s.requirements << 'ImageMagick'
-
   s.add_dependency 'rails', '>= 3.2.8'
-  s.add_dependency 'aws-sdk'
+  s.add_development_dependency 'aws-sdk'
 
   if RUBY_PLATFORM == 'java'
     s.add_development_dependency 'activerecord-jdbcsqlite3-adapter'

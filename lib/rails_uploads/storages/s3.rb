@@ -5,7 +5,14 @@ module RailsUploads
       cattr_accessor :config
 
       def initialize(default)
-        config = self.class.config[default ? Rails.env : 'production']
+        if (Rails.env == 'test' and not default)
+          env = 'test'
+        elsif default
+          env = 'production'
+        else
+          env = Rails.env
+        end
+        config = self.class.config[env]
         AWS.config access_key_id: config['access_key_id'], secret_access_key: config['secret_access_key']
         @bucket = AWS::S3.new.buckets[config['bucket']]
         @tmp = {}
@@ -37,15 +44,15 @@ module RailsUploads
           if upload.present?
             @tmp[source] = upload.path
           else
-            tmp = Tempfile.open('s3', Rails.root.join('tmp')) do |file|
-              object(source).read do |chunk|
-                file.write(chunk)
-              end
-            end
-            @tmp[source] = tmp.path
+            remote = Tempfile.new('s3')
+            remote.binmode
+            object(source).read { |chunk| remote.write(chunk) }
+            remote.close
+            remote.open
+            @tmp[source] = remote.path
           end
         end
-        tmp = Tempfile.new('s3', Rails.root.join('tmp'))
+        tmp = Tempfile.new('s3')
         yield RailsUploads::Magick::Image.new(@tmp[source], tmp.path)
         store tmp, output
       end

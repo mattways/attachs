@@ -1,4 +1,25 @@
 
+module RailsUploads
+  module Task
+
+    def self.iterate_images
+      model = ENV['MODEL'].classify.constantize
+      presets = ENV['PRESETS'].split(',').map(&:to_sym)
+      model.find_each do |record|
+        model.attachments.each do |attr, options|
+          if options[:type] == :image
+            presets.each do |preset|
+              image = record.send(attr)
+              yield image, preset
+            end
+          end
+        end
+      end
+    end
+
+  end
+end
+
 namespace :uploads do
 
   task :migrate do
@@ -19,12 +40,21 @@ namespace :uploads do
   end
 
   namespace :presets do
-    desc 'Clean preset'
-    task :clean, [:preset] do
-      if ENV['NAME'].present?
-        path = Rails.root.join('public', 'uploads', 'images', ENV['NAME'])
-        ::FileUtils.rm_rf path if ::File.directory? path
+    desc 'Refresh preset'
+    task :refresh => :clean do
+      RailsUploads::Task.iterate_images do |image, preset|
+        puts "Generating preset #{image.url(preset)}."
+        image.generate_preset preset
       end
+      puts "Presets refreshed successfully."
+    end
+    desc 'Clean preset'
+    task :clean => :environment do
+      RailsUploads::Task.iterate_images do |image, preset|
+        puts "Deleting preset #{image.url(preset)}."
+        image.delete_preset preset
+      end
+      puts "Presets cleaned successfully."
     end
   end
 

@@ -33,9 +33,9 @@ class ActiveSupport::TestCase
     self.class.teardown { Rails.application.config.uploads.storage = @storage_type }
   end
 
-  def fixture_file_upload_s3(fixture, type, path, tmp=true)
+  def fixture_file_upload_s3(fixture, type, path, default=false)
     upload = fixture_file_upload(fixture, type)
-    storage = RailsUploads::Storages::S3.new(tmp)
+    storage = RailsUploads::Storages::S3.new(default)
     storage.store(upload, path)
   end
 

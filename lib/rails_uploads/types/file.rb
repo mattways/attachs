@@ -25,6 +25,10 @@ module RailsUploads
         @options = options
       end
 
+      def is_default?
+        @default
+      end
+
       def exists?(*args)
         return false if is_deleted?
         storage.exists? path(*args)
@@ -78,17 +82,12 @@ module RailsUploads
       protected
 
       def build_storage(type=nil)
-        tmp = (Rails.env == 'test' and not is_default?)
         type = (type or Rails.application.config.uploads.storage)
-        RailsUploads::Storages.const_get(type.to_s.classify).new(tmp)
+        RailsUploads::Storages.const_get(type.to_s.classify).new(is_default?)
       end
 
       def storage
         @storage
-      end
-
-      def is_default?
-        @default
       end
 
       def is_upload?

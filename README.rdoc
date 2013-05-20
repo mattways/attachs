@@ -22,24 +22,24 @@ ImageMagick must be install, you can install it with homebrew:
   
 = Usage
 
-Mount the engine at the end of you routes.rb:
+Mount the engine at the end of you routes.rb (local storage only):
   mount RailsUploads::Engine => '/' # Will be use to generate on the fly missing image presets
 
 Add the column to your table (just a string):
   create_table :models do |t|
-    t.string :prop
+    t.string :attr
   end
 
 If you need a file:
   class Model < ActiveRecord::Base
-    attr_accessible :prop
-    attached_file :prop, :default => 'file.txt' # It's optional set a default file
+    attr_accessible :attr
+    attached_file :attr, :default => 'file.txt'
   end
 
 If you need a image:
   class Model < ActiveRecord::Base
-    attr_accessible :prop
-    attached_image :prop, :presets => [:small, :big], :default => 'assets/image.jpg' # It's optional set a default image
+    attr_accessible :attr
+    attached_image :attr, :presets => [:small, :big], :default => 'assets/image.jpg'
   end
 
 Define presets in your application.rb
@@ -51,27 +51,14 @@ Define presets in your application.rb
   config.uploads.default_presets = [:small] # Define the default presets for all models with attached images
   config.uploads.storage = :local # The default it's local, you can use :s3 as well
 
-If you want to use S3 create a s3.yml file in your config directory like this:
-  development:
-    bucket: development-bucket
-    access_key_id: development_access_key_id
-    secret_access_key: development_secret_access_key
-
-  test:
-    bucket: test-bucket
-    access_key_id: test_access_key_id
-    secret_access_key: test_secret_access_key
-
-  production:
-    bucket: production-bucket
-    access_key_id: production_access_key_id
-    secret_access_key: production_secret_access_key
+If you want to use S3 create a s3.yml config file with this generator and complete it:
+  rails g uploads:s3:config
 
 The validation works very similar to paperclip:
   class Model < ActiveRecord::Base
-    attr_accessible :prop
-    attached_file :prop
-    validates :prop, :attachment_presence => true, :attachment_size => { :in => 0..4.megabytes }, :attachment_content_type => { :in => ['txt'] }
+    attr_accessible :attr
+    attached_file :attr
+    validates :attr, :attachment_presence => true, :attachment_size => { :in => 0..4.megabytes }, :attachment_content_type => { :in => ['txt'] }
   end
 
 If you want to translate the errores the keys are:
@@ -87,24 +74,29 @@ In your views:
   a{ :href => record.image.url(:big) } # To get the a thumb
 
 In your forms:
-  = f.file_field :prop
+  = f.file_field :attr
 
 = FAQ
 
 == How can I use a cdn with this plugin?
 
-Just define a base url in your application.rb:
+Define a base url in your application.rb:
   config.uploads.base_url = 'http://cdn.example.com'
 
-== Can I automatically create buckets?
+== How can I automatically create buckets?
 
-Yes, use this rake task after create the s3.yml file:
+Use this rake task after create the s3.yml file:
   rake uploads:s3:buckets:create
   
 == How can I clean a preset?
 
-Just remove the corresponding folder in uploads/images manually or with this rake task:
-  rake uploads:preset:clean NAME=preset
+Use this rake task:
+  rake uploads:preset:clean MODEL=models PRESETS=first_preset,second_preset
+
+== How can I refresh a preset?
+
+Use this rake task:
+  rake uploads:preset:refresh MODEL=models PRESETS=first_preset,second_preset
 
 == How to migrate from versions before 0.1.0?
 

@@ -16,7 +16,7 @@ module RailsUploads
       def check_changed_attachments
         @stored_attachments = []
         @deleted_attachments = []
-        self.class.send(:attachments).each do |attr, options|
+        self.class.attachments.each do |attr, options|
           if changed_attributes.has_key? attr.to_s
             stored = attributes[attr.to_s]
             deleted = changed_attributes[attr.to_s]
@@ -27,7 +27,7 @@ module RailsUploads
       end
       
       def iterate_attachments
-        self.class.send(:attachments).each do |attr, options|
+        self.class.attachments.each do |attr, options|
           next unless instance = send(attr)
           yield instance
         end
@@ -54,6 +54,8 @@ module RailsUploads
       end   
 
       module ClassMethods
+
+        attr_reader :attachments
     
         def self.extended(base)
           [:image].each do |type|
@@ -76,8 +78,6 @@ module RailsUploads
         end
 
         protected
-
-        attr_reader :attachments
         
         def define_attachment(*args)
           options = args.extract_options!
