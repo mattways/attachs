@@ -38,6 +38,7 @@ module RailsUploads
       end
       
       def store_attachments
+        debugger
         iterate_attachments { |a| a.store }
       end
 
@@ -64,13 +65,18 @@ module RailsUploads
               options[:type] = type
               attached_file *args.append(options)
             end
-          end       
+          end
         end
 
         def attached_file(*args)
           options = args.extract_options!
           options.reverse_merge! type: :file
           define_attachment *args.append(options)
+        end
+
+        def inherited(subclass)
+          subclass.instance_variable_set(:@attachments, @attachments)
+          super
         end
 
         def is_attachable?
