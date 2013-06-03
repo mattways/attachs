@@ -38,7 +38,6 @@ module RailsUploads
       end
       
       def store_attachments
-        debugger
         iterate_attachments { |a| a.store }
       end
 
