@@ -28,14 +28,18 @@ module RailsUploads
       def is_default?
         @default
       end
+      
+      def is_stored?
+        @stored
+      end
+
+      def is_deleted?
+        @deleted
+      end
 
       def exists?(*args)
         return false if is_deleted?
         storage.exists? path(*args)
-      end
-      
-      def is_deleted?
-        @deleted
       end
 
       def size(*args)
@@ -96,10 +100,6 @@ module RailsUploads
 
       def is_upload?
         @upload != false
-      end
-
-      def is_stored?
-        @stored
       end
 
       def destination_path(*args)
