@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class LocalValidatorsTest < ActiveSupport::TestCase
+  include ActionView::Helpers::NumberHelper
 
   setup do
     @record = ValidationUpload.new
@@ -28,11 +29,11 @@ class LocalValidatorsTest < ActiveSupport::TestCase
   test "should check the file size" do
     @record.file_size = fixture_file_upload('/file_big.txt', 'text/plain')
     assert !@record.valid?
-    assert_equal [I18n.t('errors.messages.attachment_size_less_than', :less_than => 15.kilobytes)], @record.errors[:file_size]
+    assert_equal [I18n.t('errors.messages.attachment_size_less_than', :count => number_to_human_size(15.kilobytes))], @record.errors[:file_size]
 
     @record.file_size = fixture_file_upload('/file_empty.txt', 'text/plain')
     assert !@record.valid?
-    assert_equal [I18n.t('errors.messages.attachment_size_greater_than', :greater_than => 10.bytes)], @record.errors[:file_size]
+    assert_equal [I18n.t('errors.messages.attachment_size_greater_than', :count => number_to_human_size(10.bytes))], @record.errors[:file_size]
 
     @record.file_size = fixture_file_upload('/file.txt', 'text/plain')
     assert !@record.valid?
@@ -40,11 +41,11 @@ class LocalValidatorsTest < ActiveSupport::TestCase
 
     @record.image_size = fixture_file_upload('/image_big.jpg', 'image/jpeg')
     assert !@record.valid?
-    assert_equal [I18n.t('errors.messages.attachment_size_in', :greater_than => 2.kilobytes, :less_than => 60.kilobytes)], @record.errors[:image_size]
+    assert_equal [I18n.t('errors.messages.attachment_size_in', :min => number_to_human_size(2.kilobytes), :max => number_to_human_size(60.kilobytes))], @record.errors[:image_size]
 
     @record.image_size = fixture_file_upload('/image_empty.jpg', 'image/jpeg')
     assert !@record.valid?
-    assert_equal [I18n.t('errors.messages.attachment_size_in', :greater_than => 2.kilobytes, :less_than => 60.kilobytes)], @record.errors[:image_size]
+    assert_equal [I18n.t('errors.messages.attachment_size_in', :min => number_to_human_size(2.kilobytes), :max => number_to_human_size(60.kilobytes))], @record.errors[:image_size]
 
     @record.image_size = fixture_file_upload('/image.jpg', 'image/jpeg')
     assert !@record.valid?

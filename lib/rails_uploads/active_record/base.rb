@@ -17,6 +17,10 @@ module RailsUploads
         @stored_attachments = []
         @deleted_attachments = []
         self.class.attachments.each do |attr, options|
+          if @attributes[attr.to_s].present? and send("delete_#{attr}") == '1'
+            send "#{attr}_will_change!"
+            @attributes[attr.to_s] = nil
+          end
           if changed_attributes.has_key? attr.to_s
             stored = attributes[attr.to_s]
             deleted = changed_attributes[attr.to_s]
@@ -34,7 +38,7 @@ module RailsUploads
       end
       
       def add_changed_attachment(source, options, type)
-        (type == :stored ? @stored_attachments : @deleted_attachments) << build_attachment_instance(source, options)
+        (type == :stored ? @stored_attachments : @deleted_attachments) << (source.is_a?(String) ? build_attachment_instance(source, options) : source)
       end
       
       def store_attachments
@@ -114,7 +118,8 @@ module RailsUploads
               @attachments[attr] = build_attachment_instance(value, options)
               super(@attachments[attr].filename)
             end
-          end 
+          end
+          attr_accessor "delete_#{attr}".to_sym
         end
 
         def define_attachable_attribute_method_get(attr, options)

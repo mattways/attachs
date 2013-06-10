@@ -1,0 +1,8 @@
+es:
+  errors:
+    messages:
+      attachment_presence: "no puede estar vacío"
+      attachment_content_type: "los formatos permitidos son: %{types}"
+      attachment_size_less_than: "debe pesar menos de %{count}"
+      attachment_size_greater_than: "debe pesar más de %{count}"
+      attachment_size_in: "debe pesar entre %{min} y %{max}"

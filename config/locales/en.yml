@@ -1,0 +1,8 @@
+en:
+  errors:
+    messages:
+      attachment_presence: "can't be blank"
+      attachment_content_type: "the allowed types are: %{types}"
+      attachment_size_less_than: "size must be less than %{count}"
+      attachment_size_greater_than: "size must be greater than %{count}"
+      attachment_size_in: "size must be between %{min} and %{max}"

@@ -49,7 +49,7 @@ module RailsUploads
       def resize_to_fill(max_width, max_height)
         width, height = dimensions
         scale = [max_width/width.to_f, max_height/height.to_f].max
-        convert resize: "#{(scale*width).to_i}x#{(scale*height).to_i}", gravity: 'center', crop: "#{max_width}x#{max_height}+0+0" 
+        convert resize: "#{(scale*width).ceil}x#{(scale*height).ceil}", gravity: 'center', crop: "#{max_width}x#{max_height}+0+0" 
       end
 
       def resize_to_fit(max_width, max_height)

@@ -63,9 +63,9 @@ The validation works very similar to paperclip:
 
 If you want to translate the errores the keys are:
   errors.messages.attachment_presence
-  errors.messages.attachment_size_in # :less_than and :greater_than
-  errors.messages.attachment_size_less_than  # :less_than
-  errors.messages.attachment_size_greater_than # :greater_than
+  errors.messages.attachment_size_in # :max and :min
+  errors.messages.attachment_size_less_than  # :count
+  errors.messages.attachment_size_greater_than # :count
   errors.messages.attachment_content_type # :types
 
 In your views:
@@ -75,6 +75,9 @@ In your views:
 
 In your forms:
   = f.file_field :attr
+
+If your file it's optional:
+  = f.check_box :delete_attr
 
 = FAQ
 
@@ -91,12 +94,12 @@ Use this rake task after create the s3.yml file:
 == How can I clean a preset?
 
 Use this rake task:
-  rake uploads:preset:clean MODEL=models PRESETS=first_preset,second_preset
+  rake uploads:presets:clean MODEL=models PRESETS=first_preset,second_preset
 
 == How can I refresh a preset?
 
 Use this rake task:
-  rake uploads:preset:refresh MODEL=models PRESETS=first_preset,second_preset
+  rake uploads:presets:refresh MODEL=models PRESETS=first_preset,second_preset
 
 == How to migrate from versions before 0.1.0?
 

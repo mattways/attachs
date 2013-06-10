@@ -33,6 +33,10 @@ module RailsUploads
         return false if is_deleted?
         storage.exists? path(*args)
       end
+      
+      def is_deleted?
+        @deleted
+      end
 
       def size(*args)
         return 0 if is_deleted?
@@ -96,10 +100,6 @@ module RailsUploads
 
       def is_stored?
         @stored
-      end
-
-      def is_deleted?
-        @deleted
       end
 
       def destination_path(*args)
