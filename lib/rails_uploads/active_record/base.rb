@@ -17,10 +17,6 @@ module RailsUploads
         @stored_attachments = []
         @deleted_attachments = []
         self.class.attachments.each do |attr, options|
-          if @attributes[attr.to_s].present? and send("delete_#{attr}") == '1'
-            send "#{attr}_will_change!"
-            @attributes[attr.to_s] = nil
-          end
           if changed_attributes.has_key? attr.to_s
             stored = attributes[attr.to_s]
             deleted = changed_attributes[attr.to_s]
@@ -62,19 +58,13 @@ module RailsUploads
         attr_reader :attachments
     
         def self.extended(base)
-          [:image].each do |type|
+          [:file, :image].each do |type|
             base.send(:define_singleton_method, "attached_#{type}") do |*args|
               options = args.extract_options!
               options[:type] = type
-              attached_file *args.append(options)
+              define_attachment *args.append(options)
             end
           end
-        end
-
-        def attached_file(*args)
-          options = args.extract_options!
-          options.reverse_merge! type: :file
-          define_attachment *args.append(options)
         end
 
         def inherited(subclass)
@@ -93,6 +83,7 @@ module RailsUploads
           make_attachable unless is_attachable?
           args.each do |attr|
             define_attachable_attribute_methods attr.to_sym, options
+            define_default_validations attr.to_sym, options
             @attachments[attr.to_sym] = options
           end
         end
@@ -105,10 +96,13 @@ module RailsUploads
           @attachments = {}
         end
 
+        def define_default_validations(attr, options)
+          default_validations = Rails.application.config.uploads.default_validations[options[:type]]
+          validates attr, default_validations.dup if default_validations.present? and not default_validations.empty?
+        end
+
         def define_attachable_attribute_methods(attr, options)
-          ['set', 'get'].each do |method|
-            send "define_attachable_attribute_method_#{method}", attr, options
-          end
+          ['set', 'get'].each { |method| send "define_attachable_attribute_method_#{method}", attr, options }
         end
         
         def define_attachable_attribute_method_set(attr, options)
@@ -119,7 +113,14 @@ module RailsUploads
               super(@attachments[attr].filename)
             end
           end
-          attr_accessor "delete_#{attr}".to_sym
+          define_method "delete_#{attr}=" do |value|
+            if @attributes[attr.to_s].present? and value == '1'
+              send "#{attr}_will_change!"
+              @attachments[attr] = nil
+              @attributes[attr.to_s] = nil
+            end
+            instance_variable_set("@delete_#{attr}".to_sym, value)
+          end
         end
 
         def define_attachable_attribute_method_get(attr, options)
@@ -129,6 +130,7 @@ module RailsUploads
             return nil if super().nil? and not options.has_key? :default
             @attachments[attr] = build_attachment_instance(super(), options)
           end 
+          attr_reader "delete_#{attr}".to_sym
         end
 
       end    

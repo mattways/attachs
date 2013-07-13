@@ -4,6 +4,7 @@ module RailsUploads
     config.uploads = ActiveSupport::OrderedOptions.new
     config.uploads.presets = {}
     config.uploads.default_presets = []
+    config.uploads.default_validations = {}
     config.uploads.base_url = ''
     config.uploads.storage = :local
 

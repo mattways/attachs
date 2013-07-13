@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_uploads (0.2.8)
+    rails_uploads (0.2.9)
       rails (~> 3.2.8)
 
 GEM

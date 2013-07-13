@@ -62,10 +62,10 @@ class S3ValidatorsTest < ActiveSupport::TestCase
     assert_equal [], @record.errors[:image_all]
 
     assert !@record.valid?
-    assert_equal [], @record.errors[:file_default]
+    assert_equal [I18n.t('errors.messages.blank')], @record.errors[:file_default]
 
     assert !@record.valid?
-    assert_equal [], @record.errors[:image_default]
+    assert_equal [I18n.t('errors.messages.blank')], @record.errors[:image_default]
   end
 
 end 
