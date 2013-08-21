@@ -1,18 +1,13 @@
-=== NOTE: From version 0.1.5 and above defaults must be in public folder
-=== NOTE: From version 0.2.0 and above the use of path is deprecated
+{<img src="https://codeclimate.com/github/mattways/attachs.png" />}[https://codeclimate.com/github/mattways/attachs] {<img src="https://travis-ci.org/mattways/attachs.png?branch=master" alt="Build Status" />}[https://travis-ci.org/mattways/attachs] {<img src="https://gemnasium.com/mattways/attachs.png" alt="Dependency Status" />}[https://gemnasium.com/mattways/attachs]
 
----
+= Attachs
 
-{<img src="https://codeclimate.com/github/mattways/rails_uploads.png" />}[https://codeclimate.com/github/mattways/rails_uploads] {<img src="https://travis-ci.org/mattways/rails_uploads.png?branch=master" alt="Build Status" />}[https://travis-ci.org/mattways/rails_uploads] {<img src="https://gemnasium.com/mattways/rails_uploads.png" alt="Dependency Status" />}[https://gemnasium.com/mattways/rails_uploads]
-
-= Rails Uploads
-
-Minimalistic toolkit to handle file and images uploads using ActiveRecord.
+Minimalistic toolkit to attach file and images to records.
 
 = Install
 
 Put this line in your Gemfile:
-  gem 'rails_uploads'
+  gem 'attachs'
   
 Then bundle:
   $ bundle
@@ -22,8 +17,8 @@ ImageMagick must be install, you can install it with homebrew:
   
 = Usage
 
-Mount the engine at the end of you routes.rb (local storage only):
-  mount RailsUploads::Engine => '/' # Will be use to generate on the fly missing image presets
+Mount the engine at the end of you routes.rb (only if you are using local storage):
+  mount Attachs:Engine: '/' # Will be use to generate on the fly missing image presets
 
 Add the column to your table (just a string):
   create_table :models do |t|
@@ -33,32 +28,32 @@ Add the column to your table (just a string):
 If you need a file:
   class Model < ActiveRecord::Base
     attr_accessible :attr
-    attached_file :attr, :default => 'file.txt'
+    has_attached_file :attr, default: 'file.txt'
   end
 
 If you need a image:
   class Model < ActiveRecord::Base
     attr_accessible :attr
-    attached_image :attr, :presets => [:small, :big], :default => 'assets/image.jpg'
+    has_attached_image :attr, presets: [:small, :big], default: 'assets/image.jpg'
   end
 
 Define presets in your application.rb
-  config.uploads.presets = {
-    :big => { :method => :fit, :width => 1024, :height => 768 }, # Fit will scale the image until it fit in the space without cropping
-    :small => { :method => :fill, :width => 120, :height => :120 }, # Fill will scale the image to fill all the space and then crop
-    :custom => proc { |image| image.convert :resize => '100x100' } # ImageMagick wrapper to do whatever you want
+  config.attachs.presets = {
+    big: { method: :fit, width: 1024, height: 768 }, # Fit will scale the image until it fit in the space without cropping
+    small: { method: :fill, width: 120, height: :120 }, # Fill will scale the image to fill all the space and then crop
+    custom: proc { |image| image.convert resize: '100x100' } # ImageMagick wrapper to do whatever you want
   }
-  config.uploads.default_presets = [:small] # Define the default presets for all models with attached images
-  config.uploads.storage = :local # The default it's local, you can use :s3 as well
+  config.attachs.default_presets = [:small] # Define the default presets for all models with attached images
+  config.attachs.storage = :local # The default it's local, you can use :s3 as well
 
 If you want to use S3 create a s3.yml config file with this generator and complete it:
-  rails g uploads:s3:config
+  rails g attachs:s3:config
 
 The validation works very similar to paperclip:
   class Model < ActiveRecord::Base
     attr_accessible :attr
-    attached_file :attr
-    validates :attr, :attachment_presence => true, :attachment_size => { :in => 0..4.megabytes }, :attachment_content_type => { :in => ['txt'] }
+    has_attached_file :attr
+    validates :attr, attachment_presence: true, attachment_size: { in: 0..4.megabytes }, attachment_content_type: { in: ['txt'] }
   end
 
 If you want to translate the errores the keys are:
@@ -69,9 +64,9 @@ If you want to translate the errores the keys are:
   errors.messages.attachment_content_type # :types
 
 In your views:
-  a{ :href => record.file.url } # To get the file url
-  a{ :href => record.image.url } # To get the original image
-  a{ :href => record.image.url(:big) } # To get the a thumb
+  a{ href: record.file.url } # To get the file url
+  a{ href: record.image.url } # To get the original image
+  a{ href: record.image.url(:big) } # To get the a thumb
 
 In your forms:
   = f.file_field :attr
@@ -84,25 +79,19 @@ If your file it's optional:
 == How can I use a cdn with this plugin?
 
 Define a base url in your application.rb:
-  config.uploads.base_url = 'http://cdn.example.com'
+  config.attachs.base_url = 'http://cdn.example.com'
 
 == How can I automatically create buckets?
 
 Use this rake task after create the s3.yml file:
-  rake uploads:s3:buckets:create
+  rake attachs:s3:buckets:create
   
 == How can I clean a preset?
 
 Use this rake task:
-  rake uploads:presets:clean MODEL=models PRESETS=first_preset,second_preset
+  rake attachs:presets:clean MODEL=models PRESETS=first_preset,second_preset
 
 == How can I refresh a preset?
 
 Use this rake task:
-  rake uploads:presets:refresh MODEL=models PRESETS=first_preset,second_preset
-
-== How to migrate from versions before 0.1.0?
-
-To migrate from versions before 0.1.0 you need to reorganize uploads with this task after define your presets in your application.rb:
-  rake uploads:migrate
-
+  rake attachs:presets:refresh MODEL=models PRESETS=first_preset,second_preset
