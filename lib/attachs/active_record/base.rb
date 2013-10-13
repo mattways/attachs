@@ -75,7 +75,7 @@ module Attachs
         attr_reader :attachments
     
         def inherited(subclass)
-          subclass.instance_variable_set(:@attachments, @attachments)
+          subclass.instance_variable_set :@attachments, @attachments
           super
         end
 
@@ -126,14 +126,14 @@ module Attachs
               attachments[attr] = nil
               attributes[attr.to_s] = nil
             end
-            instance_variable_set("@delete_#{attr}".to_sym, value)
+            instance_variable_set :"@delete_#{attr}", value
           end
         end
 
         def define_attachable_attribute_method_get(attr, options)
           define_method attr do
             return attachments[attr] if attachments.has_key? attr
-            return nil if super().nil? and not options.has_key? :default
+            return nil unless super() or options.has_key? :default
             attachments[attr] = build_attachment_instance(super(), options)
           end 
           attr_reader :"delete_#{attr}"

@@ -32,7 +32,7 @@ module Attachs
       protected
 
       def store_path(*args)
-        ::File.join('images', (args[0] ? args[0].to_s.gsub('_', '-') : 'original'))
+        ::File.join 'images', (args[0] ? args[0].to_s.gsub('_', '-') : 'original')
       end
       
     end

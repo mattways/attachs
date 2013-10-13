@@ -13,6 +13,10 @@ module Attachs
       def size(path)
         ::File.size realpath(path)
       end
+      
+      def realpath(path)
+        base_path.join path
+      end
 
       def url(path)
         ::File.join Rails.application.config.attachs.base_url, path
@@ -41,10 +45,6 @@ module Attachs
 
       def tmp?
         @tmp == true
-      end
-
-      def realpath(path)
-        base_path.join path
       end
 
       def base_path

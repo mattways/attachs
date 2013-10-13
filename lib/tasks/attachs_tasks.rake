@@ -19,7 +19,7 @@ module Attachs
   end
 end
 
-namespace :uploads do
+namespace :attachs do
 
   namespace :presets do
     desc 'Refresh preset'
@@ -68,4 +68,3 @@ namespace :uploads do
   end
 
 end
-

@@ -57,14 +57,24 @@ module Attachs
         @filename ||= "#{(Time.now.to_f * 10000000).to_i}#{::File.extname upload.original_filename}".downcase
       end      
 
+      def original_filename
+        return nil unless upload.present?
+        upload.original_filename
+      end
+
       def path(*args)
         return nil if deleted?
-        stored? ? destination_path(*args) : upload.path
+        (stored? ? destination_path(*args) : upload.path).to_s
+      end
+
+      def realpath(*args)
+        return nil if deleted? or Rails.application.config.attachs.storage == :s3
+        (stored? ? storage.realpath(path) : upload.path).to_s
       end
 
       def url(*args)
         return nil if deleted? or not stored?
-        storage.url path(*args)
+        storage.url(path(*args)).to_s
       end
 
       def store
