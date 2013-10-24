@@ -69,7 +69,7 @@ module Attachs
 
       def realpath(*args)
         return nil if deleted? or Rails.application.config.attachs.storage == :s3
-        (stored? ? storage.realpath(path) : upload.path).to_s
+        (stored? ? storage.realpath(path(*args)) : upload.path).to_s
       end
 
       def url(*args)
