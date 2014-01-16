@@ -8,8 +8,9 @@ module Attachs
         model.attachments.each do |attr, options|
           if options[:type] == :image
             presets.each do |preset|
-              image = record.send(attr)
-              yield image, preset
+              if image = record.send(attr)
+                yield image, preset
+              end
             end
           end
         end
@@ -33,7 +34,7 @@ namespace :attachs do
     desc 'Clean preset'
     task clean: :environment do
       Attachs::Task.iterate_images do |image, preset|
-        puts "Deleting preset #{image.url(preset)}."
+        puts "Deleting preset #{image.url(preset)}." 
         image.delete_preset preset
       end
       puts "Presets cleaned successfully."
