@@ -4,7 +4,7 @@ module Attachs
       
       cattr_accessor :config
 
-      def initialize(default)
+      def initialize(default, private)
         if (Rails.env.test? and !default)
           env = 'test'
         elsif default
@@ -12,9 +12,9 @@ module Attachs
         else
           env = Rails.env
         end
-        config = self.class.config[env]
-        AWS.config access_key_id: config['access_key_id'], secret_access_key: config['secret_access_key']
-        @bucket = AWS::S3.new.buckets[config['bucket']]
+        AWS.config access_key_id: config[env]['access_key_id'], secret_access_key: config[env]['secret_access_key']
+        @bucket = AWS::S3.new.buckets[config[env]['bucket']]
+        @private = private
       end
 
       def exists?(path)
@@ -26,12 +26,11 @@ module Attachs
       end
 
       def url(path)
-        base_url = Rails.application.config.attachs.base_url
         base_url.present? ? ::File.join(base_url, path) : object(path).public_url(secure: false)
       end
 
       def store(upload, path)
-        bucket.objects.create(path, Pathname.new(upload.path)).acl = :public_read
+        bucket.objects.create(path, Pathname.new(upload.path)).acl = private? ? :private : :public_read
       end
       
       def delete(path)
@@ -43,7 +42,7 @@ module Attachs
           if upload.present?
             cache[source] = upload.path
           else
-            remote = create_tmp_file
+            remote = create_tmp
             remote.binmode
             object(source).read { |chunk| remote.write(chunk) }
             remote.close
@@ -51,7 +50,7 @@ module Attachs
             cache[source] = remote.path
           end
         end
-        tmp = create_tmp_file
+        tmp = create_tmp
         yield Attachs::Magick::Image.new(cache[source], tmp.path)
         store tmp, output
       end
@@ -59,9 +58,21 @@ module Attachs
       protected
 
       attr_reader :bucket
+
+      def config
+        self.class.config
+      end
+
+      def base_url
+        Rails.application.config.attachs.base_url
+      end
+
+      def private?
+        @private
+      end
       
-      def create_tmp_file
-        Tempfile.new('s3')
+      def create_tmp
+        Tempfile.new 's3'
       end
 
       def cache

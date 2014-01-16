@@ -2,9 +2,9 @@ class AttachmentSizeValidator < Attachs::Validators::Base
   include ActionView::Helpers::NumberHelper
     
   def validate_each(record, attribute, value)
-    if value.present? and not value.default?
+    if value.present? and !value.default?
       if options.has_key? :in
-        unless options[:in].include? value.size
+        if options[:in].exclude? value.size
           add_error record, attribute, 'attachment_size_in', min: number_to_human_size(options[:in].begin), max: number_to_human_size(options[:in].end)
         end          
       else    
@@ -16,12 +16,6 @@ class AttachmentSizeValidator < Attachs::Validators::Base
         end         
       end      
     end
-  end
-
-  protected
-
-  def add_error(record, attribute, type, options)
-    super(record, attribute, "errors.messages.#{type}", options)
   end
 
 end

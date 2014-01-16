@@ -3,6 +3,8 @@ module Attachs
     class File
       
       def initialize(source, options={})
+        @options = options
+        @deleted = false        
         if source.is_a? ActionDispatch::Http::UploadedFile or source.is_a? Rack::Test::UploadedFile
           @upload = source          
           @stored = false
@@ -21,8 +23,10 @@ module Attachs
           @default = true
           @storage = build_storage
         end
-        @deleted = false        
-        @options = options
+      end
+      
+      def private?
+        @options and @options[:private] == true
       end
 
       def default?
@@ -64,21 +68,21 @@ module Attachs
 
       def path(*args)
         return nil if deleted?
-        (stored? ? destination_path(*args) : upload.path).to_s
+        stored? ? destination_path(*args) : upload.path.to_s
       end
 
       def realpath(*args)
-        return nil if deleted? or Rails.application.config.attachs.storage == :s3
-        (stored? ? storage.realpath(path(*args)) : upload.path).to_s
+        return nil if deleted? or storage_type == :s3
+        stored? ? storage.realpath(path(*args)) : upload.path.to_s
       end
 
       def url(*args)
-        return nil if deleted? or not stored?
-        storage.url(path(*args)).to_s
+        return nil if deleted? or !stored?
+        storage.url path(*args)
       end
 
       def store
-        if not stored? and upload?
+        if !stored? and upload?
           @storage = build_storage
           storage.store upload, destination_path
           yield if block_given?
@@ -88,7 +92,7 @@ module Attachs
       end
       
       def delete
-        if not default? and stored? and exists?
+        if !default? and stored? and exists?
           storage.delete path
           yield if block_given?
           @storage = build_storage(:local) if upload?
@@ -101,9 +105,13 @@ module Attachs
 
       attr_reader :upload, :storage, :options
 
+      def storage_type
+        Rails.application.config.attachs.storage
+      end
+
       def build_storage(type=nil)
-        type ||= Rails.application.config.attachs.storage
-        Attachs::Storages.const_get(type.to_s.classify).new default?
+        klass = (type || storage_type).to_s.classify 
+        Attachs::Storages.const_get(klass).new default?, private?
       end
 
       def upload?

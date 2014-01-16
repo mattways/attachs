@@ -3,26 +3,28 @@ module Attachs
     module Base
       extend ActiveSupport::Concern
 
-      included do
-        singleton_class.class_eval do
-          [:file, :image].each do |type|
-            name = :"has_attached_#{type}"
-            define_method name do |*args|
-              options = args.extract_options!
-              options[:type] = type
-              define_attachment *args.append(options)
-            end
-            alias_method :"attached_#{type}", name
-          end
-        end
-      end
-
       protected
 
       attr_reader :stored_attachments, :deleted_attachments
 
       def attachments
         @attachments ||= {}
+      end
+      
+      def add_attachment(attr, value, options)
+        attachment = build_attachment_instance(value, options)
+        attachments[attr] = attachment
+        write_attribute attr, attachment.filename 
+      end
+
+      def get_attachment(attr, options)
+        return attachments[attr] if attachments.has_key? attr
+        return nil unless read_attribute(attr) or options.has_key? :default
+        attachments[attr] = build_attachment_instance(read_attribute(attr), options)
+      end
+
+      def remove_attachment(attr)
+        write_attribute attr, nil
       end
 
       def build_attachment_instance(source, options)
@@ -59,7 +61,7 @@ module Attachs
       end
 
       def delete_attachments
-        iterate_attachments { |a| a.delete }  
+        iterate_attachments { |a| a.delete }
       end
       
       def remove_stored_attachments
@@ -71,6 +73,16 @@ module Attachs
       end   
 
       module ClassMethods
+
+        [:file, :image].each do |type|
+          name = :"has_attached_#{type}"
+          define_method name do |*args|
+            options = args.extract_options!
+            options[:type] = type
+            define_attachment *args.map(&:to_sym).append(options)
+          end
+          alias_method :"attached_#{type}", name
+        end
 
         attr_reader :attachments
     
@@ -89,9 +101,9 @@ module Attachs
           options = args.extract_options!
           make_attachable unless attachable?
           args.each do |attr|
-            define_attachable_attribute_methods attr.to_sym, options
-            define_default_validations attr.to_sym, options
-            attachments[attr.to_sym] = options
+            define_attachment_attribute_methods attr, options
+            define_attachment_default_validations attr, options
+            attachments[attr] = options
           end
         end
 
@@ -103,40 +115,23 @@ module Attachs
           @attachments = {}
         end
 
-        def define_default_validations(attr, options)
-          default_validations = Rails.application.config.attachs.default_validations[options[:type]]
-          validates attr, default_validations.dup if default_validations.present?
-        end
-
-        def define_attachable_attribute_methods(attr, options)
-          ['set','get'].each { |method| send "define_attachable_attribute_method_#{method}", attr, options }
-        end
-        
-        def define_attachable_attribute_method_set(attr, options)
+        def define_attachment_attribute_methods(attr, options)
           define_method "#{attr}=" do |value|
-            if value.is_a? ActionDispatch::Http::UploadedFile or value.is_a? Rack::Test::UploadedFile or (value.is_a? String and value =~ /^[a-zA-Z0-9_-]+\.[a-zA-z]+$/)
-              attachment = build_attachment_instance(value, options)
-              attachments[attr] = attachment
-              write_attribute attr, attachment.filename 
-            end
+            add_attachment attr, value, options if value.is_a? ActionDispatch::Http::UploadedFile or value.is_a? Rack::Test::UploadedFile
           end
+          define_method attr do
+            get_attachment attr, options
+          end 
           define_method "delete_#{attr}=" do |value|
-            if attribute_present? attr and value == '1'
-              send "#{attr}_will_change!"
-              attachments[attr] = nil
-              attributes[attr.to_s] = nil
-            end
+            remove_attachment attr if value == '1'
             instance_variable_set :"@delete_#{attr}", value
           end
-        end
-
-        def define_attachable_attribute_method_get(attr, options)
-          define_method attr do
-            return attachments[attr] if attachments.has_key? attr
-            return nil unless super() or options.has_key? :default
-            attachments[attr] = build_attachment_instance(super(), options)
-          end 
           attr_reader :"delete_#{attr}"
+        end
+        
+        def define_attachment_default_validations(attr, options)
+          default_validations = Rails.application.config.attachs.default_validations[options[:type]]
+          validates attr, default_validations.dup if default_validations.present?
         end
 
       end    

@@ -5,7 +5,7 @@ module Attachs
       protected
       
       def add_error(record, attribute, type, options={})
-        record.errors[attribute] << (options[:message] || I18n.t(type, options))        
+        record.errors[attribute] << (options[:message] || I18n.t("errors.messages.#{type}", options))
       end
       
     end

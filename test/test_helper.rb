@@ -34,8 +34,8 @@ class ActiveSupport::TestCase
 
   def fixture_file_upload_s3(fixture, type, path, default=false)
     upload = fixture_file_upload(fixture, type)
-    storage = Attachs::Storages::S3.new(default)
-    storage.store(upload, path)
+    storage = Attachs::Storages::S3.new(default, false)
+    storage.store upload, path
   end
 
   def assert_object_s3(url)

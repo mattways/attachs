@@ -18,8 +18,9 @@ module Dummy
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
-    
-    config.attachs.default_presets = [:small]
+    I18n.enforce_available_locales = false    
+
+    config.attachs.default_presets = :small
     config.attachs.presets = {
       small: { method: :fit, width: 120, height: 120 },
       big: { method: :fill, width: 1024, height: 768 }

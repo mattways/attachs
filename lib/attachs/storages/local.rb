@@ -2,8 +2,9 @@ module Attachs
   module Storages
     class Local
 
-      def initialize(default)
+      def initialize(default, private)
         @tmp = (Rails.env.test? and !default)
+        @private = private
       end
 
       def exists?(path)
@@ -19,7 +20,7 @@ module Attachs
       end
 
       def url(path)
-        ::File.join Rails.application.config.attachs.base_url, path
+        ::File.join Rails.application.config.attachs.base_url, path unless private?
       end
 
       def store(upload, path)
@@ -47,8 +48,12 @@ module Attachs
         @tmp == true
       end
 
+      def private?
+        @private == true
+      end
+
       def base_path
-        Rails.root.join tmp? ? 'tmp' : 'public'
+        Rails.root.join tmp? ? 'tmp' : private? ? 'private' : 'public'
       end
 
       def create_dir(path)

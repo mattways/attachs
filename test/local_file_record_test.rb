@@ -17,4 +17,15 @@ class LocalFileRecordTest < ActiveSupport::TestCase
     assert !@record.file.exists?
   end
 
+  test "should delete correctly using delete_attr method" do
+    uploads_path = Rails.root.join('tmp', 'uploads', 'files', @record.file.filename)
+    
+    @record.delete_file = '1'
+    assert @record.file_changed?
+
+    @record.save
+    assert !::File.exists?(uploads_path)
+    assert !@record.file.exists?
+  end
+
 end
