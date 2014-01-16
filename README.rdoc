@@ -35,6 +35,8 @@ If you need a image:
     has_attached_image :attr, presets: [:small, :big], default: 'assets/image.jpg'
   end
 
+(If you want your attachment to be private add private: true to the parameters)
+
 Define presets in your application.rb
   config.attachs.presets = {
     big: { method: :fit, width: 1024, height: 768 }, # Fit will scale the image until it fit in the space without cropping
@@ -72,6 +74,10 @@ If your file it's optional:
   = f.check_box :delete_attr
 
 = FAQ
+
+== Where my private files are stored?
+
+In a folder named "private" in the root directory of your app.
 
 == How can I use a cdn with this plugin?
 
