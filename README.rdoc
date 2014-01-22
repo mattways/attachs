@@ -18,7 +18,7 @@ ImageMagick must be install, you can install it with homebrew:
 = Usage
 
 Mount the engine at the end of you routes.rb (only if you are using local storage):
-  mount Attachs:Engine: '/' # Will be use to generate on the fly missing image presets
+  mount Attachs::Engine => '/' # Will be use to generate on the fly missing image presets
 
 Add the column to your table (just a string):
   create_table :models do |t|
