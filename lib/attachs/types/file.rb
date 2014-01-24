@@ -68,17 +68,17 @@ module Attachs
 
       def path(*args)
         return nil if deleted?
-        stored? ? destination_path(*args) : upload.path.to_s
+        (stored? ? destination_path(*args) : upload.path).to_s
       end
 
       def realpath(*args)
         return nil if deleted? or storage_type == :s3
-        stored? ? storage.realpath(path(*args)) : upload.path.to_s
+        (stored? ? storage.realpath(path(*args)) : upload.path).to_s
       end
 
       def url(*args)
         return nil if deleted? or !stored?
-        storage.url path(*args)
+        storage.url(path(*args)).to_s
       end
 
       def store
