@@ -166,7 +166,7 @@ To configure the s3 credentials:
     }
   end
 
-NOTE: If attachment is stored in s3 you can pass a second parameter to the url method to enable or disable ssl.
+NOTE: If storage is s3 you can pass a second parameter to the url method to enable or disable ssl.
 
 = CDN
 
