@@ -37,7 +37,7 @@ Define the attachment in your model:
 
 The default path is set in the configuration file:
   Attachs.configure do |config|
-    config.path = '/:timestamp-:filename'
+    config.default_path = '/:timestamp-:filename'
   end
 
 To create custom interpolations:
