@@ -48,46 +48,18 @@ To create custom interpolations:
     }
   end
 
-The system interpolations are:
-
-*filename*: full filename
-
-*basename*: filename without extension
-
-*extension*: filename extension
-
-*size*: size of the file
-
-*timestamp*: numeric unique id
-
-*uuid*: unique id
-
-*class*: record class name
-
-*id*: id of the record
-
-*param*: param of the record
-
-*style*: style name
+NOTE: Look into lib/attachs/storages/base.rb to find a list of the system interpolations.
 
 = Styles
 
 Define the styles of the attachment:
   Attachs.configure do |config|
     config.styles = {
-      small: '120x120!',
-      medium: '240x240#',
-      big: '360x360'
+      small: '120x120!',  # forces the exact size
+      medium: '240x240#', # resizes and crops to fill the desire space
+      big: '360x360'      # resizes to contain the imagen in the desire space
     }
   end
-
-The possible strategies are:
-
-*default*: resizes to contain the imagen in the desire space
-
-*!*: forces the exact size
-
-*#*: resizes and crops to fill the desire space
 
 Then reference them in your model:
   class User < ActiveRecord::Base
