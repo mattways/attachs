@@ -40,6 +40,11 @@ The default path is set in the configuration file:
     config.default_path = '/:timestamp-:filename'
   end
 
+To customize the path to some model:
+  class User < ActiveRecord::Base
+    has_attached_file :avatar, path: '/:type/:timestamp/:filename'
+  end
+
 To create custom interpolations:
   Attachs.configure do |config|
     config.interpolations = {
