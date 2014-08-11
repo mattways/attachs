@@ -50,36 +50,25 @@ To create custom interpolations:
 
 The system interpolations are:
 
-[filename]
-  full filename
+*filename*: full filename
 
-[basename]
-  filename without extension
+*basename*: filename without extension
 
-[extension]
-  filename extension
+*extension*: filename extension
 
-[size]
-  size of the file
+*size*: size of the file
 
-[timestamp]
-  numeric unique id
+*timestamp*: numeric unique id
 
-[uuid]
-  unique id
+*uuid*: unique id
 
-[class]
-  record class name
+*class*: record class name
 
-[id]
-  id of the record
+*id*: id of the record
 
-[param]
-  param of the record
+*param*: param of the record
 
-[style]
-  style name
-
+*style*: style name
 
 = Styles
 
@@ -94,14 +83,11 @@ Define the styles of the attachment:
 
 The possible strategies are:
 
-[!]
-  Forces the exact size
+*default*: resizes to contain the imagen in the desire space
 
-[#]
-  Resizes and crops to fill the desire space
+*!*: forces the exact size
 
-[default]
-  Resizes to contain the imagen in the desire space
+*#*: resizes and crops to fill the desire space
 
 Then reference them in your model:
   class User < ActiveRecord::Base
@@ -169,3 +155,11 @@ The url method points to the original file:
 
 If you want to point to some particular style:
   <%= image_tag user.avatar.url(:small) %>
+
+= Credits
+
+This gem is maintained and funded by museways[http://museways.com].
+
+= License
+
+It is free software, and may be redistributed under the terms specified in the MIT-LICENSE file.
