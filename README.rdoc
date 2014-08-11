@@ -12,8 +12,7 @@ Put this line in your Gemfile:
 Then bundle:
   $ bundle
 
-ImageMagick is needed:
-  brew install imagemagick
+NOTE: ImageMagick is needed.
 
 = Configuration
 
@@ -73,12 +72,12 @@ To set styles for all attachments:
 
 = Security
 
-If you want the attachment to be private:
+To make the attachment private:
   class User < ActiveRecord::Base
     has_attached_file :avatar, private: true
   end
 
-NOTE: This attachment will be saved into /private folder.
+NOTE: Private attachments will be saved into /private folder.
 
 = Validations
 
@@ -100,18 +99,18 @@ To validate the content type of the attachment:
     validates_attachment_content_type_of :avatar, in: %w(image/jpg image/gif)
   end
 
-NOTE: You can combine them if you want. 
+NOTE: You can combine them too. 
 
 = I18n
 
-If you want to translate the messages the keys are:
+To translate the messages the keys are:
   errors.messages.attachment_presence
   errors.messages.attachment_size_in
   errors.messages.attachment_size_less_than
   errors.messages.attachment_size_greater_than
   errors.messages.attachment_content_type
 
-NOTE: You may want to look into lib/attachs/locales yamls.
+NOTE: Look into lib/attachs/locales yamls.
 
 = Forms
 
@@ -125,8 +124,33 @@ Your forms continue to work the same:
 The url method points to the original file:
   <%= image_tag user.avatar.url %>
 
-If you want to point to some particular style:
+To point to some particular style:
   <%= image_tag user.avatar.url(:small) %>
+
+The defauft url is used when there is no upload:
+  class User < ActiveRecord::Base
+    has_attached_file :avatar, default_url: '/missing.png'
+  end
+
+= Storage
+
+The default storage is defined in the configuration file:
+  Attachs.configure do |config|
+    config.default_storage = :local
+  end
+
+Can be overwritten in the model:
+  class User < ActiveRecord::Base
+    has_attached_file :avatar, storage: :s3
+  end
+
+To configure the s3 credentials:
+  Attachs.configure do |config|
+    config.s3 = {
+      access_key_id: 'xxx',
+      secret_access_key: 'xxx'
+    }
+  end
 
 = Credits
 
