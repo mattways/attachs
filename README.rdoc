@@ -175,6 +175,14 @@ To configure a cdn:
     config.base_url = 'http://cdn.example.com'
   end
 
+= Tasks
+
+To refresh all the styles of some attachment:
+  bundle exec rake attachs:refresh:all CLASS=User ATTACHMENT=avatar
+
+To refresh missing styles of some attachment:
+  bundle exec rake attachs:refresh:missing CLASS=User ATTACHMENT=avatar
+
 = Credits
 
 This gem is maintained and funded by museways[http://museways.com].
