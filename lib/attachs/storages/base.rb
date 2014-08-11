@@ -29,8 +29,6 @@ module Attachs
                 value = attachment.content_type.split('/').first
               when :timestamp
                 value = (attachment.updated_at.to_f * 10000000000).to_i
-              when :uuid
-                value = SecureRandom.uuid
               when :class
                 value = attachment.record.class.name
               when :id
