@@ -5,7 +5,6 @@ module Attachs
 
         def dimensions(source)
           if output = run("identify -format %wx%h '#{source}'")
-            puts output
             output.split('x').map(&:to_i)
           end
         end

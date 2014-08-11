@@ -36,7 +36,7 @@ class MagickToolTest < ActiveSupport::TestCase
   end
 
   def resized
-    Rails.root.join('tmp', 'resized.gif')
+    Rails.root.join('public', 'resized.gif')
   end
 
 end
