@@ -27,6 +27,7 @@ module Attachs
       @config ||= begin
         ActiveSupport::OrderedOptions.new.tap do |config|
           config.styles = {}
+          config.interpolations = {}
           config.global_styles = []
           config.global_convert_options= ''
           config.default_storage = :local
