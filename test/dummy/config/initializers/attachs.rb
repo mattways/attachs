@@ -19,7 +19,7 @@ Attachs.configure do |config|
     big_force: '-trim'
   }
   config.interpolations = {
-    month: -> (attachment) { attachment.updated_at.month }
+    month: lambda { |attachment| attachment.updated_at.month }
   }
 
 end
