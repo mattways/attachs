@@ -1,104 +1,171 @@
-{<img src="https://codeclimate.com/github/mattways/attachs.png" />}[https://codeclimate.com/github/mattways/attachs] {<img src="https://travis-ci.org/mattways/attachs.png?branch=master" alt="Build Status" />}[https://travis-ci.org/mattways/attachs] {<img src="https://gemnasium.com/mattways/attachs.png" alt="Dependency Status" />}[https://gemnasium.com/mattways/attachs]
+{<img src="https://badge.fury.io/rb/attachs.png" alt="Gem Version" />}[http://badge.fury.io/rb/attachs] {<img src="https://codeclimate.com/github/museways/attachs.png" />}[https://codeclimate.com/github/museways/attachs] {<img src="https://travis-ci.org/museways/attachs.png?branch=master" alt="Build Status" />}[https://travis-ci.org/museways/attachs]
 
 = Attachs
 
-Minimalistic toolkit to attach file and images to records.
+Minimalistic toolkit to attach files to records.
 
 = Install
 
 Put this line in your Gemfile:
   gem 'attachs'
-  
+
 Then bundle:
   $ bundle
 
-ImageMagick must be install, you can install it with homebrew:
+ImageMagick is needed:
   brew install imagemagick
-  
+
+= Configuration
+
+Generate the configuration file:
+  rails g attachs:install
+
+NOTE: This will generate the config/initializers/attachs.rb.
+
 = Usage
 
-Mount the engine at the end of you routes.rb (only if you are using local storage):
-  mount Attachs::Engine => '/' # Will be use to generate on the fly missing image presets
-
-Add the column to your table (just a string):
-  create_table :models do |t|
-    t.string :attr
+Add the column to your table:
+  create_table :users do |t|
+    t.attachment :avatar
   end
 
-If you need a file:
-  class Model < ActiveRecord::Base
-    has_attached_file :attr, default: 'file.txt'
+Define the attachment in your model:
+  class User < ActiveRecord::Base
+    has_attached_file :avatar
   end
 
-If you need a image:
-  class Model < ActiveRecord::Base
-    has_attached_image :attr, presets: [:small, :big], default: 'assets/image.jpg'
+= Paths
+
+The default path is set in the configuration file:
+  Attachs.configure do |config|
+    config.path = '/:timestamp-:filename'
   end
 
-(If you want your attachment to be private add private: true to the parameters)
-
-Define presets in your application.rb
-  config.attachs.presets = {
-    big: { method: :fit, width: 1024, height: 768 }, # Fit will scale the image until it fit in the space without cropping
-    small: { method: :fill, width: 120, height: :120 }, # Fill will scale the image to fill all the space and then crop
-    custom: proc { |image| image.convert resize: '100x100' } # ImageMagick wrapper to do whatever you want
-  }
-  config.attachs.default_presets = [:small] # Define the default presets for all models with attached images
-  config.attachs.storage = :local # The default it's local, you can use :s3 as well
-
-If you want to use S3 create a s3.yml config file with this generator and complete it:
-  rails g attachs:s3:config
-
-The validation works very similar to paperclip:
-  class Model < ActiveRecord::Base
-    has_attached_file :attr
-    validates :attr, attachment_presence: true, attachment_size: { in: 0..4.megabytes }, attachment_content_type: { in: ['txt'] }
+To create custom interpolations:
+  Attachs.configure do |config|
+    config.interpolations = {
+      category: -> (attachment) { attachment.record.category }
+    }
   end
 
-If you want to translate the errores the keys are:
+The system interpolations are:
+
+[filename]
+  full filename
+
+[basename]
+  filename without extension
+
+[extension]
+  filename extension
+
+[size]
+  size of the file
+
+[timestamp]
+  numeric unique id
+
+[uuid]
+  unique id
+
+[class]
+  record class name
+
+[id]
+  id of the record
+
+[param]
+  param of the record
+
+[style]
+  style name
+
+
+= Styles
+
+Define the styles of the attachment:
+  Attachs.configure do |config|
+    config.styles = {
+      small: '120x120!',
+      medium: '240x240#',
+      big: '360x360'
+    }
+  end
+
+The possible strategies are:
+
+[!]
+  Forces the exact size
+
+[#]
+  Resizes and crops to fill the desire space
+
+[default]
+  Resizes to contain the imagen in the desire space
+
+Then reference them in your model:
+  class User < ActiveRecord::Base
+    has_attached_file :avatar, styles: [:small, :medium]
+  end
+
+To set styles for all attachments:
+  Attachs.configure do |config|
+    config.global_styles = [:big]
+  end
+
+= Security
+
+If you want the attachment to be private:
+  class User < ActiveRecord::Base
+    has_attached_file :avatar, private: true
+  end
+
+NOTE: This attachment will be saved into /private folder.
+
+= Validations
+
+To validate the presence of the attachment:
+  class User < ActiveRecord::Base
+    has_attached_file :avatar
+    validates_attachment_presence_of :avatar
+  end
+
+To validate the size of the attachment:
+  class User < ActiveRecord::Base
+    has_attached_file :avatar
+    validates_attachment_size_of :avatar, in: 1..5.megabytes
+  end
+
+To validate the content type of the attachment:
+  class User < ActiveRecord::Base
+    has_attached_file :avatar
+    validates_attachment_content_type_of :avatar, in: %w(image/jpg image/gif)
+  end
+
+NOTE: You can combine them if you want. 
+
+= I18n
+
+If you want to translate the messages the keys are:
   errors.messages.attachment_presence
-  errors.messages.attachment_size_in # :max and :min
-  errors.messages.attachment_size_less_than  # :count
-  errors.messages.attachment_size_greater_than # :count
-  errors.messages.attachment_content_type # :types
+  errors.messages.attachment_size_in
+  errors.messages.attachment_size_less_than
+  errors.messages.attachment_size_greater_than
+  errors.messages.attachment_content_type
 
-In your views:
-  a{ href: record.file.url } # To get the file url
-  a{ href: record.image.url } # To get the original image
-  a{ href: record.image.url(:big) } # To get the a thumb
+NOTE: You may want to look into lib/attachs/locales yamls.
 
-In your forms:
-  = f.file_field :attr
+= Forms
 
-If your file it's optional:
-  = f.check_box :delete_attr
+Your forms continue to work the same:
+  <%= form_for @user do |f| %>
+    <%= f.file_field :avatar %>
+  <% end %>
 
-= FAQ
+= Urls
 
-== Where my private files are stored?
+The url method points to the original file:
+  <%= image_tag user.avatar.url %>
 
-In a folder named "private" in the root directory of your app.
-
-== How can I use a cdn with this plugin?
-
-Define a base url in your application.rb:
-  config.attachs.base_url = 'http://cdn.example.com'
-
-== How can I automatically create buckets?
-
-Use this rake task after create the s3.yml file:
-  rake attachs:s3:buckets:create
-  
-== How can I clean a preset?
-
-Use this rake task:
-  rake attachs:presets:clean MODEL=models PRESETS=first_preset,second_preset
-
-== How can I refresh a preset?
-
-Use this rake task:
-  rake attachs:presets:refresh MODEL=models PRESETS=first_preset,second_preset
-
-== How can I migrate from versions before 0.3.0
-
-All will work the same except from the name of the config parameter, replace uploads with attachs.
+If you want to point to some particular style:
+  <%= image_tag user.avatar.url(:small) %>

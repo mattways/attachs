@@ -1,64 +1,75 @@
 module Attachs
   module Storages
-    class Local
+    class Local < Base
 
-      def initialize(default, private)
-        @tmp = (Rails.env.test? and !default)
-        @private = private
+      def url(style=nil)
+        unless attachment.private?
+          base_url.join(path(style)).to_s
+        end
       end
 
-      def exists?(path)
-        ::File.exists? realpath(path)
-      end
-
-      def size(path)
-        ::File.size realpath(path)
-      end
-      
-      def realpath(path)
-        base_path.join path
-      end
-
-      def url(path)
-        ::File.join Rails.application.config.attachs.base_url, path unless private?
-      end
-
-      def store(upload, path)
-        create_dir realpath(path)
-        upload.rewind # Hack to avoid empty files
-        ::File.open(realpath(path), 'wb') do |file|
-          while chunk = upload.read(16 * 1024)
-            file.write(chunk)
+      def process(force=false)
+        if attachment.upload?
+          FileUtils.mkdir_p realpath.dirname
+          attachment.upload.rewind
+          File.open(realpath, 'wb') do |file|
+            while chunk = attachment.upload.read(16 * 1024)
+              file.write chunk
+            end
+          end
+        end
+        if attachment.image?
+          attachment.styles.each do |style|
+            if force == true
+              delete realpath(style)
+            end
+            unless File.file? realpath(style)
+              FileUtils.mkdir_p realpath(style).dirname
+              resize realpath, style, realpath(style)
+            end
           end
         end
       end
-      
-      def delete(path)
-        ::File.delete realpath(path)
-      end
 
-      def magick(source, output, upload)
-        create_dir realpath(output)
-        yield Attachs::Magick::Image.new(realpath(source), realpath(output))
+      def destroy
+        delete realpath
+        if attachment.image?
+          attachment.styles.each do |style|
+            delete realpath(style)
+          end
+        end
       end
 
       protected
 
-      def tmp?
-        @tmp == true
+      def delete(realpath)
+        if File.file? realpath
+          File.delete realpath
+        end
       end
 
-      def private?
-        @private == true
+      def realpath(style=nil)
+        base_path.join(path(style))
       end
 
       def base_path
-        Rails.root.join tmp? ? 'tmp' : private? ? 'private' : 'public'
+        @base_path ||= begin
+          if attachment.private?
+            Rails.root.join 'private'
+          else
+            Rails.root.join 'public'
+          end
+        end
       end
 
-      def create_dir(path)
-        dir = base_path.join('uploads', path).dirname
-        FileUtils.mkdir_p dir unless ::File.directory? dir
+      def base_url
+        @base_url ||= begin
+          if Attachs.config.base_url.present?
+            Pathname.new Attachs.config.base_url
+          else
+            Pathname.new '/'
+          end
+        end
       end
 
     end

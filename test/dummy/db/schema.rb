@@ -11,32 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130820222534) do
+ActiveRecord::Schema.define(version: 20140808012639) do
 
-  create_table "all_attacheds", force: true do |t|
-    t.string   "image"
-    t.string   "file_presence"
-    t.string   "file_content_type"
-    t.string   "file_size"
-    t.string   "file_all"
-    t.string   "file_default"
-    t.string   "image_presence"
-    t.string   "image_content_type"
-    t.string   "image_size"
-    t.string   "image_all"
-    t.string   "image_default"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "file_attacheds", force: true do |t|
-    t.string   "file"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "image_attacheds", force: true do |t|
-    t.string   "image"
+  create_table "users", force: true do |t|
+    t.string   "email"
+    t.string   "avatar_filename"
+    t.string   "avatar_content_type"
+    t.integer  "avatar_size"
+    t.datetime "avatar_updated_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -7,24 +7,27 @@ require 'attachs/version'
 Gem::Specification.new do |s|
   s.name        = 'attachs'
   s.version     = Attachs::VERSION
-  s.authors     = ['Mattways']
-  s.email       = ['contact@mattways.com']
-  s.homepage    = 'https://github.com/mattways/attachs'
-  s.summary     = 'Attachs for Rails.'
-  s.description = 'Minimalistic toolkit to attach file and images to records.'
+  s.authors     = ['Museways']
+  s.email       = ['hello@museways.com']
+  s.homepage    = 'https://github.com/museways/attachs'
+  s.summary     = 'Attachs for rails.'
+  s.description = 'Minimalistic toolkit to attach files to records in rails.'
   s.license     = 'MIT'
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.rdoc']
   s.test_files = Dir['test/**/*']
+  s.requirements << 'ImageMagick'
 
-  s.add_dependency 'rails', (ENV['RAILS_VERSION'] ? "~> #{ENV['RAILS_VERSION']}" : '>= 3.0.0')
+  s.required_ruby_version = '>= 1.9.3'
 
-  s.add_development_dependency 'aws-sdk'
-  
+  s.add_development_dependency 'aws-sdk', '~> 1.0'
+
+  s.add_dependency 'rails', (ENV['RAILS_VERSION'] ? "~> #{ENV['RAILS_VERSION']}" : ['>= 3.1.0', '< 4.2.0'])
+
   if RUBY_PLATFORM == 'java'
-    s.add_development_dependency 'activerecord-jdbcsqlite3-adapter'
-    s.add_development_dependency 'jruby-openssl'
+    s.add_development_dependency 'activerecord-jdbcsqlite3-adapter', '~> 1.3'
+    s.add_development_dependency 'jruby-openssl', '~> 0.9'
   else
-    s.add_development_dependency 'sqlite3'
+    s.add_development_dependency 'sqlite3', '~> 1.3'
   end
 end

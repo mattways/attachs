@@ -22,28 +22,20 @@ load(File.expand_path('../dummy/db/schema.rb', __FILE__))
 
 # Addons
 class ActiveSupport::TestCase
-  include ActionDispatch::TestProcess
+  include ActionView::Helpers::NumberHelper
 
-  def load_s3
-    require 'aws-sdk' unless defined?(AWS)
-    @storage_type = Rails.application.config.attachs.storage
-    Rails.application.config.attachs.storage = :s3
-    Attachs::Storages::S3.config = YAML.load_file(Rails.root.join('config', 's3.yml')) if Attachs::Storages::S3.config.blank?
-    self.class.teardown { Rails.application.config.attachs.storage = @storage_type }
+  private
+
+  def file_upload
+    fixture_file_upload('file.txt', 'text/plain')
   end
 
-  def fixture_file_upload_s3(fixture, type, path, default=false)
-    upload = fixture_file_upload(fixture, type)
-    storage = Attachs::Storages::S3.new(default, false)
-    storage.store upload, path
+  def image_upload
+    fixture_file_upload('180x150.gif', 'image/gif')
   end
 
-  def assert_object_s3(url)
-    assert_equal '200', Net::HTTP.get_response(url).code
+  def fixture_file_upload(path, content_type)
+    Rack::Test::UploadedFile.new(Rails.root.join("test/fixtures/#{path}"), content_type)
   end
 
-  def assert_not_object_s3(url)
-    assert_equal '403', Net::HTTP.get_response(url).code
-  end
 end
-
