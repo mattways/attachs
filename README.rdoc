@@ -70,6 +70,20 @@ To set styles for all attachments:
     config.global_styles = [:big]
   end
 
+= Convert
+
+To define global convert options:
+  Attachs.configure do |config|
+    config.global_convert_options = '-quality 75 -strip'
+  end
+
+To set convert options to some styles only:
+  Attachs.configure do |config|
+    config.convert_options = {
+      medium: '-trim'
+    }
+  end
+
 = Security
 
 To make the attachment private:
@@ -150,6 +164,15 @@ To configure the s3 credentials:
       access_key_id: 'xxx',
       secret_access_key: 'xxx'
     }
+  end
+
+NOTE: If attachment is stored in s3 you can pass a second parameter to the url method to enable or disable ssl.
+
+= CDN
+
+To configure a cdn:
+  Attachs.configure do |config|
+    config.base_url = 'http://cdn.example.com'
   end
 
 = Credits
