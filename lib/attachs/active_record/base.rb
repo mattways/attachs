@@ -23,18 +23,22 @@ module Attachs
         unless queued_attachments[:destroy].has_key? attr
           queued_attachments[:destroy][attr] = attachments[attr]
         end
-        queued_attachments[:process][attr] = Attachs::Attachment.new(self, attr, options, value)
+        attachment = Attachs::Attachment.new(self, attr, options, value)
+        queued_attachments[:process][attr], attachments[attr] = attachment
       end
 
       def commit_attachments
-        queued_attachments[:process].each do |attr, attachment|
-          attachment.process
+        self.class.attachments.each do |attr, options|
+          instance_variable_set "@destroy_#{attr}", nil
         end
         queued_attachments[:destroy].each do |attr, attachment|
           attachment.destroy
         end
-        queued_attachments[:process] = {}
+        queued_attachments[:process].each do |attr, attachment|
+          attachment.process
+        end
         queued_attachments[:destroy] = {}
+        queued_attachments[:process] = {}
       end
 
       def destroy_attachments
@@ -57,11 +61,16 @@ module Attachs
         end
 
         def attachments
-          @@attachments ||= {}
+          @attachments ||= {}
         end
 
         def attachable?
           attachments.any?
+        end
+
+        def inherited(subclass)
+          subclass.instance_variable_set :@attachments, @attachments
+          super
         end
 
         protected
@@ -77,6 +86,13 @@ module Attachs
           end
           define_method attr do
             attachments[attr]
+          end
+          attr_reader "destroy_#{attr}"
+          define_method "destroy_#{attr}=" do |value|
+            instance_variable_set "@destroy_#{attr}", value
+            if [1, '1', true].include? value
+              send "#{attr}=", nil
+            end
           end
         end
 

@@ -30,6 +30,7 @@ module Attachs
           config.interpolations = {}
           config.global_styles = []
           config.global_convert_options= ''
+          config.convert_options = {}
           config.default_storage = :local
           config.default_path = '/:timestamp-:filename'
           config.base_url = ''

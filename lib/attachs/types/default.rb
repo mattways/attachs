@@ -10,8 +10,10 @@ module Attachs
         false
       end
 
-      def url
-        attachment.options[:default_url]
+      def url(*args)
+        if attachment.default?
+          storage.url *args
+        end
       end
 
     end

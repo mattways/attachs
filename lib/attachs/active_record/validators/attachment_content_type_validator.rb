@@ -4,7 +4,7 @@ module Attachs
       class AttachmentContentTypeValidator < ActiveModel::EachValidator
 
         def validate_each(record, attribute, value)
-          if value.exist?
+          if value.exists?
             if options[:in].exclude? value.content_type
               record.errors.add attribute, :attachment_content_type, types: options[:in].to_sentence
             end

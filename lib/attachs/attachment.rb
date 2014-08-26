@@ -5,24 +5,27 @@ module Attachs
 
     delegate :basename, :extension, :image?, :url, :process, :destroy, to: :type
 
-    def initialize(record, attribute, options, source=nil)
+    def initialize(record, attribute, options, source=false)
       @record = record
       @attribute = attribute
       @options = options
       @upload = source
-      if source
+      case source
+      when false
+        %w(filename content_type size updated_at).each do |name|
+          instance_variable_set :"@#{name}", record.send("#{attribute}_#{name}")
+        end
+      when nil
+        %w(filename content_type size updated_at).each do |name|
+          record.send "#{attribute}_#{name}=", nil
+        end
+      else
         @filename = source.original_filename.downcase
         @content_type = source.content_type
         @size = source.size
         @updated_at = Time.zone.now
-        if record
-          %w(filename content_type size updated_at).each do |name|
-            record.send "#{attribute}_#{name}=", send(name)
-          end
-        end
-      else
         %w(filename content_type size updated_at).each do |name|
-          instance_variable_set :"@#{name}", record.send("#{attribute}_#{name}")
+          record.send "#{attribute}_#{name}=", send(name)
         end
       end
     end
@@ -39,19 +42,23 @@ module Attachs
       !upload.nil?
     end
 
-    def exist?
-      filename && size && content_type && updated_at
+    def exists?
+      filename and size and content_type and updated_at
     end
 
     def blank?
-      !exist?
+      !exists?
+    end
+
+    def default?
+      !options[:default_path].nil?
     end
 
     protected
 
     def type
       @type ||= begin
-        if exist?
+        if exists?
           Attachs::Types::Regular.new(self)
         else
           Attachs::Types::Default.new(self)

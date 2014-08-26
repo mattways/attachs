@@ -5,7 +5,7 @@ module Attachs
         include ActionView::Helpers::NumberHelper
 
         def validate_each(record, attribute, value)
-          if value.exist?
+          if value.exists?
             if options.has_key? :in
               if options[:in].exclude? value.size
                 record.errors.add attribute, :attachment_size_in, min: number_to_human_size(options[:in].begin), max: number_to_human_size(options[:in].end)

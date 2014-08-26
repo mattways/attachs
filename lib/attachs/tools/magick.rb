@@ -4,7 +4,7 @@ module Attachs
       class << self
 
         def dimensions(source)
-          if output = run("identify -format %wx%h '#{source}'")
+          if output = run(%Q(identify -format %wx%h "#{source}"))
             output.split('x').map(&:to_i)
           end
         end
@@ -29,16 +29,15 @@ module Attachs
             options << " #{style_options}"
           end
           if destination
-            run "convert '#{source}' #{options} '#{destination}'"
+            run %Q(convert "#{source}" #{options} "#{destination}")
           else
-            run "mogrify #{options} '#{source}'"
+            run %Q(mogrify #{options} "#{source}")
           end
         end
 
         protected
 
         def run(cmd)
-          Rails.logger.info cmd
           stdout, stderr, status = Open3.capture3(cmd)
           if status.success?
             stdout.strip
