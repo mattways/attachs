@@ -3,29 +3,28 @@ module Attachs
 
     attr_reader :record, :attribute, :filename, :content_type, :size, :updated_at, :upload, :options
 
-    delegate :basename, :extension, :image?, :url, :process, :destroy, to: :type
+    delegate :basename, :extension, :image?, :url, :process, :destroy, :update, to: :type
 
     def initialize(record, attribute, options, source=false)
       @record = record
       @attribute = attribute
       @options = options
-      @upload = source
-      case source
-      when false
-        %w(filename content_type size updated_at).each do |name|
-          instance_variable_set :"@#{name}", record.send("#{attribute}_#{name}")
-        end
-      when nil
-        %w(filename content_type size updated_at).each do |name|
-          record.send "#{attribute}_#{name}=", nil
-        end
-      else
+      if source
+        @upload = source
         @filename = source.original_filename.downcase
         @content_type = source.content_type
         @size = source.size
         @updated_at = Time.zone.now
         %w(filename content_type size updated_at).each do |name|
           record.send "#{attribute}_#{name}=", send(name)
+        end
+      elsif source == nil
+        %w(filename content_type size updated_at).each do |name|
+          record.send "#{attribute}_#{name}=", nil
+        end
+      elsif source == false
+        %w(filename content_type size updated_at).each do |name|
+          instance_variable_set :"@#{name}", record.send("#{attribute}_#{name}")
         end
       end
     end
@@ -38,8 +37,16 @@ module Attachs
       @private ||= options[:private] == true
     end
 
+    def public?
+      !private?
+    end
+
     def upload?
       !upload.nil?
+    end
+
+    def processed?
+      !upload? and exists?
     end
 
     def exists?

@@ -2,7 +2,7 @@ module Attachs
   module Types
     class Regular < Base
 
-      delegate :url, :process, :destroy, to: :storage
+      delegate :url, :process, :process_styles, :destroy, :destroy_styles, :update, to: :storage
 
       def basename
         @basename ||= File.basename(attachment.filename, ".#{extension}")

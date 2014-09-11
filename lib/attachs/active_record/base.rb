@@ -6,11 +6,9 @@ module Attachs
       protected
 
       def attachments
-        @attachments ||= begin
-          {}.tap do |value|
-            self.class.attachments.each do |attr, options|
-              value[attr] = Attachs::Attachment.new(self, attr, options)
-            end
+        @attachments ||= {}.tap do |instances|
+          self.class.attachments.each do |attr, options|
+            instances[attr] = Attachs::Attachment.new(self, attr, options)
           end
         end
       end
@@ -29,7 +27,7 @@ module Attachs
 
       def commit_attachments
         self.class.attachments.each do |attr, options|
-          instance_variable_set "@destroy_#{attr}", nil
+          send "destroy_#{attr}=", nil
         end
         queued_attachments[:destroy].each do |attr, attachment|
           attachment.destroy

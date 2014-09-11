@@ -3,18 +3,13 @@ module Attachs
     class S3 < Base
 
       def url(*args)
-        options = args.extract_options!
-        style = args[0]
-        unless attachment.private?
+        if attachment.public? and attachment.processed?
+          options = args.extract_options!
+          style = args[0]
           if Attachs.config.base_url.present?
             Pathname.new(Attachs.config.base_url, path(style)).to_s
           else
-            if !options[:ssl].nil?
-              secure = options[:ssl]
-            else
-              secure = Attachs.config.s3[:ssl]
-            end
-            object(style).public_url(secure: secure).to_s
+            object(style).public_url(secure: secure?).to_s
           end
         end
       end
@@ -23,6 +18,10 @@ module Attachs
         if attachment.upload?
           stream attachment.upload, path
         end
+        process_styles force
+      end
+
+      def process_styles(force=false)
         if attachment.image?
           unless cache[path]
             download = Tempfile.new('s3')
@@ -46,6 +45,10 @@ module Attachs
 
       def destroy
         object.delete
+        destroy_styles
+      end
+
+      def destroy_styles
         if attachment.image?
           attachment.styles.each do |style|
             object(style).delete
@@ -55,6 +58,18 @@ module Attachs
 
       protected
 
+      def secure?
+        if !options[:ssl].nil?
+          options[:ssl]
+        else
+          Attachs.config.s3[:ssl]
+        end
+      end
+
+      def move(origin, destination)
+        bucket.objects[origin].move_to(destination)
+      end
+
       def cache
         @cache ||= {}
       end
@@ -63,7 +78,7 @@ module Attachs
         @bucket ||= AWS::S3.new.buckets[Attachs.config.s3[:bucket]]
       end
 
-      def object(style=nil)
+      def object(style=:original)
         bucket.objects[path(style)]
       end
 

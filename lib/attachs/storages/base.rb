@@ -4,7 +4,6 @@ module Attachs
 
       def initialize(attachment)
         @attachment = attachment
-        @paths = {}
       end
 
       protected
@@ -15,15 +14,17 @@ module Attachs
         Attachs::Tools::Magick.resize(*args)
       end
 
-      def path(style=nil)
-        @paths[style ||= :original] ||= begin
+      def template
+        @template = begin
           if attachment.exists?
             (attachment.options[:path] || Attachs.config.default_path).dup
           else
             attachment.options[:default_path].dup
           end.tap do |path|
             path.scan(/:([a-zA-Z0-9_]+)/).flatten.uniq.map(&:to_sym).each do |name|
-              path.gsub! ":#{name}", interpolate(name, style).to_s
+              if name != :style
+                path.gsub! ":#{name}", interpolate(name).to_s.parameterize
+              end
             end
             path.squeeze! '/'
             path.slice! 0 if path[0] == '/'
@@ -31,9 +32,13 @@ module Attachs
         end
       end
 
-      def interpolate(name, style)
+      def path(style=:original)
+        template.gsub(':style', style.to_s)
+      end
+
+      def interpolate(name)
         if interpolation = Attachs.config.interpolations[name]
-          interpolation.call attachment, style
+          interpolation.call attachment
         else
           case name
           when :filename,:size,:basename,:extension
@@ -48,8 +53,6 @@ module Attachs
             attachment.record.id
           when :param
             attachment.record.to_param
-          when :style
-            style
           end
         end
       end

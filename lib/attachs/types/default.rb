@@ -2,7 +2,7 @@ module Attachs
   module Types
     class Default < Base
 
-      %w(basename extension process destroy).each do |name|
+      %w(basename extension process process_styles destroy destroy_styles update).each do |name|
         define_method(name) {}
       end
 

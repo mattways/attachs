@@ -4,7 +4,7 @@ module Attachs
       class << self
 
         def dimensions(source)
-          if output = run(%Q(identify -format %wx%h "#{source}"))
+          if output = run("identify -format %wx%h '#{source}'")
             output.split('x').map(&:to_i)
           end
         end
@@ -29,9 +29,9 @@ module Attachs
             options << " #{style_options}"
           end
           if destination
-            run %Q(convert "#{source}" #{options} "#{destination}")
+            run "convert '#{source}' #{options} '#{destination}'"
           else
-            run %Q(mogrify #{options} "#{source}")
+            run "mogrify #{options} '#{source}'"
           end
         end
 

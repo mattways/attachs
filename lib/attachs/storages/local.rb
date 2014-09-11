@@ -3,7 +3,7 @@ module Attachs
     class Local < Base
 
       def url(style=nil)
-        unless attachment.private?
+        if attachment.public? and attachment.processed?
           base_url.join(path(style)).to_s
         end
       end
@@ -18,6 +18,10 @@ module Attachs
             end
           end
         end
+        process_styles force
+      end
+
+      def process_styles(force=false)
         if attachment.image?
           attachment.styles.each do |style|
             if force == true
@@ -33,6 +37,10 @@ module Attachs
 
       def destroy
         delete realpath
+        destroy_styles
+      end
+
+      def destroy_styles
         if attachment.image?
           attachment.styles.each do |style|
             delete realpath(style)
@@ -42,13 +50,17 @@ module Attachs
 
       protected
 
+      def move(origin, destination)
+        FileUtils.mv base_path.join(origin), base_path.join(destination)
+      end
+
       def delete(realpath)
         if File.file? realpath
           File.delete realpath
         end
       end
 
-      def realpath(style=nil)
+      def realpath(style=:original)
         base_path.join(path(style))
       end
 
