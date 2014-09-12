@@ -46,11 +46,16 @@ module Attachs
     end
 
     def processed?
-      !upload? and exists?
+      exists? and record.persisted? and !(
+        record.send("#{attribute}_filename_changed?") or
+        record.send("#{attribute}_content_type_changed?") or
+        record.send("#{attribute}_size_changed?") or
+        record.send("#{attribute}_updated_at_changed?")
+      )
     end
 
     def exists?
-      filename and size and content_type and updated_at
+      filename and content_type and size and updated_at
     end
 
     def blank?
@@ -59,6 +64,10 @@ module Attachs
 
     def default?
       !options[:default_path].nil?
+    end
+
+    def url?
+      public? and (default? or processed?)
     end
 
     protected

@@ -3,7 +3,7 @@ module Attachs
     class S3 < Base
 
       def url(*args)
-        if attachment.public? and attachment.processed?
+        if attachment.url?
           options = args.extract_options!
           style = args[0]
           if Attachs.config.base_url.present?

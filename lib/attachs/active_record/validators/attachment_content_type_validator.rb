@@ -5,8 +5,14 @@ module Attachs
 
         def validate_each(record, attribute, value)
           if value.exists?
-            if options[:in].exclude? value.content_type
-              record.errors.add attribute, :attachment_content_type, types: options[:in].to_sentence
+            if options.has_key? :with
+              if options[:with] !~ value.content_type
+                record.errors.add attribute, :attachment_content_type_with
+              end
+            elsif options.has_key? :in
+              if options[:in].exclude? value.content_type
+                record.errors.add attribute, :attachment_content_type_in, types: options[:in].to_sentence
+              end
             end
           end
         end

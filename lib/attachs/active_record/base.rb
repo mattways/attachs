@@ -21,8 +21,11 @@ module Attachs
         unless queued_attachments[:destroy].has_key? attr
           queued_attachments[:destroy][attr] = attachments[attr]
         end
-        attachment = Attachs::Attachment.new(self, attr, options, value)
-        queued_attachments[:process][attr], attachments[attr] = attachment
+        if queued_attachments[:process].has_key? attr and value.nil?
+          attachments[attr]
+        else
+          queued_attachments[:process][attr] = Attachs::Attachment.new(self, attr, options, value)
+        end
       end
 
       def commit_attachments

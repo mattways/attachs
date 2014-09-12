@@ -3,7 +3,7 @@ module Attachs
     class Local < Base
 
       def url(style=nil)
-        if attachment.public? and attachment.processed?
+        if attachment.url?
           base_url.join(path(style)).to_s
         end
       end
