@@ -10,6 +10,20 @@ module Attachs
       @attribute = attribute
       @options = options
       if source
+        if source.is_a? URI
+          download = Tempfile.new('external')
+          File.open(download.path, 'wb') do |file|
+            Net::HTTP.start(source.host) do |http|
+              file.write http.get(source.path).body
+            end
+          end
+          type = `file --mime-type -b '#{download.path}'`.strip
+          source = ActionDispatch::Http::UploadedFile.new(
+            tempfile: download,
+            filename: File.basename(source.path),
+            type: type
+          )
+        end
         @upload = source
         @filename = source.original_filename.downcase
         @content_type = source.content_type
