@@ -206,14 +206,7 @@ NOTE: If storage is s3 you can pass ssl: true to force https.
 
 ## Storage
 
-The default storage is defined in the configuration file:
-```ruby
-Attachs.configure do |config|
-  config.default_storage = :local
-end
-```
-
-Can be overwritten in the model:
+To override the storage in the model:
 ```ruby
 class User < ActiveRecord::Base
   has_attached_file :avatar, storage: :s3
