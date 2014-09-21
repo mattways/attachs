@@ -90,9 +90,9 @@ class ValidatorsTest < ActiveSupport::TestCase
   private
 
   def build_model
-    Class.new(User) do
+    Class.new(Medium) do
       def self.name
-        'User'
+        'Medium'
       end
     end
   end

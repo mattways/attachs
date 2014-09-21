@@ -26,16 +26,16 @@ class ActiveSupport::TestCase
 
   private
 
+  def fixture_file_upload(path, content_type)
+    Rack::Test::UploadedFile.new(Rails.root.join("test/fixtures/#{path}"), content_type)
+  end
+
   def file_upload
     fixture_file_upload('file.txt', 'text/plain')
   end
 
   def image_upload
     fixture_file_upload('180x150.gif', 'image/gif')
-  end
-
-  def fixture_file_upload(path, content_type)
-    Rack::Test::UploadedFile.new(Rails.root.join("test/fixtures/#{path}"), content_type)
   end
 
   def assert_url(url)

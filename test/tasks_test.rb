@@ -8,48 +8,46 @@ class TasksTest < ActiveSupport::TestCase
   end
 
   test 'refresh all styles' do
-    create_record
+    Medium.create(attach: image_upload)
     original_small_time = small_time
     original_big_time = big_time
-    ENV['CLASS'] = 'user'
+    ENV['CLASS'] = 'medium'
     ENV['ATTACHMENT'] = 'attach'
     sleep 1
     Rake::Task['attachs:refresh:all'].invoke
-    assert File.file?(small_path)
-    assert File.file?(big_path)
+    assert File.file?(image_path(:small))
+    assert File.file?(image_path(:big))
     assert_not_equal original_small_time, small_time
     assert_not_equal original_big_time, big_time
   end
 
   test 'refersh missing styles' do
-    create_record
+    Medium.create(attach: image_upload)
     original_big_time = big_time
     original_small_time = small_time
-    File.delete small_path
-    ENV['CLASS'] = 'user'
+    File.delete image_path(:small)
+    ENV['CLASS'] = 'medium'
     ENV['ATTACHMENT'] = 'attach'
     sleep 1
     Rake::Task['attachs:refresh:missing'].invoke
-    assert File.file?(small_path)
-    assert File.file?(big_path)
+    assert File.file?(image_path(:small))
+    assert File.file?(image_path(:big))
     assert_not_equal original_small_time, small_time
     assert_equal original_big_time, big_time
   end
 
   private
 
-  attr_reader :record
-
-  def create_record
-    @record = User.create!(attach: image_upload)
+  def image_path(style=:original)
+    Rails.root.join("public/#{style}/180x150.gif")
   end
 
   def small_path
-    record.attach.send(:type).send(:storage).send(:realpath, :small)
+    image_path(:small)
   end
 
   def big_path
-    record.attach.send(:type).send(:storage).send(:realpath, :big)
+    image_path(:big)
   end
 
   def small_time

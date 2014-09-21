@@ -3,15 +3,15 @@ require 'test_helper'
 class AttachmentTest < ActiveSupport::TestCase
 
   test 'attachment source' do
-    original_user = User.create(attach: file_upload)
-    copied_user = User.create(attach: original_user.attach)
+    original_medium = Medium.create(attach: file_upload)
+    copied_medium = Medium.create(attach: original_medium.attach)
     %w(filename content_type size updated_at).each do |attr|
-      assert_equal original_user.attach.send(attr), copied_user.attach.send(attr)
+      assert_equal original_medium.attach.send(attr), copied_medium.attach.send(attr)
     end
   end
 
   test 'uri source' do
-    user = User.create!(attach: URI('https://s3.amazonaws.com/attachs-test/file.txt'))
+    medium = Medium.create(attach: URI('https://s3.amazonaws.com/attachs-test/file.txt'))
     file_path = Rails.root.join('public/original/file.txt')
     assert File.exist?(file_path)
   end

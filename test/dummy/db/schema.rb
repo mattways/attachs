@@ -13,12 +13,19 @@
 
 ActiveRecord::Schema.define(version: 20140808012639) do
 
-  create_table "users", force: true do |t|
-    t.string   "email"
+  create_table "media", force: true do |t|
     t.string   "attach_filename"
     t.string   "attach_content_type"
     t.integer  "attach_size"
     t.datetime "attach_updated_at"
+    t.string   "local_attach_filename"
+    t.string   "local_attach_content_type"
+    t.integer  "local_attach_size"
+    t.datetime "local_attach_updated_at"
+    t.string   "s3_attach_filename"
+    t.string   "s3_attach_content_type"
+    t.integer  "s3_attach_size"
+    t.datetime "s3_attach_updated_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

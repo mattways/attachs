@@ -28,7 +28,7 @@ module Attachs
             if force == true
               delete realpath(style)
             end
-            unless File.file? realpath(style)
+            unless File.exist? realpath(style)
               FileUtils.mkdir_p realpath(style).dirname
               resize realpath, style, realpath(style)
             end
@@ -56,7 +56,7 @@ module Attachs
       end
 
       def delete(realpath)
-        if File.file? realpath
+        if File.exist? realpath
           File.delete realpath
         end
       end
