@@ -6,7 +6,7 @@ class MigrationTest < ActiveSupport::TestCase
     ActiveRecord::Migration.verbose = false
   end
 
-  test "table migration" do
+  test 'table migration' do
     table_migration.migrate(:up)
     assert_includes columns, ['image_filename', :string]
     assert_includes columns, ['image_size', :integer]
@@ -18,7 +18,7 @@ class MigrationTest < ActiveSupport::TestCase
     end
   end
 
-  test "column migration" do
+  test 'column migration' do
     ActiveRecord::Base.connection.create_table :pictures
 
     column_migration.migrate(:up)

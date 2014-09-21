@@ -2,27 +2,34 @@ require 'test_helper'
 
 class LocalStorageTest < ActiveSupport::TestCase
 
-  test "url" do
-    assert_match %r{/\d+-file.txt}, file_attachment.url
-    assert_equal "/storage/image/5461/original/#{month}/180x150.gif", image_attachment.url
-    assert_equal "/storage/image/5461/small/#{month}/180x150.gif", image_attachment.url(:small)
+  test 'file url' do
+    record = model.create(attach: file_upload)
+    assert_equal file_url, record.attach.url
   end
 
-  test "storage" do
-    file_realpath = file_attachment.send(:type).send(:storage).send(:realpath)
-    file_attachment.process
-    assert File.exist?(file_realpath)
-    file_attachment.destroy
-    assert !File.exist?(file_realpath)
+  test 'image url' do
+    record = model.create(attach: image_upload)
+    assert_equal image_url, record.attach.url
+    assert_equal image_url(:small), record.attach.url(:small)
+  end
 
-    original_image_realpath = image_attachment.send(:type).send(:storage).send(:realpath)
-    small_image_realpath = image_attachment.send(:type).send(:storage).send(:realpath)
-    image_attachment.process
-    assert File.exist?(original_image_realpath)
-    assert File.exist?(small_image_realpath)
-    image_attachment.destroy
-    assert !File.exist?(original_image_realpath)
-    assert !File.exist?(small_image_realpath)
+  test 'crud' do
+    record = model.create(attach: file_upload)
+    assert File.exist?(file_path)
+    record.update_attributes! attach: image_upload
+    assert !File.exist?(file_path)
+    assert File.exist?(image_path)
+    assert File.exist?(image_path(:small))
+    record.destroy
+    assert !File.exist?(image_path)
+    assert !File.exist?(image_path(:small))
+  end
+
+  test 'detroy attr' do
+    record = model.create(attach: file_upload, destroy_attach: true)
+    assert File.exist?(file_path)
+    record.update_attributes! destroy_attach: true
+    assert !File.exist?(file_path)
   end
 
   private
@@ -31,18 +38,26 @@ class LocalStorageTest < ActiveSupport::TestCase
     Time.zone.now.month
   end
 
-  def file_attachment
-    @file_attachment ||= begin
-      options = { storage: 'local' }
-      Attachs::Attachment.new(nil, nil, options, file_upload)
+  def model
+    Class.new(User) do
+      has_attached_file :attach, storage: 'local', path: '/storage/:type/:size/:style/:month/:basename.:extension', styles: [:small]
     end
   end
 
-  def image_attachment
-    @image_attachment ||= begin
-      options = { storage: 'local', path: '/storage/:type/:size/:style/:month/:basename.:extension', styles: [:small] }
-      Attachs::Attachment.new(nil, nil, options, image_upload)
-    end
+  def file_url(style=:original)
+    "/storage/text/11/#{style}/#{month}/file.txt"
+  end
+
+  def image_url(style=:original)
+    "/storage/image/5461/#{style}/#{month}/180x150.gif"
+  end
+
+  def file_path(style=:original)
+    Rails.root.join("public/storage/text/11/#{style}/#{month}/file.txt")
+  end
+
+  def image_path(style=:original)
+    Rails.root.join("public/storage/image/5461/#{style}/#{month}/180x150.gif")
   end
 
 end

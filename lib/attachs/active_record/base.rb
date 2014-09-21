@@ -91,7 +91,7 @@ module Attachs
           attr_reader "destroy_#{attr}"
           define_method "destroy_#{attr}=" do |value|
             instance_variable_set "@destroy_#{attr}", value
-            if [1, '1', true].include? value
+            if [1, '1', true].include?(value) and !send(attr).upload?
               send "#{attr}=", nil
             end
           end

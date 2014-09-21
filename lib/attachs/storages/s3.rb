@@ -5,11 +5,18 @@ module Attachs
       def url(*args)
         if attachment.url?
           options = args.extract_options!
-          style = args[0]
+          style = (args[0] || :original)
           if Attachs.config.base_url.present?
             Pathname.new(Attachs.config.base_url, path(style)).to_s
           else
-            object(style).public_url(secure: secure?).to_s
+            if options[:ssl].present?
+              secure = options[:ssl]
+            elsif attachment.options[:ssl].present?
+              secure = attachment.options[:ssl]
+            else
+              secure = Attachs.config.s3[:ssl]
+            end
+            object(style).public_url(secure: secure).to_s
           end
         end
       end
@@ -17,6 +24,7 @@ module Attachs
       def process(force=false)
         if attachment.upload?
           stream attachment.upload, path
+          attachment.uploaded!
         end
         process_styles force
       end
@@ -57,14 +65,6 @@ module Attachs
       end
 
       protected
-
-      def secure?
-        if !options[:ssl].nil?
-          options[:ssl]
-        else
-          Attachs.config.s3[:ssl]
-        end
-      end
 
       def move(origin, destination)
         bucket.objects[origin].move_to(destination)

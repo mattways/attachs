@@ -9,38 +9,25 @@ module Attachs
       @record = record
       @attribute = attribute
       @options = options
-      if source
-        if source.is_a? URI
-          download = Tempfile.new('external')
-          File.open(download.path, 'wb') do |file|
-            Net::HTTP.start(source.host) do |http|
-              file.write http.get(source.path).body
-            end
-          end
-          type = `file --mime-type -b '#{download.path}'`.strip
-          source = ActionDispatch::Http::UploadedFile.new(
-            tempfile: download,
-            filename: File.basename(source.path),
-            type: type
-          )
-        end
-        @upload = source
-        @filename = source.original_filename.downcase
-        @content_type = source.content_type
-        @size = source.size
-        @updated_at = Time.zone.now
-        %w(filename content_type size updated_at).each do |name|
-          record.send "#{attribute}_#{name}=", send(name)
-        end
-      elsif source == nil
+      case source
+      when nil
         %w(filename content_type size updated_at).each do |name|
           record.send "#{attribute}_#{name}=", nil
         end
-      elsif source == false
+      when false
         %w(filename content_type size updated_at).each do |name|
           instance_variable_set :"@#{name}", record.send("#{attribute}_#{name}")
         end
+      else
+        load source
+        %w(filename content_type size updated_at).each do |name|
+          record.send "#{attribute}_#{name}=", send(name)
+        end
       end
+    end
+
+    def uploaded!
+      @upload = nil
     end
 
     def styles
@@ -85,6 +72,33 @@ module Attachs
     end
 
     protected
+
+    def load(source)
+      if source.is_a? URI
+        download = Tempfile.new('external')
+        File.open(download.path, 'wb') do |file|
+          Net::HTTP.start(source.host) do |http|
+            file.write http.get(source.path).body
+          end
+        end
+        type = `file --mime-type -b '#{download.path}'`.strip
+        source = ActionDispatch::Http::UploadedFile.new(
+          tempfile: download,
+          filename: File.basename(source.path),
+          type: type
+        )
+      end
+      if source.is_a? Attachs::Attachment
+        @filename = source.filename
+        @updated_at = source.updated_at
+      else
+        @upload = source
+        @filename = source.original_filename.downcase
+        @updated_at = Time.zone.now
+      end
+      @content_type = source.content_type
+      @size = source.size
+    end
 
     def type
       @type ||= begin

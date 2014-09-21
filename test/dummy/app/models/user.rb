@@ -1,3 +1,3 @@
 class User < ActiveRecord::Base
-  has_attached_file :avatar, path: '/:style/:filename'
+  has_attached_file :attach, path: '/:style/:filename'
 end

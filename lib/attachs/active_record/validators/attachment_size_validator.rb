@@ -8,7 +8,12 @@ module Attachs
           if value.exists?
             if options.has_key? :in
               if options[:in].exclude? value.size
-                record.errors.add attribute, :attachment_size_in, min: number_to_human_size(options[:in].begin), max: number_to_human_size(options[:in].end)
+                record.errors.add(
+                  attribute,
+                  :attachment_size_in,
+                  min: number_to_human_size(options[:in].begin),
+                  max: number_to_human_size(options[:in].end)
+                )
               end
             else
               if options.has_key? :less_than and value.size > options[:less_than]

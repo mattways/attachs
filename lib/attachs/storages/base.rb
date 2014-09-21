@@ -23,7 +23,7 @@ module Attachs
           end.tap do |path|
             path.scan(/:([a-zA-Z0-9_]+)/).flatten.uniq.map(&:to_sym).each do |name|
               if name != :style
-                path.gsub! ":#{name}", interpolate(name).to_s.parameterize
+                path.gsub! ":#{name}", interpolate(name)
               end
             end
             path.squeeze! '/'
@@ -38,22 +38,28 @@ module Attachs
 
       def interpolate(name)
         if interpolation = Attachs.config.interpolations[name]
-          interpolation.call attachment
+          interpolation.call(attachment).to_s.parameterize
         else
           case name
-          when :filename,:size,:basename,:extension
-            attachment.send name
+          when :basename
+            attachment.basename.parameterize
+          when :filename
+            "#{attachment.basename.parameterize}.#{attachment.extension}"
+          when :size
+            attachment.size
+          when :extension
+            attachment.extension
           when :type
-            attachment.content_type.split('/').first
+            attachment.content_type.split('/').first.parameterize
           when :timestamp
             (attachment.updated_at.to_f * 10000000000).to_i
           when :class
-            attachment.record.class.name
+            attachment.record.class.name.parameterize
           when :id
             attachment.record.id
           when :param
             attachment.record.to_param
-          end
+          end.to_s
         end
       end
 

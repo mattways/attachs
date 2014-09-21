@@ -2,7 +2,7 @@ module Attachs
   module Storages
     class Local < Base
 
-      def url(style=nil)
+      def url(style=:original)
         if attachment.url?
           base_url.join(path(style)).to_s
         end
@@ -17,6 +17,7 @@ module Attachs
               file.write chunk
             end
           end
+          attachment.uploaded!
         end
         process_styles force
       end

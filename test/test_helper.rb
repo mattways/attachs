@@ -38,4 +38,12 @@ class ActiveSupport::TestCase
     Rack::Test::UploadedFile.new(Rails.root.join("test/fixtures/#{path}"), content_type)
   end
 
+  def assert_url(url)
+    assert_equal '200', Net::HTTP.get_response(URI(url)).code
+  end
+
+  def assert_not_url(url)
+    assert_equal '403', Net::HTTP.get_response(URI(url)).code
+  end
+
 end

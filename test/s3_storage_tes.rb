@@ -2,30 +2,37 @@ require 'test_helper'
 
 class S3StorageTest < ActiveSupport::TestCase
 
-  test "url" do
-    assert_match %r{http://attachs-test.s3.amazonaws.com/\d+-file.txt}, file_attachment.url
-    assert_match %r{https://attachs-test.s3.amazonaws.com/\d+-file.txt}, file_attachment.url(ssl: true)
-    assert_equal "http://attachs-test.s3.amazonaws.com/storage/image/5461/original/#{month}/180x150.gif", image_attachment.url
-    assert_equal "https://attachs-test.s3.amazonaws.com/storage/image/5461/original/#{month}/180x150.gif", image_attachment.url(ssl: true)
-    assert_equal "http://attachs-test.s3.amazonaws.com/storage/image/5461/small/#{month}/180x150.gif", image_attachment.url(:small)
-    assert_equal "https://attachs-test.s3.amazonaws.com/storage/image/5461/small/#{month}/180x150.gif", image_attachment.url(:small, ssl: true)
+  test 'file url' do
+    record = model.create(attach: file_upload)
+    assert_equal file_url, record.attach.url
+    assert_equal file_url(ssl: true), record.attach.url(ssl: true)
   end
 
-  test "storage" do
-    file_object = file_attachment.send(:type).send(:storage).send(:object)
-    file_attachment.process
-    assert file_object.exists?
-    file_attachment.destroy
-    assert !file_object.exists?
+  test 'image url' do
+    record = model.create(attach: image_upload)
+    assert_equal image_url, record.attach.url
+    assert_equal image_url(ssl: true), record.attach.url(ssl: true)
+    assert_equal image_url(:small), record.attach.url(:small)
+    assert_equal image_url(:small, ssl: true), record.attach.url(:small, ssl: true)
+  end
 
-    original_image_object = image_attachment.send(:type).send(:storage).send(:object)
-    small_image_object = image_attachment.send(:type).send(:storage).send(:object)
-    image_attachment.process
-    assert original_image_object.exists?
-    assert small_image_object.exists?
-    image_attachment.destroy
-    assert !original_image_object.exists?
-    assert !small_image_object.exists?
+  test 'storage' do
+    record = model.create(attach: file_upload)
+    assert_url file_url
+    record.update_attributes! attach: image_upload
+    assert_not_url file_url
+    assert_url image_url
+    assert_url image_url(:small)
+    record.destroy
+    assert_not_url image_url
+    assert_not_url image_url(:small)
+  end
+
+  test 'detroy attr' do
+    record = model.create(attach: file_upload, destroy_attach: true)
+    assert_url file_url
+    record.update_attributes! destroy_attach: true
+    assert_not_url file_url
   end
 
   private
@@ -34,18 +41,22 @@ class S3StorageTest < ActiveSupport::TestCase
     Time.zone.now.month
   end
 
-  def file_attachment
-    @file_attachment ||= begin
-      options = { storage: 's3' }
-      Attachs::Attachment.new(nil, nil, options, file_upload)
+  def model
+    Class.new(User) do
+      has_attached_file :attach, storage: 's3', path: '/storage/:type/:size/:style/:month/:basename.:extension', styles: [:small]
     end
   end
 
-  def image_attachment
-    @image_attachment ||= begin
-      options = { storage: 's3', path: '/storage/:type/:size/:style/:month/:basename.:extension', styles: [:small] }
-      Attachs::Attachment.new(nil, nil, options, image_upload)
-    end
+  def file_url(*args)
+    options = args.extract_options!
+    style = (args.first || :original)
+    "http#{'s' if options[:ssl]}://attachs-test.s3.amazonaws.com/storage/text/11/#{style}/#{month}/file.txt"
+  end
+
+  def image_url(*args)
+    options = args.extract_options!
+    style = (args.first || :original)
+    "http#{'s' if options[:ssl]}://attachs-test.s3.amazonaws.com/storage/image/5461/#{style}/#{month}/180x150.gif"
   end
 
 end
