@@ -154,15 +154,7 @@ To validate the content type of the attachment:
 ```ruby
 class User < ActiveRecord::Base
   has_attached_file :avatar
-  validates_attachment_content_type_of :avatar, with: /\Aimage/ # Or in: %w(image/jpg image/gif)
-end
-```
-
-You can combime them too:
-```ruby
-class User < ActiveRecord::Base
-  has_attached_file :avatar
-  validates :avatar, attachment_presence: true, attachment_size: { in: 1..5.megabytes }
+  validates_attachment_content_type_of :avatar, with: /\Aimage/ # Or in: %w(image/jpg)
 end
 ```
 
