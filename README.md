@@ -25,7 +25,20 @@ Generate the configuration file:
 rails g attachs:install
 ```
 
-NOTE: This will generate the config/initializers/attachs.rb.
+The defaults values are:
+```ruby
+Attachs.configure do |config|
+  config.styles = {}
+  config.interpolations = {}
+  config.global_styles = []
+  config.global_convert_options= ''
+  config.convert_options = {}
+  config.default_storage = :local
+  config.default_path = '/:timestamp-:filename'
+  config.base_url = ''
+  config.s3 = { ssl: false }
+end
+```
 
 ## Usage
 
@@ -44,13 +57,6 @@ end
 ```
 
 ## Paths
-
-The default path is set in the configuration file:
-```ruby
-Attachs.configure do |config|
-  config.default_path = '/:timestamp-:filename'
-end
-```
 
 To customize the path to some model:
 ```ruby
@@ -148,11 +154,17 @@ To validate the content type of the attachment:
 ```ruby
 class User < ActiveRecord::Base
   has_attached_file :avatar
-  validates_attachment_content_type_of :avatar, in: %w(image/jpg image/gif)
+  validates_attachment_content_type_of :avatar, with: /\Aimage/ # Or in: %w(image/jpg image/gif)
 end
 ```
 
-NOTE: You can combine them too. 
+You can combime them too:
+```ruby
+class User < ActiveRecord::Base
+  has_attached_file :avatar
+  validates :avatar, attachment_presence: true, attachment_size: { in: 1..5.megabytes }
+end
+```
 
 ## I18n
 
@@ -196,6 +208,8 @@ class User < ActiveRecord::Base
 end
 ```
 
+NOTE: If storage is s3 you can pass ssl: true to force https.
+
 ## Storage
 
 The default storage is defined in the configuration file:
@@ -216,13 +230,12 @@ To configure the s3 credentials:
 ```ruby
 Attachs.configure do |config|
   config.s3 = {
+    bucket: 'xxx',
     access_key_id: 'xxx',
     secret_access_key: 'xxx'
   }
 end
 ```
-
-NOTE: If storage is s3 you can pass a second parameter to the url method to enable or disable ssl.
 
 ## CDN
 
