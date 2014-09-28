@@ -1,4 +1,4 @@
-[![Gem Version](https://badge.fury.io/rb/attachs.svg)](http://badge.fury.io/rb/attachs) [![Code Climate](https://codeclimate.com/github/museways/attachs/badges/gpa.svg)](https://codeclimate.com/github/museways/attachs) [![Build Status](https://travis-ci.org/museways/attachs.svg?branch=master)](https://travis-ci.org/museways/attachs)
+[![Gem Version](https://badge.fury.io/rb/attachs.svg)](http://badge.fury.io/rb/attachs) [![Code Climate](https://codeclimate.com/github/museways/attachs/badges/gpa.svg)](https://codeclimate.com/github/museways/attachs) [![Build Status](https://travis-ci.org/museways/attachs.svg?branch=master)](https://travis-ci.org/museways/attachs) [![Dependency Status](https://gemnasium.com/museways/attachs.svg)](https://gemnasium.com/museways/attachs)
 
 # Attachs
 
