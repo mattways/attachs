@@ -24,13 +24,16 @@ module Attachs
 
       def process_styles(force=false)
         if attachment.image?
-          attachment.styles.each do |style|
-            if force == true
-              delete realpath(style)
-            end
-            unless File.exist? realpath(style)
-              FileUtils.mkdir_p realpath(style).dirname
-              resize realpath, style, realpath(style)
+          attachment.processors.each do |klass|
+            processor = klass.new(attachment, realpath)
+            attachment.styles.each do |style|
+              if force == true
+                delete realpath(style)
+              end
+              unless File.exist? realpath(style)
+                FileUtils.mkdir_p realpath(style).dirname
+                processor.process style, realpath(style)
+              end
             end
           end
         end
@@ -50,10 +53,6 @@ module Attachs
       end
 
       protected
-
-      def move(origin, destination)
-        FileUtils.mv base_path.join(origin), base_path.join(destination)
-      end
 
       def delete(realpath)
         if File.exist? realpath

@@ -10,10 +10,6 @@ module Attachs
 
       attr_reader :attachment
 
-      def resize(*args)
-        Attachs::Tools::Magick.resize(*args)
-      end
-
       def template
         @template = begin
           if attachment.exists?

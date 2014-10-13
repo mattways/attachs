@@ -38,14 +38,17 @@ module Attachs
             end
             cache[path] = download
           end
-          attachment.styles.each do |style|
-            if force == true
-              object(style).delete
-            end
-            unless object(style).exists?
-              tmp = Tempfile.new('s3')
-              resize cache[path].path, style, tmp.path
-              stream tmp, path(style)
+          attachment.processors.each do |klass|
+            processor = klass.new(attachment, cache[path].path)
+            attachment.styles.each do |style|
+              if force == true
+                object(style).delete
+              end
+              unless object(style).exists?
+                tmp = Tempfile.new('s3')
+                processor.process style, tmp.path
+                stream tmp, path(style)
+              end
             end
           end
         end
@@ -65,10 +68,6 @@ module Attachs
       end
 
       protected
-
-      def move(origin, destination)
-        bucket.objects[origin].move_to(destination)
-      end
 
       def cache
         @cache ||= {}

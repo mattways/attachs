@@ -1,8 +1,8 @@
 module Attachs
   module Task
     def self.process(force)
-      model = ENV['CLASS'].classify.constantize
-      attachment = ENV['ATTACHMENT'].to_sym
+      model = (ENV['class'] || ENV['CLASS']).classify.constantize
+      attachment = (ENV['attachment'] || ENV['ATTACHMENT']).to_sym
       model.find_each do |record|
         model.attachments.each do |attr, options|
           if attr == attachment

@@ -1,6 +1,7 @@
 require 'open3'
 require 'attachs/attachment'
-require 'attachs/tools/magick'
+require 'attachs/processors/base'
+require 'attachs/processors/thumbnail'
 require 'attachs/storages/base'
 require 'attachs/storages/local'
 require 'attachs/storages/s3'
@@ -26,15 +27,16 @@ module Attachs
     def config
       @config ||= begin
         ActiveSupport::OrderedOptions.new.tap do |config|
+          config.s3 = { ssl: false }
+          config.base_url = ''
           config.styles = {}
           config.interpolations = {}
+          config.convert_options = {}
           config.global_styles = []
           config.global_convert_options= ''
-          config.convert_options = {}
           config.default_storage = :local
+          config.default_processors = [:thumbnail]
           config.default_path = '/:timestamp-:filename'
-          config.base_url = ''
-          config.s3 = { ssl: false }
         end
       end
     end

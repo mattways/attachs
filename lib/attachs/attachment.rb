@@ -38,6 +38,12 @@ module Attachs
       @private ||= options[:private] == true
     end
 
+    def processors
+      @processors ||= (options[:processors] || Attachs.config.default_processors).map do |processor|
+        "Attachs::Processors::#{processor.to_s.classify}".constantize
+      end
+    end
+
     def public?
       !private?
     end
