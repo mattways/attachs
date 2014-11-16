@@ -53,8 +53,8 @@ module Attachs
             attachment.record.class.name.parameterize
           when :id
             attachment.record.id
-          when :param
-            attachment.record.to_param
+          when :attribute
+            attachment.attribute.to_s.parameterize
           end.to_s
         end
       end
