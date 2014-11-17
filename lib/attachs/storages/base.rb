@@ -48,6 +48,9 @@ module Attachs
           when :type
             attachment.content_type.split('/').first.parameterize
           when :timestamp
+            Rails.logger.info "#{attachment.record.inspect}"
+            Rails.logger.info "#{attachment.inspect}"
+            Rails.logger.info "Setting time #{(attachment.updated_at.to_f * 10000000000).to_i}"
             (attachment.updated_at.to_f * 10000000000).to_i
           when :class
             attachment.record.class.name.parameterize
