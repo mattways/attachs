@@ -33,6 +33,7 @@ Attachs.configure do |config|
   config.global_styles = []
   config.global_convert_options= ''
   config.convert_options = {}
+  config.default_processors = [:thumbnail]
   config.default_storage = :local
   config.default_path = '/:timestamp-:filename'
   config.base_url = ''
@@ -221,6 +222,37 @@ Attachs.configure do |config|
     access_key_id: 'xxx',
     secret_access_key: 'xxx'
   }
+end
+```
+
+## Processors
+
+To create a custom processor:
+```ruby
+class Attachs::Processors::CustomThumbnail
+
+  def initialize(attachment, source)
+    # Custom initialization
+  end
+
+  def process(style, destination)
+    # Custom logic
+  end
+
+end
+```
+
+To change the processors in the model:
+```ruby
+class User < ActiveRecord::Base
+  has_attached_file :avatar, processors: [:custom_thumbnail]
+end
+```
+
+To change the default processors:
+```ruby
+Attachs.configure do |config|
+  config.default_processors = [:custom_thumbnail]
 end
 ```
 
