@@ -38,24 +38,16 @@ class TasksTest < ActiveSupport::TestCase
 
   private
 
-  def image_path(style=:original)
+  def image_path(style)
     Rails.root.join("public/#{style}/180x150.gif")
   end
 
-  def small_path
-    image_path(:small)
-  end
-
-  def big_path
-    image_path(:big)
-  end
-
   def small_time
-    File.mtime(small_path)
+    File.mtime(image_path(:small))
   end
 
   def big_time
-    File.mtime(big_path)
+    File.mtime(image_path(:big))
   end
 
 end

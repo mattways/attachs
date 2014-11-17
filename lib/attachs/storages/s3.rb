@@ -2,8 +2,10 @@ module Attachs
   module Storages
     class S3 < Base
 
-      def url(style=:original, options={})
+      def url(*args)
         if attachment.url?
+          options = args.extract_options!
+          style = (args[0] || :original)
           if Attachs.config.base_url.present?
             Pathname.new(Attachs.config.base_url).join(path(style)).to_s
           else
