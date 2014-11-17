@@ -269,7 +269,7 @@ end
 
 To refresh all the styles of some attachment:
 ```
-bundle exec rake attachs:refresh:all class=user ATTACHMENT=avatar
+bundle exec rake attachs:refresh:all class=user attachment=avatar
 ```
 
 To refresh missing styles of some attachment:
