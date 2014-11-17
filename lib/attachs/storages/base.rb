@@ -11,7 +11,7 @@ module Attachs
       attr_reader :attachment
 
       def template
-        @template = begin
+        @template ||= begin
           if attachment.exists?
             (attachment.options[:path] || Attachs.config.default_path).dup
           else
