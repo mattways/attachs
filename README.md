@@ -206,6 +206,32 @@ end
 
 NOTE: If storage is s3 you can pass ssl: true to force https, or cachebuster: false in any storage to remove timestamp.
 
+## Cachebuster
+
+All the urls have a timestamp at the end help prevent unwanted caching:
+```
+example.com/media/photo.jpg?1234567890
+```
+
+To disable cachebuster globally:
+```ruby
+Attachs.configure do |config|
+  config.cachebuster = false
+end
+```
+
+To disable cachebuster in a model:
+```ruby
+class User < ActiveRecord::Base
+  has_attached_file :avatar, cachebuster: false
+end
+```
+
+To disable cachebuster for some url:
+```erb
+<%= image_tag user.avatar.url(cachebuster: false) %>
+```
+
 ## Storage
 
 To override the storage in the model:
