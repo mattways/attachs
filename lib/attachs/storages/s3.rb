@@ -7,7 +7,7 @@ module Attachs
           options = args.extract_options!
           style = (args[0] || :original)
           if Attachs.config.base_url.present?
-            Pathname.new(Attachs.config.base_url, path(style)).to_s
+            Pathname.new(Attachs.config.base_url).join(path(style)).to_s
           else
             if options[:ssl].present?
               secure = options[:ssl]
