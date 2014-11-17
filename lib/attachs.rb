@@ -30,6 +30,7 @@ module Attachs
           config.s3 = { ssl: false }
           config.base_url = ''
           config.styles = {}
+          config.cachebuster = true
           config.interpolations = {}
           config.convert_options = {}
           config.global_styles = []

@@ -28,16 +28,17 @@ rails g attachs:install
 The defaults values are:
 ```ruby
 Attachs.configure do |config|
+  config.s3 = { ssl: false }
+  config.base_url = ''
   config.styles = {}
+  config.cachebuster = true
   config.interpolations = {}
+  config.convert_options = {}
   config.global_styles = []
   config.global_convert_options= ''
-  config.convert_options = {}
-  config.default_processors = [:thumbnail]
   config.default_storage = :local
+  config.default_processors = [:thumbnail]
   config.default_path = '/:timestamp-:filename'
-  config.base_url = ''
-  config.s3 = { ssl: false }
 end
 ```
 
@@ -203,7 +204,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-NOTE: If storage is s3 you can pass ssl: true to force https.
+NOTE: If storage is s3 you can pass ssl: true to force https, or cachebuster: false in any storage to remove timestamp.
 
 ## Storage
 

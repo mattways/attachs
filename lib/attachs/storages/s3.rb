@@ -9,16 +9,11 @@ module Attachs
           if Attachs.config.base_url.present?
             Pathname.new(Attachs.config.base_url).join(path(style)).to_s
           else
-            if options[:ssl].present?
-              secure = options[:ssl]
-            elsif attachment.options[:ssl].present?
-              secure = attachment.options[:ssl]
-            else
-              secure = Attachs.config.s3[:ssl]
-            end
-            object(style).public_url(secure: secure).to_s
+            object(style).public_url(secure: find_option(options, :ssl, Attachs.config.s3[:ssl])).to_s
           end.tap do |url|
-            url << "?#{attachment.updated_at.to_i}"
+            if find_option(options, :cachebuster, Attachs.config.cachebuster)
+              url << "?#{attachment.updated_at.to_i}"
+            end
           end
         end
       end

@@ -59,6 +59,16 @@ module Attachs
         end
       end
 
+      def find_option(options, name, default)
+        if options.has_key?(name)
+          options[name]
+        elsif attachment.options.has_key?(name)
+          attachment.options[name]
+        else
+          default
+        end
+      end
+
     end
   end
 end

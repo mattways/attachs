@@ -2,9 +2,15 @@ module Attachs
   module Storages
     class Local < Base
 
-      def url(style=:original)
+      def url(*args)
         if attachment.url?
-          "#{base_url.join(path(style))}?#{attachment.updated_at.to_i}"
+          options = args.extract_options!
+          style = (args[0] || :original)
+          base_url.join(path(style)).to_s.tap do |url|
+            if find_option(options, :cachebuster, Attachs.config.cachebuster)
+              url << "?#{attachment.updated_at.to_i}"
+            end
+          end
         end
       end
 

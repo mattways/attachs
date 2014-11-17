@@ -4,13 +4,16 @@ class LocalStorageTest < ActiveSupport::TestCase
 
   test 'file url' do
     medium = Medium.create(local_attach: file_upload)
-    assert_equal file_url(:original, medium), medium.local_attach.url
+    assert_equal file_url(:original, medium, true), medium.local_attach.url
+    assert_equal file_url(:original, medium, false), medium.local_attach.url(cachebuster: false)
   end
 
   test 'image url' do
     medium = Medium.create(local_attach: image_upload)
-    assert_equal image_url(:original, medium), medium.local_attach.url
-    assert_equal image_url(:small, medium), medium.local_attach.url(:small)
+    assert_equal image_url(:original, medium, true), medium.local_attach.url
+    assert_equal image_url(:original, medium, false), medium.local_attach.url(cachebuster: false)
+    assert_equal image_url(:small, medium, true), medium.local_attach.url(:small)
+    assert_equal image_url(:small, medium, false), medium.local_attach.url(:small, cachebuster: false)
   end
 
   test 'crud' do
@@ -38,12 +41,20 @@ class LocalStorageTest < ActiveSupport::TestCase
     Time.zone.now.month
   end
 
-  def file_url(style, record)
-    "/storage/text/11/#{style}/#{month}/file.txt?#{record.local_attach_updated_at.to_i}"
+  def file_url(style, record, cachebuster=true)
+    "/storage/text/11/#{style}/#{month}/file.txt".tap do |url|
+      if cachebuster
+        url << "?#{record.local_attach_updated_at.to_i}"
+      end
+    end
   end
 
-  def image_url(style, record)
-    "/storage/image/5461/#{style}/#{month}/180x150.gif?#{record.local_attach_updated_at.to_i}"
+  def image_url(style, record, cachebuster=true)
+    "/storage/image/5461/#{style}/#{month}/180x150.gif".tap do |url|
+      if cachebuster
+        url << "?#{record.local_attach_updated_at.to_i}"
+      end
+    end
   end
 
   def file_path(style)
