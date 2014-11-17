@@ -101,7 +101,7 @@ module Attachs
         @upload = source
         @filename = source.original_filename.downcase
         @updated_at = Time.zone.now
-        Rails.logger.info "Setting time #{@updated_at}"
+        Rails.logger.info "Setting time #{(@updated_at.to_f * 10000000000).to_i}"
       end
       @content_type = source.content_type
       @size = source.size
