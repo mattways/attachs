@@ -2,10 +2,8 @@ module Attachs
   module Storages
     class S3 < Base
 
-      def url(*args)
+      def url(style=:original, options={})
         if attachment.url?
-          options = args.extract_options!
-          style = (args[0] || :original)
           if Attachs.config.base_url.present?
             Pathname.new(Attachs.config.base_url).join(path(style)).to_s
           else
@@ -17,6 +15,8 @@ module Attachs
               secure = Attachs.config.s3[:ssl]
             end
             object(style).public_url(secure: secure).to_s
+          end.tap do |url|
+            url << "?#{attachment.updated_at.to_i}"
           end
         end
       end

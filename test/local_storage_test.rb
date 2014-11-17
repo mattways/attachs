@@ -4,13 +4,13 @@ class LocalStorageTest < ActiveSupport::TestCase
 
   test 'file url' do
     medium = Medium.create(local_attach: file_upload)
-    assert_equal file_url, medium.local_attach.url
+    assert_equal file_url(:original, medium.local_attach), medium.local_attach.url
   end
 
   test 'image url' do
     medium = Medium.create(local_attach: image_upload)
-    assert_equal image_url, medium.local_attach.url
-    assert_equal image_url(:small), medium.local_attach.url(:small)
+    assert_equal image_url(:original, medium.local_attach), medium.local_attach.url
+    assert_equal image_url(:small, medium.local_attach), medium.local_attach.url(:small)
   end
 
   test 'crud' do
@@ -38,12 +38,12 @@ class LocalStorageTest < ActiveSupport::TestCase
     Time.zone.now.month
   end
 
-  def file_url(style=:original)
-    "/storage/text/11/#{style}/#{month}/file.txt"
+  def file_url(style=:original, attachment)
+    "/storage/text/11/#{style}/#{month}/file.txt?#{attachment.updated_at.to_i}"
   end
 
-  def image_url(style=:original)
-    "/storage/image/5461/#{style}/#{month}/180x150.gif"
+  def image_url(style=:original, attachment)
+    "/storage/image/5461/#{style}/#{month}/180x150.gif?#{attachment.updated_at.to_i}"
   end
 
   def file_path(style=:original)

@@ -4,7 +4,7 @@ module Attachs
 
       def url(style=:original)
         if attachment.url?
-          base_url.join(path(style)).to_s
+          "#{base_url.join(path(style))}?#{attachment.updated_at.to_i}"
         end
       end
 
