@@ -208,7 +208,7 @@ NOTE: If storage is s3 you can pass ssl: true to force https, or cachebuster: fa
 
 ## Cachebuster
 
-All the urls have a timestamp at the end help prevent unwanted caching:
+All the urls end with a timestamp helper to prevent unwanted caching:
 ```
 example.com/media/photo.jpg?1234567890
 ```
