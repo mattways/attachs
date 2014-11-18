@@ -204,7 +204,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-NOTE: If storage is s3 you can pass ssl: true to force https, or cachebuster: false in any storage to remove timestamp.
+NOTE: If storage is s3 you can pass ssl: true to force https.
 
 ## Cachebuster
 
