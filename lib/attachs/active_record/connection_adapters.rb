@@ -2,10 +2,10 @@ module Attachs
   module ActiveRecord
     module ConnectionAdapters
       COLUMNS = {
-        filename:     'string',
+        filename: 'string',
         content_type: 'string',
-        size:         'integer',
-        updated_at:   'datetime'
+        size: 'integer',
+        updated_at: 'datetime'
       }
 
       module AbstractAdapter

@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'aws-sdk', '~> 1.0'
 
-  s.add_dependency 'rails', (ENV['RAILS_VERSION'] ? "~> #{ENV['RAILS_VERSION']}" : ['>= 3.1.0', '< 4.2.0'])
+  s.add_dependency 'rails', (ENV['RAILS_VERSION'] ? "~> #{ENV['RAILS_VERSION']}" : ['>= 4.0.0', '<= 4.2.0'])
 
   if RUBY_PLATFORM == 'java'
     s.add_development_dependency 'activerecord-jdbcsqlite3-adapter', '~> 1.3'

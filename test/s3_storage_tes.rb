@@ -48,15 +48,15 @@ class S3StorageTest < ActiveSupport::TestCase
   end
 
   def file_url(style, record, cachebuster=true, ssl=false)
-    "http#{'s' if ssl}://attachs-test.s3.amazonaws.com/storage/text/11/#{style}/#{month}/file.txt".tap do |url|
-      if cachebuster 
+    "http#{'s' if ssl}://s3.amazonaws.com/attachs.test/storage/text/11/#{style}/#{month}/file.txt".tap do |url|
+      if cachebuster
         url << "?#{record.s3_attach_updated_at.to_i}"
       end
     end
   end
 
   def image_url(style, record, cachebuster=true, ssl=false)
-    "http#{'s' if ssl}://attachs-test.s3.amazonaws.com/storage/image/5461/#{style}/#{month}/180x150.gif".tap do |url|
+    "http#{'s' if ssl}://s3.amazonaws.com/attachs.test/storage/image/5461/#{style}/#{month}/180x150.gif".tap do |url|
       if cachebuster
         url << "?#{record.s3_attach_updated_at.to_i}"
       end

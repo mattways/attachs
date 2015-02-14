@@ -17,10 +17,18 @@ module Attachs
               end
             else
               if options.has_key? :less_than and value.size > options[:less_than]
-                record.errors.add attribute, :attachment_size_less_than, count: number_to_human_size(options[:less_than])
+                record.errors.add(
+                  attribute,
+                  :attachment_size_less_than,
+                  count: number_to_human_size(options[:less_than])
+                )
               end
               if options.has_key? :greater_than and value.size < options[:greater_than]
-                record.errors.add attribute, :attachment_size_greater_than, count: number_to_human_size(options[:greater_than])
+                record.errors.add(
+                  attribute,
+                  :attachment_size_greater_than,
+                  count: number_to_human_size(options[:greater_than])
+                )
               end
             end
           end
