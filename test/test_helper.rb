@@ -26,6 +26,10 @@ class ActiveSupport::TestCase
 
   private
 
+  def clean_storage
+    FileUtils.rm_rf Rails.root.join('public/storage')
+  end
+
   def fixture_file_upload(path, content_type)
     Rack::Test::UploadedFile.new(Rails.root.join("test/fixtures/#{path}"), content_type)
   end
@@ -35,7 +39,7 @@ class ActiveSupport::TestCase
   end
 
   def image_upload
-    fixture_file_upload('180x150.gif', 'image/gif')
+    fixture_file_upload('image.gif', 'image/gif')
   end
 
   def assert_url(url)

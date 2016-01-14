@@ -7,9 +7,9 @@ require 'attachs/version'
 Gem::Specification.new do |s|
   s.name        = 'attachs'
   s.version     = Attachs::VERSION
-  s.authors     = ['Museways']
-  s.email       = ['hello@museways.com']
-  s.homepage    = 'https://github.com/museways/attachs'
+  s.authors     = ['mmontossi']
+  s.email       = ['mmontossi@buyin.io']
+  s.homepage    = 'https://github.com/mmontossi/attachs'
   s.summary     = 'Attachs for rails.'
   s.description = 'Minimalistic toolkit to attach files to records in rails.'
   s.license     = 'MIT'

@@ -1,4 +1,7 @@
-[![Gem Version](https://badge.fury.io/rb/attachs.svg)](http://badge.fury.io/rb/attachs) [![Code Climate](https://codeclimate.com/github/museways/attachs/badges/gpa.svg)](https://codeclimate.com/github/museways/attachs) [![Build Status](https://travis-ci.org/museways/attachs.svg?branch=master)](https://travis-ci.org/museways/attachs) [![Dependency Status](https://gemnasium.com/museways/attachs.svg)](https://gemnasium.com/museways/attachs)
+[![Gem Version](https://badge.fury.io/rb/attachs.svg)](http://badge.fury.io/rb/attachs)
+[![Code Climate](https://codeclimate.com/github/mmontossi/attachs/badges/gpa.svg)](https://codeclimate.com/github/mmontossi/attachs)
+[![Build Status](https://travis-ci.org/mmontossi/attachs.svg)](https://travis-ci.org/mmontossi/attachs)
+[![Dependency Status](https://gemnasium.com/mmontossi/attachs.svg)](https://gemnasium.com/mmontossi/attachs)
 
 # Attachs
 
@@ -306,7 +309,7 @@ bundle exec rake attachs:refresh:missing class=user attachment=avatar
 
 ## Credits
 
-This gem is maintained and funded by [museways](http://museways.com).
+This gem is maintained and funded by [mmontossi](https://github.com/mmontossi).
 
 ## License
 

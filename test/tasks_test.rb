@@ -7,6 +7,10 @@ class TasksTest < ActiveSupport::TestCase
     Dummy::Application.load_tasks
   end
 
+  teardown do
+    clean_storage
+  end
+
   test 'refresh all styles' do
     Medium.create(attach: image_upload)
     original_small_time = small_time
@@ -39,7 +43,7 @@ class TasksTest < ActiveSupport::TestCase
   private
 
   def image_path(style)
-    Rails.root.join("public/#{style}/180x150.gif")
+    Rails.root.join("public/storage/#{style}/image.gif")
   end
 
   def small_time

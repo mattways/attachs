@@ -56,7 +56,7 @@ class S3StorageTest < ActiveSupport::TestCase
   end
 
   def image_url(style, record, cachebuster=true, ssl=false)
-    "http#{'s' if ssl}://s3.amazonaws.com/attachs.test/storage/image/5461/#{style}/#{month}/180x150.gif".tap do |url|
+    "http#{'s' if ssl}://s3.amazonaws.com/attachs.test/storage/image/5461/#{style}/#{month}/image.gif".tap do |url|
       if cachebuster
         url << "?#{record.s3_attach_updated_at.to_i}"
       end

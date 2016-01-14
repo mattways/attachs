@@ -2,6 +2,10 @@ require 'test_helper'
 
 class LocalStorageTest < ActiveSupport::TestCase
 
+  teardown do
+    clean_storage
+  end
+
   test 'file url' do
     medium = Medium.create(local_attach: file_upload)
     assert_equal file_url(:original, medium, true), medium.local_attach.url
@@ -50,7 +54,7 @@ class LocalStorageTest < ActiveSupport::TestCase
   end
 
   def image_url(style, record, cachebuster=true)
-    "/storage/image/5461/#{style}/#{month}/180x150.gif".tap do |url|
+    "/storage/image/5461/#{style}/#{month}/image.gif".tap do |url|
       if cachebuster
         url << "?#{record.local_attach_updated_at.to_i}"
       end
@@ -62,7 +66,7 @@ class LocalStorageTest < ActiveSupport::TestCase
   end
 
   def image_path(style)
-    Rails.root.join("public/storage/image/5461/#{style}/#{month}/180x150.gif")
+    Rails.root.join("public/storage/image/5461/#{style}/#{month}/image.gif")
   end
 
 end

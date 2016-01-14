@@ -2,6 +2,10 @@ require 'test_helper'
 
 class AttachmentTest < ActiveSupport::TestCase
 
+  teardown do
+    clean_storage
+  end
+
   test 'attachment source' do
     original_medium = Medium.create(attach: file_upload)
     copied_medium = Medium.create(attach: original_medium.attach)
@@ -12,7 +16,7 @@ class AttachmentTest < ActiveSupport::TestCase
 
   test 'uri source' do
     medium = Medium.create(attach: URI('https://s3.amazonaws.com/attachs-test/file.txt'))
-    file_path = Rails.root.join('public/original/file.txt')
+    file_path = Rails.root.join('public/storage/original/file.txt')
     assert File.exist?(file_path)
   end
 
