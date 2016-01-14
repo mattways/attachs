@@ -3,11 +3,12 @@ require 'test_helper'
 class ProcessorTest < ActiveSupport::TestCase
 
   setup do
+    FileUtils.mkdir_p resized_path.dirname
     FileUtils.cp source_path, resized_path
   end
 
   teardown do
-    FileUtils.rm_rf resized_path
+    clean_storage
   end
 
   test 'force resize' do
@@ -38,7 +39,7 @@ class ProcessorTest < ActiveSupport::TestCase
   end
 
   def resized_path
-    Rails.root.join('tmp/resized.gif')
+    Rails.root.join('public/storage/processor/resized.gif')
   end
 
   def dimensions(source)
