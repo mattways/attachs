@@ -1,5 +1,3 @@
-require 'open3'
-
 module Attachs
   class Console
     class << self

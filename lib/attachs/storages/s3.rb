@@ -1,5 +1,3 @@
-require 'aws-sdk'
-
 module Attachs
   module Storages
     class S3 < Base
@@ -66,6 +64,11 @@ module Attachs
 
       def bucket
         @bucket ||= begin
+          require 'aws-sdk'
+          credentials = Aws::Credentials.new(
+            Rails.application.secrets.aws_access_key_id,
+            Rails.application.secrets.aws_secret_access_key
+          )
           Aws.config.update(
             region: Attachs.configuration.region,
             credentials: credentials
@@ -77,13 +80,6 @@ module Attachs
       def build_tempfile(path)
         extension = File.extname(path)
         Tempfile.new ['s3', extension]
-      end
-
-      def credentials
-        Aws::Credentials.new(
-          Rails.application.secrets.aws_access_key_id,
-          Rails.application.secrets.aws_secret_access_key
-        )
       end
 
       def upload(local_path, remote_path)

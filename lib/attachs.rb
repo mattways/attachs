@@ -19,6 +19,7 @@ require 'attachs/configuration'
 require 'attachs/console'
 require 'attachs/railtie'
 require 'attachs/version'
+require 'open3'
 
 module Attachs
   class << self
