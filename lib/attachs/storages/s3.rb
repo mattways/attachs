@@ -7,7 +7,7 @@ module Attachs
         if base_url.present?
           Pathname.new(base_url).join(path).to_s
         else
-          bucket.object(path).public_url.to_s.remove /https?:/
+          bucket.object(path).public_url
         end
       end
 

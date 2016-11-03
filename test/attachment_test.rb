@@ -82,11 +82,11 @@ class AttachmentTest < ActiveSupport::TestCase
     assert_equal 400, attachment.width
     assert_equal 269, attachment.height
     assert_equal (269.0 / 400.0), attachment.ratio
-    assert_equal "//s3.amazonaws.com/attachs.test/#{attachment.id}-original.png", attachment.url
-    assert_equal "//s3.amazonaws.com/attachs.test/#{attachment.id}-tiny.png", attachment.url(:tiny)
-    assert_equal "//s3.amazonaws.com/attachs.test/#{attachment.id}-small.png", attachment.url(:small)
-    assert_equal "//s3.amazonaws.com/attachs.test/#{attachment.id}-medium.png", attachment.url(:medium)
-    assert_equal "//s3.amazonaws.com/attachs.test/#{attachment.id}-large.png", attachment.url(:large)
+    assert_equal "https://s3.amazonaws.com/attachs.test/#{attachment.id}-original.png", attachment.url
+    assert_equal "https://s3.amazonaws.com/attachs.test/#{attachment.id}-tiny.png", attachment.url(:tiny)
+    assert_equal "https://s3.amazonaws.com/attachs.test/#{attachment.id}-small.png", attachment.url(:small)
+    assert_equal "https://s3.amazonaws.com/attachs.test/#{attachment.id}-medium.png", attachment.url(:medium)
+    assert_equal "https://s3.amazonaws.com/attachs.test/#{attachment.id}-large.png", attachment.url(:large)
     assert_url_content_type 'image/png', attachment.url
     assert_url_dimensions '400x269', attachment.url
     assert_url_content_type 'image/png', attachment.url(:tiny)
@@ -131,11 +131,11 @@ class AttachmentTest < ActiveSupport::TestCase
     shop.run_callbacks :commit
     attachment = shop.logo
 
-    assert_equal "//s3.amazonaws.com/attachs.test/anderstons/#{attachment.id}-original.png", attachment.url
-    assert_equal "//s3.amazonaws.com/attachs.test/anderstons/#{attachment.id}-tiny.png", attachment.url(:tiny)
-    assert_equal "//s3.amazonaws.com/attachs.test/anderstons/#{attachment.id}-small.png", attachment.url(:small)
-    assert_equal "//s3.amazonaws.com/attachs.test/anderstons/#{attachment.id}-medium.png", attachment.url(:medium)
-    assert_equal "//s3.amazonaws.com/attachs.test/anderstons/#{attachment.id}-large.png", attachment.url(:large)
+    assert_equal "https://s3.amazonaws.com/attachs.test/anderstons/#{attachment.id}-original.png", attachment.url
+    assert_equal "https://s3.amazonaws.com/attachs.test/anderstons/#{attachment.id}-tiny.png", attachment.url(:tiny)
+    assert_equal "https://s3.amazonaws.com/attachs.test/anderstons/#{attachment.id}-small.png", attachment.url(:small)
+    assert_equal "https://s3.amazonaws.com/attachs.test/anderstons/#{attachment.id}-medium.png", attachment.url(:medium)
+    assert_equal "https://s3.amazonaws.com/attachs.test/anderstons/#{attachment.id}-large.png", attachment.url(:large)
     assert_url attachment.url
     assert_url attachment.url(:tiny)
     assert_url attachment.url(:small)
@@ -149,11 +149,11 @@ class AttachmentTest < ActiveSupport::TestCase
     attachment = shop.logo
 
     sleep 5
-    assert_equal "//s3.amazonaws.com/attachs.test/musicians-friend/#{attachment.id}-original.png", attachment.url
-    assert_equal "//s3.amazonaws.com/attachs.test/musicians-friend/#{attachment.id}-tiny.png", attachment.url(:tiny)
-    assert_equal "//s3.amazonaws.com/attachs.test/musicians-friend/#{attachment.id}-small.png", attachment.url(:small)
-    assert_equal "//s3.amazonaws.com/attachs.test/musicians-friend/#{attachment.id}-medium.png", attachment.url(:medium)
-    assert_equal "//s3.amazonaws.com/attachs.test/musicians-friend/#{attachment.id}-large.png", attachment.url(:large)
+    assert_equal "https://s3.amazonaws.com/attachs.test/musicians-friend/#{attachment.id}-original.png", attachment.url
+    assert_equal "https://s3.amazonaws.com/attachs.test/musicians-friend/#{attachment.id}-tiny.png", attachment.url(:tiny)
+    assert_equal "https://s3.amazonaws.com/attachs.test/musicians-friend/#{attachment.id}-small.png", attachment.url(:small)
+    assert_equal "https://s3.amazonaws.com/attachs.test/musicians-friend/#{attachment.id}-medium.png", attachment.url(:medium)
+    assert_equal "https://s3.amazonaws.com/attachs.test/musicians-friend/#{attachment.id}-large.png", attachment.url(:large)
     assert_url attachment.url
     assert_url attachment.url(:tiny)
     assert_url attachment.url(:small)

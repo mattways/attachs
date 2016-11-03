@@ -54,9 +54,6 @@ module StorageHelper
   end
 
   def get(url)
-    if url.starts_with?('//')
-      url.prepend 'http:'
-    end
     Net::HTTP.get_response URI.parse(url)
   end
 
