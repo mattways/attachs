@@ -1,3 +1,5 @@
+require 'aws-sdk'
+
 module Attachs
   module Storages
     class S3 < Base
