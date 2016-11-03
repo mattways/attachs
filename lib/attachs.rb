@@ -19,9 +19,7 @@ require 'attachs/configuration'
 require 'attachs/console'
 require 'attachs/railtie'
 require 'attachs/version'
-
 require 'open3'
-require 'aws-sdk'
 
 module Attachs
   class << self
