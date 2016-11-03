@@ -5,7 +5,7 @@
 
 # Attachs
 
-Minimalistic toolkit to attach files to records.
+Seo friendly way to attach files to records in rails.
 
 ## Install
 
@@ -19,7 +19,10 @@ Then bundle:
 $ bundle
 ```
 
-NOTE: ImageMagick is needed.
+To install GraphicsMagick you can use homebrew:
+```
+brew install graphicsmagick
+```
 
 ## Configuration
 
@@ -31,33 +34,28 @@ rails g attachs:install
 The defaults values are:
 ```ruby
 Attachs.configure do |config|
-  config.s3 = { ssl: false }
-  config.base_url = ''
-  config.styles = {}
-  config.cachebuster = true
-  config.interpolations = {}
-  config.convert_options = {}
-  config.global_styles = []
-  config.global_convert_options= ''
-  config.default_storage = :local
-  config.default_processors = [:thumbnail]
-  config.default_path = '/:timestamp-:filename'
+  config.convert_options = '-strip -quality 82'
+  config.original_path = '/media/original/:id.:extension'
+  config.base_url = nil
 end
 ```
 
-## Usage
+## Definition
 
-Add the column to your table:
+Add the columns to your tables:
 ```ruby
-create_table :users do |t|
-  t.attachment :avatar
+class AddAttachments < ActiveRecord::Migration
+  def change
+    add_column :shops, :logo, :attachment
+    add_column :products, :pictures, :attachment, multiple: true
+  end
 end
 ```
 
-Define the attachment in your model:
+Define the attachment in your models:
 ```ruby
-class User < ActiveRecord::Base
-  has_attached_file :avatar
+class Shop < ActiveRecord::Base
+  has_attachment :logo
 end
 ```
 
@@ -83,17 +81,6 @@ NOTE: Look into lib/attachs/storages/base.rb to find a list of the system interp
 
 ## Styles
 
-Define the styles of the attachment:
-```ruby
-Attachs.configure do |config|
-  config.styles = {
-    small: '120x120!',  # forces the exact size
-    medium: '240x240#', # resizes and crops to fill the desire space
-    big: '360x360'      # resizes to contain the imagen in the desire space
-  }
-end
-```
-
 Then reference them in your model:
 ```ruby
 class User < ActiveRecord::Base
@@ -107,35 +94,6 @@ Attachs.configure do |config|
   config.global_styles = [:big]
 end
 ```
-
-## Convert
-
-To define global convert options:
-```ruby
-Attachs.configure do |config|
-  config.global_convert_options = '-quality 75 -strip'
-end
-```
-
-To set convert options to some styles only:
-```ruby
-Attachs.configure do |config|
-  config.convert_options = {
-    medium: '-trim'
-  }
-end
-```
-
-## Security
-
-To make the attachment private:
-```ruby
-class User < ActiveRecord::Base
-  has_attached_file :avatar, private: true
-end
-```
-
-NOTE: Private attachments will be saved into /private folder.
 
 ## Validations
 
@@ -200,39 +158,11 @@ To point to some particular style:
 <%= image_tag user.avatar.url(:small) %>
 ```
 
-The defauft url is used when there is no upload:
+The defauft path is used when there is no upload:
 ```ruby
 class User < ActiveRecord::Base
-  has_attached_file :avatar, default_url: '/missing.png'
+  has_attached_file :avatar, default_path: '/missing.png'
 end
-```
-
-NOTE: If storage is s3 you can pass ssl: true to force https.
-
-## Cachebuster
-
-All the urls end with a timestamp helper to prevent unwanted caching:
-```
-example.com/media/photo.jpg?1234567890
-```
-
-To disable cachebuster globally:
-```ruby
-Attachs.configure do |config|
-  config.cachebuster = false
-end
-```
-
-To disable cachebuster in a model:
-```ruby
-class User < ActiveRecord::Base
-  has_attached_file :avatar, cachebuster: false
-end
-```
-
-To disable cachebuster for some url:
-```erb
-<%= image_tag user.avatar.url(cachebuster: false) %>
 ```
 
 ## Storage

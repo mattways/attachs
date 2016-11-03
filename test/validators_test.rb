@@ -1,100 +1,160 @@
 require 'test_helper'
 
 class ValidatorsTest < ActiveSupport::TestCase
-  include ActionView::Helpers::NumberHelper
+  include StorageHelper
 
-  test 'presence validator' do
-    model = build_model
-    model.validates_attachment_presence_of :attach
-    record = model.new
-    assert !record.valid?
-    message = I18n.t('errors.messages.attachment_presence')
-    assert record.errors[:attach].include?(message)
-
-    record = model.new(attach: image_upload)
-    assert record.valid?
-    assert record.errors[:attach].empty?
-    record.destroy
+  teardown do
+    Product.clear_validators!
   end
 
-  test 'content type regex validator' do
-    model = build_model
-    model.validates_attachment_content_type_of :attach, with: /\Aimage/
-    record = model.new(attach: file_upload)
-    assert !record.valid?
-    message = I18n.t('errors.messages.attachment_content_type_with')
-    assert record.errors[:attach].include?(message)
-
-    record = model.new(attach: image_upload)
-    assert record.valid?
-    assert record.errors[:attach].empty?
-    record.destroy
-  end
-
-  test 'content type inclusion validator' do
-    model = build_model
-    model.validates_attachment_content_type_of :attach, in: %w(image/gif)
-    record = model.new(attach: file_upload)
-    assert !record.valid?
-    message = I18n.t('errors.messages.attachment_content_type_in', types: %w(image/gif).to_sentence)
-    assert record.errors[:attach].include?(message)
-
-    record = model.new(attach: image_upload)
-    assert record.valid?
-    assert record.errors[:attach].empty?
-    record.destroy
-  end
-
-  test 'size range validator' do
-    model = build_model
-    model.validates_attachment_size_of :attach, in: 1..20.bytes
-    record = model.new(attach: image_upload)
-    assert !record.valid?
-    message = I18n.t('errors.messages.attachment_size_in', min: number_to_human_size(1.byte), max: number_to_human_size(20.bytes))
-    assert record.errors[:attach].include?(message)
-
-    record = model.new(attach: file_upload)
-    assert record.valid?
-    assert record.errors[:attach].empty?
-    record.destroy
-  end
-
-  test 'size minimum validator' do
-    model = build_model
-    model.validates_attachment_size_of :attach, less_than: 20.bytes
-    record = model.new(attach: image_upload)
-    assert !record.valid?
-    message = I18n.t('errors.messages.attachment_size_less_than', count: number_to_human_size(20.bytes))
-    assert record.errors[:attach].include?(message)
-
-    record = model.new(attach: file_upload)
-    assert record.valid?
-    assert record.errors[:attach].empty?
-    record.destroy
-  end
-
-  test 'size maximum validator' do
-    model = build_model
-    model.validates_attachment_size_of :attach, greater_than: 20.bytes
-    record = model.new(attach: file_upload)
-    assert !record.valid?
-    message = I18n.t('errors.messages.attachment_size_greater_than', count: number_to_human_size(20.bytes))
-    assert record.errors[:attach].include?(message)
-
-    record = model.new(attach: image_upload)
-    assert record.valid?
-    assert record.errors[:attach].empty?
-    record.destroy
-  end
-
-  private
-
-  def build_model
-    Class.new(Medium) do
-      def self.name
-        'Medium'
-      end
+  test 'methods' do
+    %i(content_type size).each do |validator|
+      method = "validates_attachment_#{validator}_of"
+      assert Product.respond_to?(method)
     end
+  end
+
+  test 'content type with' do
+    Product.class_eval do
+      validates :pictures, attachment_content_type: { with: /\Aimage/ }
+      validates :brief, attachment_content_type: { with: /\Atext/ }
+    end
+
+    product = Product.new(pictures: [file, image], brief: image)
+    assert_not product.valid?
+    assert product.errors.added?(:pictures, :invalid)
+    assert product.pictures.first.errors.added?(:content_type, :not_allowed)
+    assert product.pictures.second.valid?
+    assert product.errors.added?(:brief, :invalid)
+    assert product.brief.errors.added?(:content_type, :not_allowed)
+
+    product = Product.new(pictures: [image], brief: file)
+    assert product.valid?
+  end
+
+  test 'content type in' do
+    Product.class_eval do
+      validates :pictures, attachment_content_type: { in: %w(image/jpeg) }
+      validates :brief, attachment_content_type: { in: %w(text/plain) }
+    end
+
+    product = Product.new(pictures: [file, image], brief: image)
+    assert_not product.valid?
+    assert product.errors.added?(:pictures, :invalid)
+    assert product.pictures.first.errors.added?(:content_type, :not_listed, list: 'image/jpeg')
+    assert product.pictures.second.valid?
+    assert product.errors.added?(:brief, :invalid)
+    assert product.brief.errors.added?(:content_type, :not_listed, list: 'text/plain')
+
+    product = Product.new(pictures: [image], brief: file)
+    assert product.valid?
+  end
+
+
+  test 'content type within' do
+    Product.class_eval do
+      validates :pictures, attachment_content_type: { within: %w(image/jpeg) }
+      validates :brief, attachment_content_type: { within: %w(text/plain) }
+    end
+
+    product = Product.new(pictures: [file, image], brief: image)
+    assert_not product.valid?
+    assert product.errors.added?(:pictures, :invalid)
+    assert product.pictures.first.errors.added?(:content_type, :not_listed, list: 'image/jpeg')
+    assert product.pictures.second.valid?
+    assert product.errors.added?(:brief, :invalid)
+    assert product.brief.errors.added?(:content_type, :not_listed, list: 'text/plain')
+
+    product = Product.new(pictures: [image], brief: file)
+    assert product.valid?
+  end
+
+  test 'size in' do
+    Product.class_eval do
+      validates :pictures, attachment_size: { in: 15.kilobytes..250.kilobytes }
+      validates :brief, attachment_size: { in: 14.bytes..500.bytes }
+    end
+
+    product = Product.new(pictures: [big_image, image], brief: big_file)
+    assert_not product.valid?
+    assert product.errors.added?(:pictures, :invalid)
+    assert product.pictures.first.errors.added?(:size, :less_than_or_equal_to, count: humanize_size(250.kilobytes))
+    assert product.pictures.second.valid?
+    assert product.errors.added?(:brief, :invalid)
+    assert product.brief.errors.added?(:size, :less_than_or_equal_to, count: humanize_size(500.bytes))
+
+    product = Product.new(pictures: [small_image, image], brief: small_file)
+    assert_not product.valid?
+    assert product.errors.added?(:pictures, :invalid)
+    assert product.pictures.first.errors.added?(:size, :greater_than_or_equal_to, count: humanize_size(15.kilobytes))
+    assert product.pictures.second.valid?
+    assert product.errors.added?(:brief, :invalid)
+    assert product.brief.errors.added?(:size, :greater_than_or_equal_to, count: humanize_size(14.bytes))
+
+    product = Product.new(pictures: [image], brief: file)
+    assert product.valid?
+  end
+
+  test 'size within' do
+    Product.class_eval do
+      validates :pictures, attachment_size: { within: 15.kilobytes..250.kilobytes }
+      validates :brief, attachment_size: { within: 14.bytes..500.bytes }
+    end
+
+    product = Product.new(pictures: [big_image, image], brief: big_file)
+    assert_not product.valid?
+    assert product.errors.added?(:pictures, :invalid)
+    assert product.pictures.first.errors.added?(:size, :less_than_or_equal_to, count: humanize_size(250.kilobytes))
+    assert product.pictures.second.valid?
+    assert product.errors.added?(:brief, :invalid)
+    assert product.brief.errors.added?(:size, :less_than_or_equal_to, count: humanize_size(500.bytes))
+
+    product = Product.new(pictures: [small_image, image], brief: small_file)
+    assert_not product.valid?
+    assert product.errors.added?(:pictures, :invalid)
+    assert product.pictures.first.errors.added?(:size, :greater_than_or_equal_to, count: humanize_size(15.kilobytes))
+    assert product.pictures.second.valid?
+    assert product.errors.added?(:brief, :invalid)
+    assert product.brief.errors.added?(:size, :greater_than_or_equal_to, count: humanize_size(14.bytes))
+
+    product = Product.new(pictures: [image], brief: file)
+    assert product.valid?
+  end
+
+  test 'size less than' do
+    Product.class_eval do
+      validates :pictures, attachment_size: { less_than: 250.kilobytes }
+      validates :brief, attachment_size: { less_than: 500.bytes }
+    end
+
+    product = Product.new(pictures: [big_image, image], brief: big_file)
+    assert_not product.valid?
+    assert product.errors.added?(:pictures, :invalid)
+    assert product.pictures.first.errors.added?(:size, :less_than, count: humanize_size(250.kilobytes))
+    assert product.pictures.second.valid?
+    assert product.errors.added?(:brief, :invalid)
+    assert product.brief.errors.added?(:size, :less_than, count: humanize_size(500.bytes))
+
+    product = Product.new(pictures: [image], brief: file)
+    assert product.valid?
+  end
+
+  test 'size greater than' do
+    Product.class_eval do
+      validates :pictures, attachment_size: { greater_than: 15.kilobytes }
+      validates :brief, attachment_size: { greater_than: 14.bytes }
+    end
+
+    product = Product.new(pictures: [small_image, image], brief: small_file)
+    assert_not product.valid?
+    assert product.errors.added?(:pictures, :invalid)
+    assert product.pictures.first.errors.added?(:size, :greater_than, count: humanize_size(15.kilobytes))
+    assert product.pictures.second.valid?
+    assert product.errors.added?(:brief, :invalid)
+    assert product.brief.errors.added?(:size, :greater_than, count: humanize_size(14.bytes))
+
+    product = Product.new(pictures: [image], brief: file)
+    assert product.valid?
   end
 
 end

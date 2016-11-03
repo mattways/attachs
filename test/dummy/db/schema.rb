@@ -11,23 +11,33 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140808012639) do
+ActiveRecord::Schema.define(version: 20161031135453) do
 
-  create_table "media", force: true do |t|
-    t.string   "attach_filename"
-    t.string   "attach_content_type"
-    t.integer  "attach_size"
-    t.datetime "attach_updated_at"
-    t.string   "local_attach_filename"
-    t.string   "local_attach_content_type"
-    t.integer  "local_attach_size"
-    t.datetime "local_attach_updated_at"
-    t.string   "s3_attach_filename"
-    t.string   "s3_attach_content_type"
-    t.integer  "s3_attach_size"
-    t.datetime "s3_attach_updated_at"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
+  create_table "products", force: :cascade do |t|
+    t.integer  "shop_id"
+    t.string   "name"
+    t.jsonb    "pictures",   default: []
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.jsonb    "brief",      default: {}
+  end
+
+  create_table "shops", force: :cascade do |t|
+    t.string   "name"
+    t.jsonb    "logo",       default: {}
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  create_table "uploads", force: :cascade do |t|
+    t.jsonb    "file",             default: {}
+    t.string   "record_type"
+    t.string   "record_attribute"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
 end

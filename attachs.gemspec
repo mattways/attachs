@@ -10,24 +10,20 @@ Gem::Specification.new do |s|
   s.authors     = ['mmontossi']
   s.email       = ['mmontossi@buyin.io']
   s.homepage    = 'https://github.com/mmontossi/attachs'
-  s.summary     = 'Attachs for rails.'
-  s.description = 'Minimalistic toolkit to attach files to records in rails.'
+  s.summary     = 'File attachments for rails.'
+  s.description = 'Json based attachments for records in rails.'
   s.license     = 'MIT'
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
   s.test_files = Dir['test/**/*']
-  s.requirements << 'ImageMagick'
+
+  s.requirements << 'GraphicsMagick'
 
   s.required_ruby_version = '>= 2.0.0'
 
-  s.add_development_dependency 'aws-sdk', '~> 1.0'
+  s.add_dependency 'rails', ['>= 4.2.0', '< 4.3.0']
+  s.add_dependency 'aws-sdk', '~> 2.0'
 
-  s.add_dependency 'rails', (ENV['RAILS_VERSION'] ? "~> #{ENV['RAILS_VERSION']}" : ['>= 4.0.0', '< 4.3.0'])
-
-  if RUBY_PLATFORM == 'java'
-    s.add_development_dependency 'activerecord-jdbcsqlite3-adapter', '~> 1.3'
-    s.add_development_dependency 'jruby-openssl', '~> 0.9'
-  else
-    s.add_development_dependency 'sqlite3', '~> 1.3'
-  end
+  s.add_development_dependency 'pg', '~> 0.18'
+  s.add_development_dependency 'mocha', '~> 1.1'
 end

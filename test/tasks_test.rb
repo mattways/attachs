@@ -1,57 +1,69 @@
 require 'test_helper'
-require 'rake'
 
 class TasksTest < ActiveSupport::TestCase
+  include StorageHelper
 
   setup do
     Dummy::Application.load_tasks
   end
 
-  teardown do
-    clean_storage
+  test 'reprocess' do
+    shop = Shop.new(logo: image)
+    assert_raises do
+      shop.logo.reprocess
+    end
+
+    shop.save
+    shop.run_callbacks :commit
+    shop.logo.paths.except(:original).each do |style, path|
+      Attachs.storage.delete path
+    end
+    silence_stream(STDOUT) do
+      Rake::Task['attachs:reprocess'].invoke
+    end
+    shop.reload
+    shop.logo.paths.each do |style, path|
+      assert_url shop.logo.url(style)
+    end
+    shop.logo.destroy
   end
 
-  test 'refresh all styles' do
-    Medium.create(attach: image_upload)
-    original_small_time = small_time
-    original_big_time = big_time
-    ENV['CLASS'] = 'medium'
-    ENV['ATTACHMENT'] = 'attach'
-    sleep 1
-    Rake::Task['attachs:refresh:all'].invoke
-    assert File.file?(image_path(:small))
-    assert File.file?(image_path(:big))
-    assert_not_equal original_small_time, small_time
-    assert_not_equal original_big_time, big_time
+  test 'fix missings' do
+    shop = Shop.new(logo: image)
+    assert_raises do
+      shop.logo.fix_missings
+    end
+
+    shop.save
+    shop.run_callbacks :commit
+    %i(tiny small).each do |style|
+      Attachs.storage.delete shop.logo.paths[style]
+    end
+    silence_stream(STDOUT) do
+      Rake::Task['attachs:fix_missings'].invoke
+    end
+    shop.logo.paths.each do |style, path|
+      assert_url shop.logo.url(style)
+    end
+    shop.logo.destroy
   end
 
-  test 'refersh missing styles' do
-    Medium.create(attach: image_upload)
-    original_big_time = big_time
-    original_small_time = small_time
-    File.delete image_path(:small)
-    ENV['CLASS'] = 'medium'
-    ENV['ATTACHMENT'] = 'attach'
-    sleep 1
-    Rake::Task['attachs:refresh:missing'].invoke
-    assert File.file?(image_path(:small))
-    assert File.file?(image_path(:big))
-    assert_not_equal original_small_time, small_time
-    assert_equal original_big_time, big_time
-  end
-
-  private
-
-  def image_path(style)
-    Rails.root.join("public/storage/#{style}/image.gif")
-  end
-
-  def small_time
-    File.mtime(image_path(:small))
-  end
-
-  def big_time
-    File.mtime(image_path(:big))
+  test 'clear' do
+    shop1 = Shop.create(logo: image)
+    shop1.run_callbacks :commit
+    shop2 = Shop.create(logo: image)
+    shop2.run_callbacks :commit
+    shop2.delete
+    silence_stream(STDOUT) do
+      Rake::Task['attachs:clear'].invoke
+    end
+    shop1.logo.styles.each do |style, path|
+      assert_url shop1.logo.url(style)
+    end
+    shop2.logo.styles.each do |style, path|
+      assert_not_url shop2.logo.url(style)
+    end
+    shop1.logo.destroy
   end
 
 end

@@ -2,23 +2,13 @@ module Attachs
   module Processors
     class Base
 
-      def initialize(attachment, source)
-        @attachment = attachment
-        @source = source
+      def initialize(source_path)
+        @source_path = source_path
       end
 
-      protected
+      private
 
-      attr_reader :attachment, :source
-
-      def run(cmd)
-        stdout, stderr, status = Open3.capture3(cmd)
-        if status.success?
-          stdout.strip
-        else
-          false
-        end
-      end
+      attr_reader :source_path
 
     end
   end

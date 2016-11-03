@@ -1,9 +1,5 @@
 es:
   errors:
     messages:
-      attachment_presence: "no puede estar vacío"
-      attachment_content_type_with: "tiene un formato no permitido"
-      attachment_content_type_in: "debe ser de uno de los siguientes formatos: %{types}"
-      attachment_size_less_than: "debe pesar menos de %{count}"
-      attachment_size_greater_than: "debe pesar más de %{count}"
-      attachment_size_in: "debe pesar entre %{min} y %{max}"
+      not_allowed: "no permitido"
+      not_listed: "debe ser de uno de los siguientes: %{list}"

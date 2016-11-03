@@ -1,9 +1,5 @@
 en:
   errors:
     messages:
-      attachment_presence: "can't be blank"
-      attachment_content_type_with: "has not allowed type"
-      attachment_content_type_in: "must be of one of the following types: %{types}"
-      attachment_size_less_than: "size must be less than %{count}"
-      attachment_size_greater_than: "size must be greater than %{count}"
-      attachment_size_in: "size must be between %{min} and %{max}"
+      not_allowed: "not allowed"
+      not_listed: "must be one of the following: %{list}"

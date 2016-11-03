@@ -2,90 +2,97 @@ module Attachs
   module Storages
     class S3 < Base
 
-      def url(*args)
-        if attachment.url?
-          options = args.extract_options!
-          style = (args[0] || :original)
-          if Attachs.config.base_url.present?
-            Pathname.new(Attachs.config.base_url).join(path(style)).to_s
-          else
-            object(style).public_url(secure: find_option(options, :ssl, Attachs.config.s3[:ssl])).to_s
-          end.tap do |url|
-            if find_option(options, :cachebuster, Attachs.config.cachebuster)
-              url << "?#{attachment.updated_at.to_i}"
-            end
-          end
+      def url(path)
+        base_url = Attachs.configuration.base_url
+        if base_url.present?
+          Pathname.new(base_url).join(path).to_s
+        else
+          bucket.object(path).public_url.to_s.remove /https?:/
         end
       end
 
-      def process(force=false)
-        if attachment.upload?
-          stream attachment.upload, path
-          attachment.uploaded!
-        end
-        process_styles force
-      end
-
-      def process_styles(force=false)
-        if attachment.image?
-          unless cache[path]
-            download = Tempfile.new('s3')
-            object.read do |chunk|
-              download.write chunk
-            end
-            cache[path] = download
+      def process(file, paths, options)
+        if processable?(file.path)
+          processor = build_processor(file.path)
+          paths.each do |style, path|
+            tmp = build_tempfile(path)
+            processor.process tmp.path, options[style]
+            upload tmp.path, path
           end
-          attachment.processors.each do |klass|
-            processor = klass.new(attachment, cache[path].path)
-            attachment.styles.each do |style|
-              if force == true
-                object(style).delete
-              end
-              unless object(style).exists?
-                tmp = Tempfile.new('s3')
-                processor.process style, tmp.path
-                stream tmp, path(style)
-              end
-            end
-          end
+        else
+          upload file.path, paths[:original]
         end
       end
 
-      def destroy
-        object.delete
-        destroy_styles
+      def get(path)
+        file = build_tempfile(path)
+        file.binmode
+        bucket.object(path).get do |chunk|
+          file.write chunk
+        end
+        file.rewind
+        file.close
+        file
       end
 
-      def destroy_styles
-        if attachment.image?
-          attachment.styles.each do |style|
-            object(style).delete
-          end
+      def copy(current_path, new_path)
+        Attachs.logger.info "Copying: #{current_path} => #{new_path}"
+        bucket.object(current_path).copy_to bucket.object(new_path), acl: 'public-read'
+      end
+
+      def move(current_path, new_path)
+        Attachs.logger.info "Moving: #{current_path} => #{new_path}"
+        bucket.object(current_path).move_to bucket.object(new_path)
+      end
+
+      def delete(path)
+        Attachs.logger.info "Deleting: #{path}"
+        bucket.object(path).delete
+      end
+
+      def exist?(path)
+        bucket.object(path).exists?
+      end
+
+      def find_each
+        bucket.objects.each do |object|
+          yield object.key
         end
       end
 
-      protected
-
-      def cache
-        @cache ||= {}
-      end
+      private
 
       def bucket
-        @bucket ||= AWS::S3.new.buckets[Attachs.config.s3[:bucket]]
-      end
-
-      def object(style=:original)
-        bucket.objects[path(style)]
-      end
-
-      def stream(file, path)
-        object = bucket.objects.create(path, File.open(file.path, 'rb'))
-        if attachment.private?
-          object.acl = :private
-        else
-          object.acl = :public_read
+        @bucket ||= begin
+          Aws.config.update(
+            region: Attachs.configuration.region,
+            credentials: credentials
+          )
+          Aws::S3::Resource.new.bucket Attachs.configuration.bucket
         end
-        cache[path] = file
+      end
+
+      def build_tempfile(path)
+        extension = File.extname(path)
+        Tempfile.new ['s3', extension]
+      end
+
+      def credentials
+        Aws::Credentials.new(
+          Rails.application.secrets.aws_access_key_id,
+          Rails.application.secrets.aws_secret_access_key
+        )
+      end
+
+      def upload(local_path, remote_path)
+        Attachs.logger.info "Uploading: #{local_path} => #{remote_path}"
+        bucket.object(remote_path).upload_file(
+          local_path,
+          acl: 'public-read',
+          content_type: detect_content_type(remote_path),
+          cache_control: 'max-age=315360000, public',
+          expires: Time.parse('31 Dec 2037 23:55:55 GMT').httpdate
+        )
       end
 
     end
