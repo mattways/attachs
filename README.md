@@ -31,12 +31,13 @@ Generate the configuration file:
 rails g attachs:install
 ```
 
-The defaults values are:
+The available confgiurations are:
 ```ruby
 Attachs.configure do |config|
   config.convert_options = '-strip -quality 82'
-  config.original_path = '/media/original/:id.:extension'
-  config.base_url = nil
+  config.region = 'us-east-1'
+  config.bucket = 'some-bucket'
+  config.base_url = 'https://cdn.mydomain.com'
 end
 ```
 
@@ -46,16 +47,33 @@ Add the columns to your tables:
 ```ruby
 class AddAttachments < ActiveRecord::Migration
   def change
-    add_column :shops, :logo, :attachment
-    add_column :products, :pictures, :attachment, multiple: true
+    add_attachment :shops, :logo
+    add_attachments :products, :pictures
   end
 end
 ```
 
-Define the attachment in your models:
+Define the attachments in your models:
 ```ruby
 class Shop < ActiveRecord::Base
-  has_attachment :logo
+  has_attachment(
+    :logo,
+    path: 'logos/:id.png',
+    default_path: '/missing.png'
+  )
+end
+
+class Product < ActiveRecord::Base
+  has_attachment(
+    :pictures,
+    path: 'products/:id-:style.:extension',
+    styles: {
+      tiny: '25x25',
+      small: '150x150#',
+      medium: '300x300!',
+      large: '600x'
+    }
+  )
 end
 ```
 
@@ -63,86 +81,66 @@ end
 
 To customize the path to some model:
 ```ruby
-class User < ActiveRecord::Base
-  has_attached_file :avatar, path: '/:type/:timestamp/:filename'
+class Shop < ActiveRecord::Base
+  has_attachment :logo, path: '/:logo/:name/:id.png'
 end
 ```
 
 To create custom interpolations:
 ```ruby
 Attachs.configure do |config|
-  config.interpolations = {
-    category: -> (attachment) { attachment.record.category }
-  }
+  config.interpolations[:name] = Proc.new do |record|
+    record.name
+  end
 end
 ```
 
-NOTE: Look into lib/attachs/storages/base.rb to find a list of the system interpolations.
-
-## Styles
-
-Then reference them in your model:
-```ruby
-class User < ActiveRecord::Base
-  has_attached_file :avatar, styles: [:small, :medium]
-end
-```
-
-To set styles for all attachments:
-```ruby
-Attachs.configure do |config|
-  config.global_styles = [:big]
-end
-```
+NOTE: The available interpolations are: filename, basename, extension, attribute, content_type, size.
 
 ## Validations
 
 To validate the presence of the attachment:
 ```ruby
 class User < ActiveRecord::Base
-  has_attached_file :avatar
-  validates_attachment_presence_of :avatar
+  has_attachment :pictures
+  validates_attachment_presence_of :pictures
 end
 ```
 
 To validate the size of the attachment:
 ```ruby
 class User < ActiveRecord::Base
-  has_attached_file :avatar
-  validates_attachment_size_of :avatar, in: 1..5.megabytes
+  has_attachment :pictures
+  validates_attachment_size_of :pictures, in: 1..5.megabytes
 end
 ```
 
 To validate the content type of the attachment:
 ```ruby
 class User < ActiveRecord::Base
-  has_attached_file :avatar
-  validates_attachment_content_type_of :avatar, with: /\Aimage/
-  # Or using a list
-  validates_attachment_content_type_of :avatar, in: %w(image/jpg image/png)
+  has_attachment :pictures
+  validates_attachment_content_type_of :pictures, with: /\Aimage/
 end
-```
 
-## I18n
-
-To translate the messages the keys are:
 ```
-errors.messages.attachment_presence
-errors.messages.attachment_size_in
-errors.messages.attachment_size_less_than
-errors.messages.attachment_size_greater_than
-errors.messages.attachment_content_type_with
-errors.messages.attachment_content_type_in
-```
-
-NOTE: Look into lib/attachs/locales yamls.
+NOTE: Look into lib/attachs/locales yamls to known the keys.
 
 ## Forms
 
 Your forms continue to work the same:
 ```erb
-<%= form_for @user do |f| %>
-  <%= f.file_field :avatar %>
+<%= form_for @shop do |f| %>
+  <%= f.file_field :logo %>
+<% end %>
+```
+
+You can manage collections with fields_for:
+```erb
+<%= form_for @product do |f| %>
+  <%= f.fields_for :pictures do |ff| %>
+    <%= ff.file_field :value %>
+    <%= ff.number_field :position %>
+  <% end %>
 <% end %>
 ```
 
@@ -150,91 +148,29 @@ Your forms continue to work the same:
 
 The url method points to the original file:
 ```erb
-<%= image_tag user.avatar.url %>
+<%= image_tag shop.logo.url %>
 ```
 
 To point to some particular style:
 ```erb
-<%= image_tag user.avatar.url(:small) %>
-```
-
-The defauft path is used when there is no upload:
-```ruby
-class User < ActiveRecord::Base
-  has_attached_file :avatar, default_path: '/missing.png'
-end
-```
-
-## Storage
-
-To override the storage in the model:
-```ruby
-class User < ActiveRecord::Base
-  has_attached_file :avatar, storage: :s3
-end
-```
-
-To configure the s3 credentials:
-```ruby
-Attachs.configure do |config|
-  config.s3 = {
-    bucket: 'xxx',
-    access_key_id: 'xxx',
-    secret_access_key: 'xxx'
-  }
-end
-```
-
-## Processors
-
-To create a custom processor:
-```ruby
-class Attachs::Processors::CustomThumbnail
-
-  def initialize(attachment, source)
-    # Custom initialization
-  end
-
-  def process(style, destination)
-    # Custom logic
-  end
-
-end
-```
-
-To change the processors in the model:
-```ruby
-class User < ActiveRecord::Base
-  has_attached_file :avatar, processors: [:custom_thumbnail]
-end
-```
-
-To change the default processors:
-```ruby
-Attachs.configure do |config|
-  config.default_processors = [:custom_thumbnail]
-end
-```
-
-## CDN
-
-To configure a cdn:
-```ruby
-Attachs.configure do |config|
-  config.base_url = 'http://cdn.example.com'
-end
+<%= image_tag shop.logo.url(:small) %>
 ```
 
 ## Tasks
 
-To refresh all the styles of some attachment:
+To reprocess all styles:
 ```
-bundle exec rake attachs:refresh:all class=user attachment=avatar
+bundle exec rake attachs:reprocess
 ```
 
-To refresh missing styles of some attachment:
+To fix missing styles:
 ```
-bundle exec rake attachs:refresh:missing class=user attachment=avatar
+bundle exec rake attachs:fix_missings
+```
+
+To remove orphan files:
+```
+bundle exec rake attachs:clear
 ```
 
 ## Credits

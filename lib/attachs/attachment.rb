@@ -303,7 +303,7 @@ module Attachs
         send name
       elsif name == :attribute
         record_attribute
-      elsif attributes.except(:paths).has_key?(name)
+      elsif attributes.except(:upload_at, :paths, :old_paths).has_key?(name)
         attributes[name]
       elsif interpolation = Attachs.configuration.interpolations[name]
         interpolation.call record
