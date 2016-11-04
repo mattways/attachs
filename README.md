@@ -5,7 +5,7 @@
 
 # Attachs
 
-Seo friendly way to attach files to records in rails.
+Json based attachments for records in rails.
 
 ## Install
 
