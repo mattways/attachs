@@ -71,15 +71,15 @@ Define the attachments in your models:
 class Shop < ActiveRecord::Base
   has_attachment(
     :logo,
-    path: 'logos/:id.png',
-    default_path: '/missing.png'
+    path: ':id/:name.png',
+    default_path: 'missing.png'
   )
 end
 
 class Product < ActiveRecord::Base
   has_attachment(
     :pictures,
-    path: 'products/:id-:style.:extension',
+    path: ':id/:style.:extension',
     styles: {
       tiny: '25x25',
       small: '150x150#',

@@ -10,6 +10,13 @@ class AttachmentTest < ActiveSupport::TestCase
     assert product.brief.present?
   end
 
+  test 'default' do
+    product = Product.new
+    attachment = product.pictures.new
+
+    assert_equal 'https://s3.amazonaws.com/attachs.test/missing.png', attachment.url
+  end
+
   test 'attributes' do
     shop = Shop.new
     attachment = shop.logo

@@ -56,7 +56,12 @@ module Attachs
     end
 
     def url(style=:original)
-      if path = attributes[:paths][style]
+      paths = attributes[:paths]
+      if paths.has_key?(style)
+        storage.url paths[style]
+      elsif options.has_key?(:default_path)
+        template = options[:default_path]
+        path = generate_path(template, style)
         storage.url path
       end
     end
@@ -259,16 +264,8 @@ module Attachs
       end
     end
 
-    def find_template_path(style)
-      if present?
-        options[:path]
-      else
-        options[:default_path]
-      end
-    end
-
-    def generate_path(style)
-      if path = find_template_path(style).try(:dup)
+    def generate_path(template, style)
+      if path = template.try(:dup)
         path.gsub! ':style', style.to_s.gsub('_', '-')
         path.scan(/:[a-z_]+/).each do |token|
           name = token.from(1).to_sym
@@ -285,9 +282,10 @@ module Attachs
     end
 
     def generate_paths
-      paths = { original: generate_path(:original) }
+      template = options[:path]
+      paths = { original: generate_path(template, :original) }
       styles.each do |style, geometry|
-        paths[style] = generate_path(style)
+        paths[style] = generate_path(template, style)
       end
       paths
     end

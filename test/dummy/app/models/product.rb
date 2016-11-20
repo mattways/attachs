@@ -4,7 +4,8 @@ class Product < ActiveRecord::Base
 
   has_attachments(
     :pictures,
-    path: ':id-:style.:extension'
+    path: ':id-:style.:extension',
+    default_path: 'missing.png'
   )
 
   has_attachment(
