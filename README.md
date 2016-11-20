@@ -77,7 +77,7 @@ class Shop < ActiveRecord::Base
 end
 
 class Product < ActiveRecord::Base
-  has_attachment(
+  has_attachments(
     :pictures,
     path: ':id/:style.:extension',
     styles: {
