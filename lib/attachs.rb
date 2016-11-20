@@ -18,6 +18,7 @@ require 'attachs/collection'
 require 'attachs/concern'
 require 'attachs/configuration'
 require 'attachs/console'
+require 'attachs/interpolations'
 require 'attachs/railtie'
 require 'attachs/version'
 require 'open3'
@@ -35,6 +36,10 @@ module Attachs
 
     def storage
       @storage ||= Storages::S3.new
+    end
+
+    def interpolations
+      @interpolations ||= Interpolations.new
     end
 
     def models

@@ -49,6 +49,10 @@ Attachs.configure do |config|
   config.region = 'us-east-1'
   config.bucket = 'some-bucket'
   config.base_url = 'https://cdn.mydomain.com'
+
+  config.add_interpolation :name do |record|
+    record.name
+  end
 end
 ```
 
@@ -85,6 +89,8 @@ class Product < ActiveRecord::Base
   )
 end
 ```
+
+NOTE: The out of the box interpolations are: filename, basename, extension, attribute, content_type, size.
 
 ## Usage
 
@@ -146,19 +152,6 @@ To point to some particular style:
 ```erb
 <%= image_tag shop.logo.url(:small) %>
 ```
-
-### Interpolations
-
-To create interpolations:
-```ruby
-Attachs.configure do |config|
-  config.interpolations[:name] = Proc.new do |record|
-    record.name
-  end
-end
-```
-
-NOTE: The out of the box interpolations are: filename, basename, extension, attribute, content_type, size.
 
 ### Tasks
 

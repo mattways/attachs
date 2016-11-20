@@ -299,8 +299,8 @@ module Attachs
         record_attribute
       elsif attributes.except(:upload_at, :paths, :old_paths).has_key?(name)
         attributes[name]
-      elsif interpolation = Attachs.configuration.interpolations[name]
-        interpolation.call record
+      else
+        Attachs.interpolations.find(name).call record
       end
     end
 
