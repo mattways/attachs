@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.name        = 'attachs'
   s.version     = Attachs::VERSION
   s.authors     = ['mmontossi']
-  s.email       = ['mmontossi@buyin.io']
+  s.email       = ['mmontossi@gmail.com']
   s.homepage    = 'https://github.com/mmontossi/attachs'
   s.summary     = 'File attachments for rails.'
   s.description = 'Json based attachments for records in rails.'

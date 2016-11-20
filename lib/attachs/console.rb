@@ -21,7 +21,7 @@ module Attachs
       private
 
       def run(cmd)
-        Attachs.logger.info "Running: #{cmd}"
+        Rails.logger.info "Running: #{cmd}"
         stdout, stderr, status = Open3.capture3(cmd)
         if status.success?
           output = stdout.strip

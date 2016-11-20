@@ -152,14 +152,12 @@ module Attachs
           if storage.exist?(path)
             storage.delete path
           end
-          Attachs.logger.info "Regenerating: #{style} => #{path}"
+          Rails.logger.info "Regenerating: #{style} => #{path}"
         end
         new_paths = generate_paths
         storage.process file, new_paths, styles
         attributes[:paths] = new_paths
         update_record
-      else
-        Attachs.logger.info 'No styles found'
       end
     end
 
@@ -171,15 +169,13 @@ module Attachs
         paths.except(:original).each do |style, path|
           unless storage.exist?(path)
             missings[style] = path
-            Attachs.logger.info "Generating: #{style} => #{path}"
+            Rails.logger.info "Generating: #{style} => #{path}"
           end
         end
         if missings.size > 1
           file = storage.get(paths[:original])
           storage.process file, missings, styles
         end
-      else
-        Attachs.logger.info 'No styles found'
       end
     end
 
@@ -234,10 +230,8 @@ module Attachs
 
     attr_reader :original_attributes, :source
 
-    %i(storage logger).each do |name|
-      define_method name do
-        Attachs.send name
-      end
+    def storage
+      Attachs.storage
     end
 
     def normalize_attributes(attributes)

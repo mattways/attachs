@@ -13,6 +13,7 @@ require 'attachs/processors/image'
 require 'attachs/storages/base'
 require 'attachs/storages/s3'
 require 'attachs/attachment'
+require 'attachs/builder'
 require 'attachs/collection'
 require 'attachs/concern'
 require 'attachs/configuration'
@@ -34,10 +35,6 @@ module Attachs
 
     def storage
       @storage ||= Storages::S3.new
-    end
-
-    def logger
-      Rails.logger
     end
 
     def models
@@ -83,7 +80,7 @@ module Attachs
     def clear
       storage.find_each do |path|
         unless exists?(path)
-          logger.info "Deleting #{path}"
+          Rails.logger.info "Deleting #{path}"
           storage.delete path
         end
       end
@@ -94,7 +91,7 @@ module Attachs
         class_name = attachment.record.class.name
         id = attachment.record.id
         attribute = attachment.record_attribute
-        logger.info "Reprocessing #{class_name} ##{id} => #{attribute}"
+        Rails.logger.info "Reprocessing #{class_name} ##{id} => #{attribute}"
         attachment.reprocess
       end
     end
@@ -104,7 +101,7 @@ module Attachs
         class_name = attachment.record.class.name
         id = attachment.record.id
         attribute = attachment.record_attribute
-        logger.info "Fix missings of #{class_name} ##{id} => #{attribute}"
+        Rails.logger.info "Fix missings of #{class_name} ##{id} => #{attribute}"
         attachment.fix_missings
       end
     end

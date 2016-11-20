@@ -21,17 +21,17 @@ $ bundle
 
 To install GraphicsMagick you can use homebrew:
 ```
-brew install graphicsmagick
+$ brew install graphicsmagick
 ```
 
 ## Configuration
 
-Generate the configuration file:
+Run the install generator:
 ```
-rails g attachs:install
+$ bundle exec rails g attachs:install
 ```
 
-The available confgiurations are:
+Set the global settings:
 ```ruby
 Attachs.configure do |config|
   config.convert_options = '-strip -quality 82'
@@ -40,8 +40,6 @@ Attachs.configure do |config|
   config.base_url = 'https://cdn.mydomain.com'
 end
 ```
-
-## Definition
 
 Add the columns to your tables:
 ```ruby
@@ -77,27 +75,9 @@ class Product < ActiveRecord::Base
 end
 ```
 
-## Paths
+## Usage
 
-To customize the path to some model:
-```ruby
-class Shop < ActiveRecord::Base
-  has_attachment :logo, path: '/:logo/:name/:id.png'
-end
-```
-
-To create custom interpolations:
-```ruby
-Attachs.configure do |config|
-  config.interpolations[:name] = Proc.new do |record|
-    record.name
-  end
-end
-```
-
-NOTE: The available interpolations are: filename, basename, extension, attribute, content_type, size.
-
-## Validations
+### Validations
 
 To validate the presence of the attachment:
 ```ruby
@@ -125,7 +105,7 @@ end
 ```
 NOTE: Look into lib/attachs/locales yamls to known the keys.
 
-## Forms
+### Forms
 
 Your forms continue to work the same:
 ```erb
@@ -144,7 +124,7 @@ You can manage collections with fields_for:
 <% end %>
 ```
 
-## Urls
+### Urls
 
 The url method points to the original file:
 ```erb
@@ -156,21 +136,34 @@ To point to some particular style:
 <%= image_tag shop.logo.url(:small) %>
 ```
 
-## Tasks
+### Interpolations
+
+To create interpolations:
+```ruby
+Attachs.configure do |config|
+  config.interpolations[:name] = Proc.new do |record|
+    record.name
+  end
+end
+```
+
+NOTE: The out of the box interpolations are: filename, basename, extension, attribute, content_type, size.
+
+### Tasks
 
 To reprocess all styles:
 ```
-bundle exec rake attachs:reprocess
+$ bundle exec rake attachs:reprocess
 ```
 
 To fix missing styles:
 ```
-bundle exec rake attachs:fix_missings
+$ bundle exec rake attachs:fix_missings
 ```
 
 To remove orphan files:
 ```
-bundle exec rake attachs:clear
+$ bundle exec rake attachs:clear
 ```
 
 ## Credits

@@ -4,15 +4,9 @@ class AttachmentTest < ActiveSupport::TestCase
   include StorageHelper
 
   test 'nested attributes' do
-    product = Product.new(pictures: [image])
+    product = Product.new
     product.brief_attributes = { value: file }
-    product.pictures_attributes = [
-      { id: product.pictures.first.id, _destroy: '1' },
-      { value: image }
-    ]
 
-    assert product.pictures.first.blank?
-    assert product.pictures.second.present?
     assert product.brief.present?
   end
 

@@ -36,17 +36,17 @@ module Attachs
       end
 
       def copy(current_path, new_path)
-        Attachs.logger.info "Copying: #{current_path} => #{new_path}"
+        Rails.logger.info "Copying: #{current_path} => #{new_path}"
         bucket.object(current_path).copy_to bucket.object(new_path), acl: 'public-read'
       end
 
       def move(current_path, new_path)
-        Attachs.logger.info "Moving: #{current_path} => #{new_path}"
+        Rails.logger.info "Moving: #{current_path} => #{new_path}"
         bucket.object(current_path).move_to bucket.object(new_path)
       end
 
       def delete(path)
-        Attachs.logger.info "Deleting: #{path}"
+        Rails.logger.info "Deleting: #{path}"
         bucket.object(path).delete
       end
 
@@ -83,7 +83,7 @@ module Attachs
       end
 
       def upload(local_path, remote_path)
-        Attachs.logger.info "Uploading: #{local_path} => #{remote_path}"
+        Rails.logger.info "Uploading: #{local_path} => #{remote_path}"
         bucket.object(remote_path).upload_file(
           local_path,
           acl: 'public-read',

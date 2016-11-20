@@ -1,7 +1,11 @@
 module Attachs
   class Collection
 
-    delegate :map, :each, :size, :length, :count, :reject, :select, :any?, :all?, :none?, :first, :second, :last, to: :to_a
+    delegate(
+      :map, :each, :size, :length, :count, :reject, :select, :any?,
+      :all?, :none?, :first, :second, :last, :[],
+      to: :to_a
+    )
 
     attr_reader :record, :record_attribute, :options
 
@@ -10,14 +14,6 @@ module Attachs
       @record_attribute = record_attribute
       @options = options
       @attachments = build_attachments(collection)
-    end
-
-    def present?
-      any? &:present?
-    end
-
-    def blank?
-      all? &:blank?
     end
 
     %i(save destroy persist unpersist).each do |name|
@@ -38,6 +34,14 @@ module Attachs
     def find(id)
       to_a.find do |attachment|
         attachment.id == id
+      end
+    end
+
+    def []=(index, value)
+      if attachment = to_a[index]
+        attachment.assign value
+      else
+        append value
       end
     end
 
