@@ -7,6 +7,17 @@
 
 Json based attachments for records in rails.
 
+## Why
+
+I did this gem to:
+
+- Save attachments into one json column.
+- Handle multiple attachments without the need of a separate model.
+- Have a way to delete orphan files.
+- Use graphicsmagick out of the box.
+- Delete and rename attachemnts asynchronous.
+- Keep renamed files to improve seo.
+
 ## Install
 
 Put this line in your Gemfile:
