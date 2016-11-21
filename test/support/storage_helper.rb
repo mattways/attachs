@@ -1,4 +1,5 @@
 module StorageHelper
+  extend ActiveSupport::Concern
 
   private
 
