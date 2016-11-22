@@ -3,6 +3,7 @@ module Attachs
     module ActiveRecord
       module Migration
         module CommandRecorder
+          extend ActiveSupport::Concern
 
           def add_attachment(*args)
             record :add_attachment, args

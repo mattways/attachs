@@ -3,6 +3,7 @@ module Attachs
     module ActiveRecord
       module ConnectionAdapters
         module AbstractAdapter
+          extend ActiveSupport::Concern
 
           def add_attachments(table, column)
             add_column table, column, :jsonb, default: []
@@ -19,6 +20,7 @@ module Attachs
 
         end
         module TableDefinition
+          extend ActiveSupport::Concern
 
           def attachments(name)
             column name, :jsonb, default: []
