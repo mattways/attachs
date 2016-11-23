@@ -15,7 +15,7 @@ I did this gem to:
 - Handle multiple attachments without the need of a separate model.
 - Have a way to delete orphan files.
 - Use graphicsmagick out of the box.
-- Delete and rename attachemnts asynchronous.
+- Delete and rename attachments asynchronous.
 - Keep renamed files to improve seo.
 
 ## Install
