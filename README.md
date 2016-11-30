@@ -35,7 +35,9 @@ To install GraphicsMagick you can use homebrew:
 $ brew install graphicsmagick
 ```
 
-## Configuration
+## Usage
+
+### Configuration
 
 Run the install generator:
 ```
@@ -55,6 +57,8 @@ Attachs.configure do |config|
   end
 end
 ```
+
+### Definitions
 
 Add the columns to your tables:
 ```ruby
@@ -92,8 +96,6 @@ end
 
 NOTE: The out of the box interpolations are: filename, basename, extension, attribute, content_type, size.
 
-## Usage
-
 ### Validations
 
 To validate the presence of the attachment:
@@ -118,8 +120,8 @@ class User < ActiveRecord::Base
   has_attachment :pictures
   validates_attachment_content_type_of :pictures, with: /\Aimage/
 end
-
 ```
+
 NOTE: Look into lib/attachs/locales yamls to known the keys.
 
 ### Forms
