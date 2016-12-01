@@ -35,11 +35,9 @@ To install GraphicsMagick you can use homebrew:
 $ brew install graphicsmagick
 ```
 
-## Usage
+## Configuration
 
-### Configuration
-
-Run the install generator:
+Generate the configuration file:
 ```
 $ bundle exec rails g attachs:install
 ```
@@ -57,6 +55,8 @@ Attachs.configure do |config|
   end
 end
 ```
+
+## Usage
 
 ### Definitions
 
