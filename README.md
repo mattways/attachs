@@ -50,7 +50,7 @@ Attachs.configure do |config|
   config.bucket = 'some-bucket'
   config.base_url = 'https://cdn.mydomain.com'
 
-  config.add_interpolation :name do |record|
+  config.interpolation :name do |record|
     record.name
   end
 end
