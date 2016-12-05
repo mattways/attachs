@@ -64,8 +64,8 @@ Add the columns to your tables:
 ```ruby
 class AddAttachments < ActiveRecord::Migration
   def change
-    add_attachment :shops, :logo
-    add_attachments :products, :pictures
+    add_column :shops, :logo, :jsonb, default: {}
+    add_column :products, :pictures, :jsonb, default: []
   end
 end
 ```

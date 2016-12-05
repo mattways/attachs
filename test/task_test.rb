@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TasksTest < ActiveSupport::TestCase
+class TaskTest < ActiveSupport::TestCase
   include StorageHelper
 
   setup do

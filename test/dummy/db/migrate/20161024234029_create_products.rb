@@ -3,7 +3,8 @@ class CreateProducts < ActiveRecord::Migration
     create_table :products do |t|
       t.integer :shop_id
       t.string :name
-      t.attachments :pictures
+      t.jsonb :pictures, default: []
+      t.jsonb :brief, default: {}
 
       t.timestamps null: false
     end

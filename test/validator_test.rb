@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ValidatorsTest < ActiveSupport::TestCase
+class ValidatorTest < ActiveSupport::TestCase
   include StorageHelper
 
   teardown do
