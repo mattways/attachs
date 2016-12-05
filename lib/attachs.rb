@@ -3,8 +3,6 @@ require 'attachs/extensions/active_record/validations/attachment_content_type_va
 require 'attachs/extensions/active_record/validations/attachment_presence_validator'
 require 'attachs/extensions/active_record/validations/attachment_size_validator'
 require 'attachs/extensions/active_record/base'
-require 'attachs/extensions/active_record/connection_adapters'
-require 'attachs/extensions/active_record/migration'
 require 'attachs/jobs/base'
 require 'attachs/jobs/delete_job'
 require 'attachs/jobs/update_job'
