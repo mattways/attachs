@@ -6,15 +6,6 @@ module Attachs
         Attachs::Extensions::ActiveRecord::Base,
         Attachs::Extensions::ActiveRecord::Validations
       )
-      ::ActiveRecord::ConnectionAdapters::TableDefinition.include(
-        Attachs::Extensions::ActiveRecord::ConnectionAdapters::TableDefinition
-      )
-      ::ActiveRecord::ConnectionAdapters::AbstractAdapter.include(
-        Attachs::Extensions::ActiveRecord::ConnectionAdapters::AbstractAdapter
-      )
-      ::ActiveRecord::Migration::CommandRecorder.include(
-        Attachs::Extensions::ActiveRecord::Migration::CommandRecorder
-      )
     end
 
     initializer 'attachs.locales' do

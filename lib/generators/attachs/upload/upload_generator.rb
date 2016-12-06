@@ -8,7 +8,7 @@ module Attachs
       source_root File.expand_path('../templates', __FILE__)
 
       def create_model_file
-        copy_file 'model.rb', 'app/models/model.rb'
+        copy_file 'model.rb', 'app/models/upload.rb'
       end
 
       def create_migration_file
