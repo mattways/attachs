@@ -215,7 +215,7 @@ module Attachs
     def unpersist
       if changed? && present?
         attributes[:paths] = original_attributes[:paths]
-        attributes[:uploaded_at] = original_attributes[:paths]
+        attributes[:uploaded_at] = original_attributes[:uploaded_at]
         write_record
       end
     end
@@ -311,19 +311,16 @@ module Attachs
       when 'NilClass'
         [nil, {}]
       when 'Attachs::Attachment'
-        attributes = value.attributes.merge(id: generate_id)
-        [value, attributes]
+        [value, value.attributes.merge(id: generate_id)]
       when 'Upload'
-        attributes = value.file.attributes.merge(id: generate_id)
-        [value.file, attributes]
+        [value, value.file.attributes.merge(id: generate_id)]
       when 'String','Fixnum','Bignum'
         if Rails.configuration.cache_classes == false
           Rails.application.eager_load!
         end
         if defined?(Upload)
           upload = Upload.find(value)
-          attributes = upload.file.attributes.merge(id: generate_id)
-          [upload, attributes]
+          [upload, upload.file.attributes.merge(id: generate_id)]
         end
       when 'ActionDispatch::Http::UploadedFile'
         attributes = {

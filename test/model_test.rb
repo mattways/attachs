@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ConcernTest < ActiveSupport::TestCase
+class ModelTest < ActiveSupport::TestCase
 
   test 'inherit' do
     Subclass = Class.new(Product)
