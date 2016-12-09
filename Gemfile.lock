@@ -53,6 +53,7 @@ GEM
       aws-sdk-core (= 2.6.35)
     aws-sigv4 (1.0.0)
     builder (3.2.2)
+    byebug (9.0.6)
     concurrent-ruby (1.0.2)
     erubis (2.7.0)
     globalid (0.3.7)
@@ -120,6 +121,7 @@ PLATFORMS
 
 DEPENDENCIES
   attachs!
+  byebug
   mocha (~> 1.1)
   pg (~> 0.18)
 

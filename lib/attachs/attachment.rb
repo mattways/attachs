@@ -2,7 +2,7 @@ module Attachs
   class Attachment
     include ActiveModel::Validations
 
-    attr_reader :record, :record_attribute, :options, :attributes, :value
+    attr_reader :record, :record_attribute, :options, :attributes, :value, :original_attributes, :source
 
     def initialize(record, record_attribute, options={}, attributes={})
       @record = record
@@ -232,8 +232,6 @@ module Attachs
     end
 
     private
-
-    attr_reader :original_attributes, :source
 
     def storage
       Attachs.storage

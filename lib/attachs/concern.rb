@@ -10,14 +10,22 @@ module Attachs
     end
 
     def reload(options=nil)
-      super.tap do
-        self.class.attachments.keys.each do |attribute|
-          instance_variable_set "@#{attribute}", nil
-        end
-      end
+      clear_attachments
+      super
     end
 
     private
+
+    def initialize_dup(other)
+      clear_attachments
+      super
+    end
+
+    def clear_attachments
+      self.class.attachments.keys.each do |attribute|
+        instance_variable_set "@#{attribute}", nil
+      end
+    end
 
     %i(save destroy persist unpersist).each do |method|
       define_method "#{method}_attachments" do
