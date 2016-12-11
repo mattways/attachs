@@ -50,7 +50,7 @@ module Attachs
         bucket.object(path).delete
       end
 
-      def exist?(path)
+      def exists?(path)
         bucket.object(path).exists?
       end
 

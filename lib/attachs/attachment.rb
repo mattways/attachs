@@ -136,7 +136,7 @@ module Attachs
           new_paths.each do |style, new_path|
             original_path = paths[style]
             if original_path != new_path
-              unless storage.exist?(new_path)
+              unless storage.exists?(new_path)
                 storage.copy original_path, new_path
               end
               attributes[:paths][style] = new_path
@@ -154,7 +154,7 @@ module Attachs
       elsif present? && styles
         file = storage.get(paths[:original])
         paths.each do |style, path|
-          if storage.exist?(path)
+          if storage.exists?(path)
             storage.delete path
           end
           Rails.logger.info "Regenerating: #{style} => #{path}"
@@ -172,7 +172,7 @@ module Attachs
       elsif present? && styles
         missings = paths.slice(:original)
         paths.except(:original).each do |style, path|
-          unless storage.exist?(path)
+          unless storage.exists?(path)
             missings[style] = path
             Rails.logger.info "Generating: #{style} => #{path}"
           end

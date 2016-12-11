@@ -4,7 +4,7 @@ Attachs.configure do |config|
   config.region = 'us-east-1'
   config.bucket = "attachs.#{Rails.env}"
 
-  config.add_interpolation :name do |record|
+  config.interpolation :name do |record|
     record.name
   end
 

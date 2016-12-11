@@ -1,12 +1,12 @@
 module Attachs
   class Interpolations
 
-    def exist?(name)
+    def exists?(name)
       registry.has_key? name
     end
 
     def find(name)
-      if exist?(name)
+      if exists?(name)
         registry[name]
       else
         raise "Interpolation #{name} not found"

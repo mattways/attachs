@@ -4,7 +4,7 @@ module Attachs
 
       def perform(paths)
         paths.each do |path|
-          if storage.exist?(path)
+          if storage.exists?(path)
             storage.delete path
           end
         end
