@@ -5,19 +5,21 @@ module Attachs
 
     def initialize(model)
       @model = model
-      @concern = Module.new
+      @concern = Module.new do
+        extend ActiveSupport::Concern
+        include Concern
+      end
     end
 
     def define(attribute, options={})
       unless options.has_key?(:path)
         raise 'Path required'
       end
-      model.include Attachs::Concern
-      model.attachments[attribute] = options
       define_writer attribute
       define_reader attribute, options
       define_attributes_writer attribute, options
       model.include concern
+      model.attachments[attribute] = options
     end
 
     private

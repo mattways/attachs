@@ -1,7 +1,10 @@
-development:
+default: &default
   adapter: postgresql
+
+development:
+  <<: *default
   database: attachs_development
 
 test:
-  adapter: postgresql
+  <<: *default
   database: attachs_test

@@ -2,7 +2,7 @@ require 'rails/generators'
 
 module Attachs
   module Generators
-    class UploadGenerator < ::Rails::Generators::Base
+    class UploadGenerator < Rails::Generators::Base
       include Rails::Generators::Migration
 
       source_root File.expand_path('../templates', __FILE__)
