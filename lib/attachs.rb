@@ -1,3 +1,5 @@
+require 'attachs/attachment/attributes'
+require 'attachs/attachment/processing'
 require 'attachs/extensions/active_record/validations/attachment_validator'
 require 'attachs/extensions/active_record/validations/attachment_content_type_validator'
 require 'attachs/extensions/active_record/validations/attachment_presence_validator'
