@@ -55,16 +55,15 @@ module Attachs
               original_attributes[:old_paths]
             )
           end
-          case source.class.name
-          when 'Attachs::Attachment'
+          if source.is_a?(Attachment)
             file = storage.get(source.paths[:original])
             storage.process file, paths, styles
-          when 'Upload'
+          elsif source.is_a?(ActionDispatch::Http::UploadedFile)
+            storage.process source, paths, styles
+          elsif source.class.name == 'Upload'
             source.file.paths.each do |style, path|
               storage.copy path, paths[style]
             end
-          when 'ActionDispatch::Http::UploadedFile'
-            storage.process source, paths, styles
           end
           @source = @value = nil
           @original_attributes = @attributes
@@ -217,14 +216,15 @@ module Attachs
       end
 
       def normalize_value(value)
-        case value.class.name
-        when 'NilClass'
+        if value.blank?
           [nil, {}]
-        when 'Attachs::Attachment'
+        elsif value.is_a?(ActionDispatch::Http::UploadedFile)
+          [value, build_attributes(value)]
+        elsif value.is_a?(Attachment)
           [value, value.attributes.merge(id: generate_id)]
-        when 'Upload'
+        elsif value.class.name == 'Upload'
           [value, value.file.attributes.merge(id: generate_id)]
-        when 'String','Fixnum','Bignum'
+        else
           if Rails.configuration.cache_classes == false
             Rails.application.eager_load!
           end
@@ -232,8 +232,6 @@ module Attachs
             upload = Upload.find(value)
             [upload, upload.file.attributes.merge(id: generate_id)]
           end
-        when 'ActionDispatch::Http::UploadedFile'
-          [value, build_attributes(value)]
         end
       end
 
