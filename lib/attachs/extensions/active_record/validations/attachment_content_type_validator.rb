@@ -6,18 +6,16 @@ module Attachs
 
         class AttachmentContentTypeValidator < AttachmentValidator
 
-          def validate_one(record, attribute, attachment)
+          def validate_attachment(record, attachment)
             unless attachment.blank?
               if options.has_key?(:with)
                 if options[:with] !~ attachment.content_type
-                  record.errors.add attribute, :invalid
-                  attachment.errors.add :content_type, :not_allowed
+                  attachment.errors.add :value, :not_allowed
                 end
               elsif options.has_key?(:in) || options.has_key?(:within)
                 list = (options[:in] || options[:within])
                 if list.exclude?(attachment.content_type)
-                  record.errors.add attribute, :invalid
-                  attachment.errors.add :content_type, :not_listed, list: list.to_sentence
+                  attachment.errors.add :value, :can_only_be, list: list.to_sentence
                 end
               end
             end
@@ -26,8 +24,8 @@ module Attachs
         end
         module ClassMethods
 
-          def validates_attachment_content_type_of(*attr_names)
-            validates_with AttachmentContentTypeValidator, _merge_attributes(attr_names)
+          def validates_attachment_content_type_of(*attributes)
+            validates_with AttachmentContentTypeValidator, _merge_attributes(attributes)
           end
 
         end

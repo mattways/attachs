@@ -2,7 +2,7 @@ module Attachs
   class Collection
 
     delegate(
-      :map, :each, :size, :length, :count, :reject, :select, :any?,
+      :map, :each, :size, :length, :count, :reject, :select, :any?, :empty?,
       :all?, :none?, :first, :second, :last, :[],
       to: :to_a
     )

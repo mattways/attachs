@@ -15,7 +15,7 @@ module Attachs
             super
           end
 
-          def validate_one(record, attribute, attachment)
+          def validate_attachment(record, attachment)
             unless attachment.blank?
               CHECKS.each do |name, operator|
                 if options.has_key?(name)
@@ -27,8 +27,7 @@ module Attachs
                     other = other.call(record)
                   end
                   unless attachment.size.send(operator, other)
-                    record.errors.add attribute, :invalid
-                    attachment.errors.add :size, name, count: humanize_size(other)
+                    attachment.errors.add :value, name, count: humanize_size(other)
                   end
                 end
               end
@@ -44,8 +43,8 @@ module Attachs
         end
         module ClassMethods
 
-          def validates_attachment_size_of(*attr_names)
-            validates_with AttachmentSizeValidator, _merge_attributes(attr_names)
+          def validates_attachment_size_of(*attributes)
+            validates_with AttachmentSizeValidator, _merge_attributes(attributes)
           end
 
         end

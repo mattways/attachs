@@ -6,18 +6,17 @@ module Attachs
 
         class AttachmentPresenceValidator < AttachmentValidator
 
-          def validate_one(record, attribute, attachment)
-            unless attachment.blank?
-              record.errors.add attribute, :invalid
-              attachment.errors.add :base, :blank
+          def validate_attachment(record, attachment)
+            if attachment.blank?
+              attachment.errors.add :value, :blank
             end
           end
 
         end
         module ClassMethods
 
-          def validates_attachment_presence_of(*attr_names)
-            validates_with AttachmentPresenceValidator, _merge_attributes(attr_names)
+          def validates_attachment_presence_of(*attributes)
+            validates_with AttachmentPresenceValidator, _merge_attributes(attributes)
           end
 
         end
