@@ -55,7 +55,17 @@ module Attachs
               original_attributes[:old_paths]
             )
           end
-          store
+          case source.class.name
+          when 'Attachs::Attachment'
+            file = storage.get(source.paths[:original])
+            storage.process file, paths, styles
+          when 'Upload'
+            source.file.paths.each do |style, path|
+              storage.copy path, paths[style]
+            end
+          when 'ActionDispatch::Http::UploadedFile'
+            storage.process source, paths, styles
+          end
           @source = @value = nil
           @original_attributes = @attributes
         elsif present?
@@ -137,20 +147,6 @@ module Attachs
 
       def storage
         Attachs.storage
-      end
-
-      def store
-        case source.class.name
-        when 'Attachs::Attachment'
-          file = storage.get(source.paths[:original])
-          storage.process file, paths, styles
-        when 'Upload'
-          source.file.paths.each do |style, path|
-            storage.copy path, paths[style]
-          end
-        when 'ActionDispatch::Http::UploadedFile'
-          storage.process source, paths, styles
-        end
       end
 
       def update_record(value=nil)
