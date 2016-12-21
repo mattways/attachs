@@ -39,7 +39,7 @@ module Attachs
           if instance = instance_variable_get(variable)
             instance
           else
-            if options[:multiple] == true
+            if options[:multiple]
               klass = Attachs::Collection
             else
               klass = Attachs::Attachment
@@ -56,7 +56,7 @@ module Attachs
     def define_attributes_writer(attribute, options)
       concern.class_eval do
         define_method "#{attribute}_attributes=" do |collection_or_attributes|
-          if options[:multiple] == true
+          if options[:multiple]
             collection_or_attributes.each do |attributes|
               if id = attributes.delete(:id)
                 attachment = send(attribute).find(id)

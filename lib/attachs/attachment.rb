@@ -1,9 +1,7 @@
 module Attachs
   class Attachment
-    include(
-      ActiveModel::Validations,
-      Attachs::Attachment::Attributes,
-      Attachs::Attachment::Processing
-    )
+
+    include ActiveModel::Validations, Attributes, Processing
+
   end
 end

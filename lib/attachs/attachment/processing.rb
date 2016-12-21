@@ -4,7 +4,6 @@ module Attachs
       extend ActiveSupport::Concern
 
       def url(style=:original)
-        paths = attributes[:paths]
         if paths.has_key?(style)
           storage.url paths[style]
         elsif options.has_key?(:default_path)
@@ -49,11 +48,10 @@ module Attachs
 
       def save
         if changed?
-          if original_attributes[:paths].any? || original_attributes[:old_paths].any?
-            Jobs::DeleteJob.perform_later(
-              original_attributes[:paths].values +
-              original_attributes[:old_paths]
-            )
+          original_paths = (original_attributes[:paths] || {})
+          original_old_paths = (original_attributes[:old_paths] || [])
+          if original_paths.any? || original_old_paths.any?
+            Jobs::DeleteJob.perform_later (original_paths.values + original_old_paths)
           end
           if source.is_a?(Attachment)
             file = storage.get(source.paths[:original])
@@ -97,7 +95,9 @@ module Attachs
                 unless storage.exists?(new_path)
                   storage.copy original_path, new_path
                 end
+                attributes[:paths] ||= {}
                 attributes[:paths][style] = new_path
+                attributes[:old_paths] ||= []
                 attributes[:old_paths] |= [original_path]
               end
             end
@@ -173,11 +173,11 @@ module Attachs
 
       def generate_paths
         template = options[:path]
-        paths = { original: generate_path(template, :original) }
+        new_paths = { original: generate_path(template, :original) }
         styles.each do |style, geometry|
-          paths[style] = generate_path(template, style)
+          new_paths[style] = generate_path(template, style)
         end
-        paths
+        new_paths
       end
 
       def interpolate(name)
@@ -197,7 +197,7 @@ module Attachs
       end
 
       def build_attributes(value)
-        attributes = {
+        hash = {
           id: generate_id,
           filename: value.original_filename,
           content_type: value.content_type,
@@ -208,11 +208,11 @@ module Attachs
         }
         if value.content_type.starts_with?('image/')
           width, height = Console.find_dimensions(value.path)
-          attributes[:width] = width
-          attributes[:height] = height
-          attributes[:ratio] = (height.to_d / width.to_d).to_f
+          hash[:width] = width
+          hash[:height] = height
+          hash[:ratio] = (height.to_d / width.to_d).to_f
         end
-        attributes
+        hash
       end
 
       def normalize_value(value)
