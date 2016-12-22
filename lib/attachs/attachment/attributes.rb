@@ -102,13 +102,6 @@ module Attachs
 
       private
 
-      def write_record
-        unless record.destroyed?
-          record.send "#{record_attribute}_will_change!"
-          record.send :write_attribute, record_attribute, raw_attributes
-        end
-      end
-
       def raw_attributes
         if options[:multiple]
           collection = record.send(:read_attribute, record_attribute).reject do |hash|

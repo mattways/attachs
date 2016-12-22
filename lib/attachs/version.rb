@@ -1,5 +1,5 @@
 module Attachs
 
-  VERSION = '4.0.0.4'
+  VERSION = '4.0.0.5'
 
 end

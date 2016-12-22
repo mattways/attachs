@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    attachs (4.0.0.4)
+    attachs (4.0.0.5)
       aws-sdk (~> 2.0)
       rails (>= 4.2.0, < 4.3.0)
 

@@ -4,10 +4,9 @@ module Attachs
       extend ActiveSupport::Concern
 
       def url(style=:original)
-        if paths.has_key?(style)
+        if path = paths[style]
           storage.url paths[style]
-        elsif options.has_key?(:default_path)
-          template = options[:default_path]
+        elsif template = options[:default_path]
           path = generate_path(template, style)
           storage.url path
         end
@@ -148,36 +147,43 @@ module Attachs
         Attachs.storage
       end
 
-      def update_record(value=nil)
+      def write_record
         unless record.destroyed?
-          record.update_column record_attribute, (value || raw_attributes)
+          record.send "#{record_attribute}_will_change!"
+          record.send :write_attribute, record_attribute, raw_attributes
+        end
+      end
+
+      def update_record
+        unless record.destroyed?
+          record.update_column record_attribute, raw_attributes
         end
       end
 
       def generate_path(template, style)
-        if path = template.try(:dup)
-          path.gsub! ':style', style.to_s.gsub('_', '-')
-          path.scan(/:[a-z_]+/).each do |token|
-            name = token.from(1).to_sym
-            path.gsub! token, interpolate(name).to_s.parameterize
-          end
-          path.squeeze! '-'
-          path.squeeze! '/'
-          path.gsub! '-.', '.'
-          path.gsub! '/-', '/'
-          path.gsub! '-/', '/'
-          path.sub! /^\//, ''
-          path
+        path = template.dup
+        path.gsub! ':style', style.to_s.gsub('_', '-')
+        path.scan(/:[a-z_]+/).each do |token|
+          name = token.from(1).to_sym
+          path.gsub! token, interpolate(name).to_s.parameterize
         end
+        path.squeeze! '-'
+        path.squeeze! '/'
+        path.gsub! '-.', '.'
+        path.gsub! '/-', '/'
+        path.gsub! '-/', '/'
+        path.sub! /^\//, ''
+        path
       end
 
       def generate_paths
-        template = options[:path]
-        new_paths = { original: generate_path(template, :original) }
-        styles.each do |style, geometry|
-          new_paths[style] = generate_path(template, style)
+        if template = options[:path]
+          new_paths = { original: generate_path(template, :original) }
+          styles.each do |style, geometry|
+            new_paths[style] = generate_path(template, style)
+          end
+          new_paths
         end
-        new_paths
       end
 
       def interpolate(name)
