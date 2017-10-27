@@ -5,7 +5,15 @@ module Attachs
         extend ActiveSupport::Concern
 
         class AttachmentSizeValidator < AttachmentValidator
-          CHECKS = { less_than: :<, less_than_or_equal_to: :<=, greater_than: :>, greater_than_or_equal_to: :>= }
+
+          CHECKS = {
+            equal_to: :==,
+            other_than: :!=,
+            less_than: :<,
+            less_than_or_equal_to: :<=,
+            greater_than: :>,
+            greater_than_or_equal_to: :>=
+          }
 
           def initialize(options)
             if range = (options[:in] || options[:within])
@@ -27,7 +35,7 @@ module Attachs
                     other = other.call(record)
                   end
                   unless attachment.size.send(operator, other)
-                    attachment.errors.add :value, name, count: humanize_size(other)
+                    attachment.errors.add :size, name, count: humanize_size(other)
                   end
                 end
               end

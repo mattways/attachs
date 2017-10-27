@@ -1,5 +1,0 @@
-en:
-  errors:
-    messages:
-      not_allowed: "not allowed"
-      can_only_be: "can only be: %{list}"

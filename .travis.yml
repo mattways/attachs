@@ -1,25 +1,18 @@
 language: ruby
-sudo: true
+sudo: false
 before_install:
-  - sudo apt-get install graphicsmagick
   - rm Gemfile.lock
   - mv Gemfile.travis Gemfile
-  - mv test/dummy/config/database.yml.travis test/dummy/config/database.yml
 script:
-  - cd test/dummy && bundle exec rake db:create db:migrate
-  - bundle exec rake test
+  - cd test/dummy && bin/rails db:create db:migrate
+  - cd ../.. && bin/test
 env:
-  - RAILS=4.2.0
+  - RAILS=5.1
 rvm:
-  - 2.1.0
-  - 2.2.0
-  - 2.3.0
-  - jruby-9.0.0.0
-  - jruby-9.1.0.0
+  - 2.4.2
 matrix:
   fast_finish: true
-  allow_failures:
-    - rvm: jruby-9.0.0.0
-    - rvm: jruby-9.1.0.0
-addons:
-  postgresql: 9.4
+services:
+  postgresql: '9.4'
+notifications:
+  email: false

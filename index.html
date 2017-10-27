@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script>
+    var policy = {
+      'expiration': '2020-12-01T12:00:00.000Z',
+      'conditions': [
+        {'bucket': 'attachs-test'},
+        ['starts-with', '$key', 'uploads/'],
+        {'acl': 'private'},
+        ['Content-Type', 'application/octet-stream'],
+        ['content-length-range', 0, 5242880]
+      ]
+    };
+      var id = 'AKIAIVZ5LPEDTNALAFDQ';
+      var signature = '8m8amJQ8TbaCaOGQw5Vr5iKN4EE=';
+      var policy = 'eyJleHBpcmF0aW9uIjoiMjAyMC0xMi0wMVQxMjowMDowMC4wMDBaIiwiY29uZGl0aW9ucyI6W3siYnVja2V0IjoiYXR0YWNocy10ZXN0In0sWyJzdGFydHMtd2l0aCIsIiRrZXkiLCIiXSx7ImFjbCI6InByaXZhdGUifSxbInN0YXJ0cy13aXRoIiwiJENvbnRlbnQtVHlwZSIsIiJdLFsiY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsNTI0Mjg4MDAwXV19';
+      var key = 'uploads/37e34fd251744c9bb6bc8acefa93815b'
+
+
+      function uploadFile() {
+        var file = document.getElementById('file').files[0];
+        var form = new FormData();
+
+        form.append('key', key);
+        form.append('acl', 'private');
+        form.append('Content-Type', 'application/octet-stream');
+        form.append('AWSAccessKeyId', id);
+        form.append('policy', policy)
+        form.append('signature', signature);
+        form.append('file', file);
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener('progress', uploadProgress);
+        xhr.addEventListener('load', uploadComplete);
+        xhr.addEventListener('error', uploadFailed);
+        xhr.addEventListener('abort', uploadCanceled);
+        xhr.open('POST', 'https://attachs-test.s3.amazonaws.com/');
+        xhr.send(form);
+      }
+
+      function uploadProgress(event) {
+        var element = document.getElementById('progressNumber');
+        if (event.lengthComputable) {
+          var percentComplete = Math.round(event.loaded * 100 / event.total);
+          element.innerHTML = percentComplete.toString() + '%';
+        }
+        else {
+          element.innerHTML = 'unable to compute';
+        }
+      }
+
+      function uploadComplete(event) {
+        console.debug(event.target.responseText);
+      }
+
+      function uploadFailed(event) {
+        console.debug(event);
+      }
+
+      function uploadCanceled(event) {
+        console.debug(event);
+      }
+    </script>
+  </head>
+  <body>
+    <form id="form" enctype="multipart/form-data" method="post">
+      <label for="file">Select a File to Upload</label><br />
+      <input type="file" name="file" id="file" />
+      <div id="fileName"></div>
+      <div id="fileSize"></div>
+      <div id="fileType"></div>
+      <input type="button" onclick="uploadFile()" value="Upload" />
+      <div id="progressNumber"></div>
+    </form>
+  </body>
+</html>

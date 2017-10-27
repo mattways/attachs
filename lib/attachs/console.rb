@@ -2,15 +2,21 @@ module Attachs
   class Console
     class << self
 
-      def find_content_type(path)
+      def detect_content_type(path)
         run "file -Ib '#{path}'" do |output|
           output.split(';').first
         end
       end
 
-      def find_dimensions(path)
+      def read_dimensions(path)
         run "gm identify -format %wx%h '#{path}'" do |output|
           output.split('x').map &:to_i
+        end
+      end
+
+      def identical?(first_path, second_path)
+        run "gm compare -metric mse '#{first_path}' '#{second_path}'" do |output|
+          output.include? 'Total: 0.0000000000'
         end
       end
 

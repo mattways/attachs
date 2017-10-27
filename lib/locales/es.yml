@@ -1,0 +1,9 @@
+es:
+  attachments:
+    business:
+      logo: "Logo de %{name}"
+  errors:
+    messages:
+      immutable: "no puede cambiar"
+      unallowed: "no permitido"
+      allowed_list: "solo puede ser: %{list}"

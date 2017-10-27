@@ -3,14 +3,10 @@ module Attachs
     class Image < Base
 
       def process(destination_path, geometry)
-        if geometry
-          size, suffix = geometry.scan(/([^!#]+)(!|#)?$/).flatten
-          strategy = detect_strategy(suffix)
-          new_width, new_height = size.split('x').map(&:to_i)
-          resize new_width, new_height, strategy, destination_path
-        else
-          Console.convert source_path, destination_path
-        end
+        size, suffix = geometry.scan(/([^!#]+)(!|#)?$/).flatten
+        strategy = detect_strategy(suffix)
+        new_width, new_height = size.split('x').map(&:to_i)
+        resize new_width, new_height, strategy, destination_path
       end
 
       private

@@ -8,14 +8,18 @@ module Attachs
 
           def validate_attachment(record, attachment)
             unless attachment.blank?
-              if options.has_key?(:with)
+              if options.has_key?(:is)
+                if options[:is] != attachment.content_type
+                  attachment.errors.add :content_type, :allowed_list, list: options[:is]
+                end
+              elsif options.has_key?(:with)
                 if options[:with] !~ attachment.content_type
-                  attachment.errors.add :value, :not_allowed
+                  attachment.errors.add :content_type, :unallowed
                 end
               elsif options.has_key?(:in) || options.has_key?(:within)
                 list = (options[:in] || options[:within])
                 if list.exclude?(attachment.content_type)
-                  attachment.errors.add :value, :can_only_be, list: list.to_sentence
+                  attachment.errors.add :content_type, :allowed_list, list: list.to_sentence
                 end
               end
             end

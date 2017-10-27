@@ -3,37 +3,15 @@ module Attachs
     extend ActiveSupport::Concern
 
     included do
-      before_save :persist_attachments
-      after_commit :save_attachments, on: %i(create update)
-      after_commit :destroy_attachments, on: :destroy
-      after_rollback :unpersist_attachments
-    end
-
-    def reload(options=nil)
-      clear_attachments
-      super
+      has_many(
+        :attachments,
+        class_name: 'Attachs::Attachment',
+        dependent: :nullify,
+        as: :record
+      )
     end
 
     private
-
-    def initialize_dup(other)
-      clear_attachments
-      super
-    end
-
-    def clear_attachments
-      self.class.attachments.keys.each do |attribute|
-        instance_variable_set "@#{attribute}", nil
-      end
-    end
-
-    %i(save destroy persist unpersist).each do |method|
-      define_method "#{method}_attachments" do
-        self.class.attachments.keys.each do |attribute|
-          send(attribute).send method
-        end
-      end
-    end
 
     module ClassMethods
 
@@ -48,6 +26,10 @@ module Attachs
 
       def attachable?
         attachments.any?
+      end
+
+      def has_attachment?(name)
+        attachments.has_key? name.to_sym
       end
 
     end

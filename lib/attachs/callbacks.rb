@@ -1,0 +1,39 @@
+module Attachs
+  class Callbacks
+
+    AVAILABLE_NAMES = %i(before_process after_process)
+
+    def process(name, file, attachment)
+      if registry.has_key?(name)
+        registry[name].each do |expression, blocks|
+          if attachment.content_type =~ expression
+            blocks.each do |block|
+              Console.instance_exec file, attachment, &block
+            end
+          end
+        end
+      end
+    end
+
+    def add(name, expression, &block)
+      if AVAILABLE_NAMES.include?(name)
+        (registry[name][expression] ||= []) << block
+      else
+        raise "Callbacks available are: #{AVAILABLE_NAMES.join(', ')}"
+      end
+    end
+
+    private
+
+    def registry
+      @registry ||= begin
+        hash = {}
+        AVAILABLE_NAMES.each do |name|
+          hash[name] = {}
+        end
+        hash
+      end
+    end
+
+  end
+end

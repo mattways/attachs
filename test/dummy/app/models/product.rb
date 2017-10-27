@@ -1,16 +1,16 @@
-class Product < ActiveRecord::Base
+class Product < ApplicationRecord
 
-  belongs_to :shop
+  belongs_to :business, required: false
 
   has_attachments(
     :pictures,
-    path: ':id-:style.:extension',
     default_path: 'missing.png'
   )
 
-  has_attachment(
-    :brief,
-    path: ':id.:extension'
-  )
+  has_attachment :brief
+
+  def to_s
+    name
+  end
 
 end

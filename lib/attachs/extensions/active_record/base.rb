@@ -7,14 +7,13 @@ module Attachs
         module ClassMethods
 
           def has_attachment(*args)
-            builder = Builder.new(self)
+            builder = Builder.new(self, false)
             builder.define *args
           end
 
           def has_attachments(*args)
-            options = args.extract_options!
-            options[:multiple] = true
-            has_attachment *args.append(options)
+            builder = Builder.new(self, true)
+            builder.define *args
           end
 
         end

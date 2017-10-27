@@ -6,22 +6,23 @@ module Attachs
 
         class AttachmentValidator < ActiveModel::EachValidator
 
-          def validate_each(record, record_attribute, attachment_or_collection)
-            case attachment_or_collection
-            when Collection
+          def validate_each(record, attribute, attachment_or_collection)
+            if record.class.reflections[attribute.to_s].macro == :has_many
               attachment_or_collection.each do |attachment|
                 validate_attachment record, attachment
-                if attachment.errors.any?
-                  record.errors.add record_attribute
-                end
+                propagate_error record, attribute, attachment
               end
-            when Attachment
+            else
               validate_attachment record, attachment_or_collection
-              if attachment_or_collection.errors.any?
-                attachment_or_collection.errors.each do |attachment_attribute, message|
-                  record.errors.add record_attribute, message
-                end
-              end
+              propagate_error record, attribute, attachment_or_collection
+            end
+          end
+
+          private
+
+          def propagate_error(record, attribute, attachment)
+            if attachment.errors.any?
+              record.errors.add attribute, :invalid
             end
           end
 
