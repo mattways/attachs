@@ -4,22 +4,6 @@
     <meta charset="UTF-8">
     <title></title>
     <script>
-    var policy = {
-      'expiration': '2020-12-01T12:00:00.000Z',
-      'conditions': [
-        {'bucket': 'attachs-test'},
-        ['starts-with', '$key', 'uploads/'],
-        {'acl': 'private'},
-        ['Content-Type', 'application/octet-stream'],
-        ['content-length-range', 0, 5242880]
-      ]
-    };
-      var id = 'AKIAIVZ5LPEDTNALAFDQ';
-      var signature = '8m8amJQ8TbaCaOGQw5Vr5iKN4EE=';
-      var policy = 'eyJleHBpcmF0aW9uIjoiMjAyMC0xMi0wMVQxMjowMDowMC4wMDBaIiwiY29uZGl0aW9ucyI6W3siYnVja2V0IjoiYXR0YWNocy10ZXN0In0sWyJzdGFydHMtd2l0aCIsIiRrZXkiLCIiXSx7ImFjbCI6InByaXZhdGUifSxbInN0YXJ0cy13aXRoIiwiJENvbnRlbnQtVHlwZSIsIiJdLFsiY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsNTI0Mjg4MDAwXV19';
-      var key = 'uploads/37e34fd251744c9bb6bc8acefa93815b'
-
-
       function uploadFile() {
         var file = document.getElementById('file').files[0];
         var form = new FormData();
