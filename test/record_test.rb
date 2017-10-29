@@ -8,33 +8,35 @@ class RecordTest < ActiveSupport::TestCase
   end
 
   test 'setters' do
-    product = Product.new(pictures: [image_attachment])
+    attachment = build(:attachment)
+
+    product = build(:product, pictures: [attachment])
     picture = product.pictures.first
     assert_equal 'Product', picture.record_type
     assert_equal 'pictures', picture.record_attribute
 
-    product = Product.new
-    picture = product.pictures.build(image_attributes)
+    product = build(:product)
+    picture = product.pictures.build(attachment.attributes)
     assert_equal 'Product', picture.record_type
     assert_equal 'pictures', picture.record_attribute
 
-    product = Product.create
-    picture = product.pictures.create(image_attributes)
+    product = create(:product)
+    picture = product.pictures.create(attachment.attributes)
     assert_equal 'Product', picture.record_type
     assert_equal 'pictures', picture.record_attribute
 
-    product = Product.new(brief: pdf_attachment)
+    product = build(:product, brief: attachment)
     brief = product.brief
     assert_equal 'Product', brief.record_type
     assert_equal 'brief', brief.record_attribute
 
-    product = Product.new
-    brief = product.build_brief(pdf_attributes)
+    product = build(:product)
+    brief = product.build_brief(attachment.attributes)
     assert_equal 'Product', brief.record_type
     assert_equal 'brief', brief.record_attribute
 
-    product = Product.create
-    brief = product.create_brief(pdf_attributes)
+    product = build(:product)
+    brief = product.create_brief(attachment.attributes)
     assert_equal 'Product', brief.record_type
     assert_equal 'brief', brief.record_attribute
   end

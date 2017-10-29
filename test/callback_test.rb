@@ -4,7 +4,7 @@ class CallbackTest < ActiveSupport::TestCase
 
   test 'process' do
     file = image_file
-    attachment = image_attachment
+    attachment = build(:image)
 
     assert_nothing_raised do
       callbacks.process :before_process, file, attachment
@@ -17,7 +17,7 @@ class CallbackTest < ActiveSupport::TestCase
   end
 
   test 'add' do
-    assert_raises_message 'Callbacks available are: before_process, after_process' do
+    assert_raises Attachs::CallbackNotFound do
       callbacks.add :other, /text\// do |file, attachment|
       end
     end

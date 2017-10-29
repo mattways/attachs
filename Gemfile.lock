@@ -7,6 +7,12 @@ PATH
       rails (~> 5.1)
       tuning (~> 5.1)
 
+PATH
+  remote: /Users/Matt/Documents/Herramientas/Ruby/Gemas/Nuevas/makers
+  specs:
+    makers (5.1.1)
+      rails (~> 5.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -62,6 +68,7 @@ GEM
       aws-sigv4 (~> 1.0)
     aws-sigv4 (1.0.2)
     builder (3.2.3)
+    byebug (9.1.0)
     concurrent-ruby (1.0.5)
     crass (1.0.2)
     erubi (1.7.0)
@@ -137,6 +144,8 @@ PLATFORMS
 
 DEPENDENCIES
   attachs!
+  byebug
+  makers!
   mocha (~> 1.2)
   pg (~> 0.21)
 

@@ -8,33 +8,16 @@ class HelperTest < ActionView::TestCase
       '<img src="/images/test.jpg" alt="Test" />',
       image_tag('test.jpg')
     )
+
+    attachment = create(:image, :processed, :attached)
     assert_equal(
-      %Q{<img alt="Logo of Test" src="#{url('1/s4rmrc8x.jpg')}" />},
+      %Q{<img alt="Logo of Test" src="#{attachment.url}" />},
       image_tag(attachment)
     )
     assert_equal(
-      %Q{<img alt="Logo of Test" src="#{url('1/orcg.jpg')}" />},
+      %Q{<img alt="Logo of Test" src="#{attachment.url(:tiny)}" />},
       image_tag(attachment, style: :tiny)
     )
-  end
-
-  private
-
-  def attachment
-    @attachment ||= Attachs::Attachment.create(
-      id: 1,
-      record: business,
-      record_attribute: 'logo',
-      extension: 'jpg',
-      size: 234234,
-      state: 'processed',
-      content_type: 'image/jpeg',
-      processed_at: (Time.zone.now + 1.hour)
-    )
-  end
-
-  def business
-    @business ||= Business.new(name: 'Test')
   end
 
 end

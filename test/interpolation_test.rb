@@ -8,22 +8,22 @@ class InterpolationTest < ActiveSupport::TestCase
   end
 
   test 'process' do
-    business = Business.new(name: 'test')
+    business = build(:business)
 
-    assert_raises_message 'Interpolation other not found' do
+    assert_raises Attachs::InterpolationNotFound do
       interpolations.process :other, business
     end
-    assert_equal 'test', interpolations.process(:name, business)
+    assert_equal 'Test', interpolations.process(:name, business)
   end
 
   test 'add' do
     %i(id extension).each do |name|
-      assert_raises_message "Interpolation #{name} is reserved" do
+      assert_raises Attachs::InterpolationReserved do
         interpolations.add name do |record|
         end
       end
     end
-    assert_raises_message 'Interpolation name already exists' do
+    assert_raises Attachs::InterpolationExists do
       interpolations.add :name do |record|
       end
     end

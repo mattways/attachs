@@ -14,7 +14,7 @@ module Attachs
 
     def define(attribute, options={})
       define_association attribute
-      unless multiple?
+      if !multiple?
         override_setter attribute
       end
       model.include concern

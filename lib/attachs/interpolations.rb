@@ -11,15 +11,15 @@ module Attachs
       if exists?(name)
         registry[name].call record
       else
-        raise "Interpolation #{name} not found"
+        raise InterpolationNotFound
       end
     end
 
     def add(name, &block)
       if RESERVED_NAMES.include?(name)
-        raise "Interpolation #{name} is reserved"
+        raise InterpolationReserved
       elsif exists?(name)
-        raise "Interpolation #{name} already exists"
+        raise InterpolationExists
       else
         registry[name] = block
       end

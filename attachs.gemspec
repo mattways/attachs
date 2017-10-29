@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.authors     = ['mmontossi']
   s.email       = ['hi@museways.com']
   s.homepage    = 'https://github.com/museways/attachs'
-  s.summary     = 'File attachments for rails'
-  s.description = 'Json based attachments for records in rails.'
+  s.summary     = 'Uploads for rails'
+  s.description = 'Async and seo friendly uploads for rails.'
   s.license     = 'MIT'
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
@@ -25,4 +25,5 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'pg', '~> 0.21'
   s.add_development_dependency 'mocha', '~> 1.2'
+  #s.add_development_dependency 'makers', '~> 5.1'
 end

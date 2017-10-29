@@ -13,6 +13,7 @@ class StorageTest < ActiveSupport::TestCase
   test 'url' do
     configuration.base_url = 'https://cdn.dummy.com'
     assert_equal 'https://cdn.dummy.com/test.jpg', storage.url('test.jpg')
+
     configuration.base_url = nil
     assert_equal 'https://attachs-test.s3.amazonaws.com/test.jpg', storage.url('test.jpg')
   end
@@ -29,7 +30,7 @@ class StorageTest < ActiveSupport::TestCase
       'Z2UiLDAsNTI0Mjg4MF1dfQ==',
       policy
     )
-    assert_equal 'Uj13GMurrTsUvrWbGebDx15J/jQ=', signature
+    assert_equal '1CAKs9pgMRRqQbP2dPMSP+VKNnI=', signature
   end
 
   test 'upload' do

@@ -6,6 +6,8 @@ class IntegrationTest < ActionDispatch::IntegrationTest
     post '/attachments', params: { attachment: { record_type: 'Product', record_attribute: 'brief' } }
     assert_equal attachment.slice(:id).merge(policy: policy, signature: signature), json
 
+    #post '/attachments', params{}
+
     storage.upload pdf_path, attachment.id.to_s, 'application/pdf'
 
     Attachs::ProcessJob.expects(:perform_later).with attachment

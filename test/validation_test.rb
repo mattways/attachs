@@ -19,21 +19,18 @@ class ValidationTest < ActiveSupport::TestCase
       validates :brief, attachment_content_type: { with: /\Aapplication\/pdf\z/ }
     end
 
-    product = Product.new(
-      pictures: [pdf_attachment, image_attachment],
-      brief: image_attachment
-    )
+    pdf = build(:pdf, :processed)
+    image = build(:image, :processed)
+
+    product = build(:product, pictures: [pdf.dup, image.dup], brief: image.dup)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:content_type, :unallowed)
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:content_type, :unallowed)
 
-    product = Product.new(
-      pictures: [image_attachment],
-      brief: pdf_attachment
-    )
+    product = build(:product, pictures: [image.dup], brief: pdf.dup)
     assert product.valid?
   end
 
@@ -43,21 +40,18 @@ class ValidationTest < ActiveSupport::TestCase
       validates :brief, attachment_content_type: { is: 'application/pdf' }
     end
 
-    product = Product.new(
-      pictures: [pdf_attachment, image_attachment],
-      brief: image_attachment
-    )
+    pdf = build(:pdf, :processed)
+    image = build(:image, :processed)
+
+    product = build(:product, pictures: [pdf.dup, image.dup], brief: image.dup)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:content_type, :allowed_list, list: 'image/jpeg')
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:content_type, :allowed_list, list: 'application/pdf')
 
-    product = Product.new(
-      pictures: [image_attachment],
-      brief: pdf_attachment
-    )
+    product = build(:product, pictures: [image.dup], brief: pdf.dup)
     assert product.valid?
   end
 
@@ -67,21 +61,18 @@ class ValidationTest < ActiveSupport::TestCase
       validates :brief, attachment_content_type: { in: %w(application/pdf) }
     end
 
-    product = Product.new(
-      pictures: [pdf_attachment, image_attachment],
-      brief: image_attachment
-    )
+    pdf = build(:pdf, traits: :processed)
+    image = build(:image, :processed)
+
+    product = build(:product, pictures: [pdf.dup, image.dup], brief: image.dup)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:content_type, :allowed_list, list: 'image/jpeg')
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:content_type, :allowed_list, list: 'application/pdf')
 
-    product = Product.new(
-      pictures: [image_attachment],
-      brief: pdf_attachment
-    )
+    product = build(:product, pictures: [image.dup], brief: pdf.dup)
     assert product.valid?
   end
 
@@ -91,21 +82,18 @@ class ValidationTest < ActiveSupport::TestCase
       validates :brief, attachment_content_type: { within: %w(application/pdf) }
     end
 
-    product = Product.new(
-      pictures: [pdf_attachment, image_attachment],
-      brief: image_attachment
-    )
+    pdf = build(:pdf, :processed)
+    image = build(:image, :processed)
+
+    product = build(:product, pictures: [pdf.dup, image.dup], brief: image.dup)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:content_type, :allowed_list, list: 'image/jpeg')
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:content_type, :allowed_list, list: 'application/pdf')
 
-    product = Product.new(
-      pictures: [image_attachment],
-      brief: pdf_attachment
-    )
+    product = build(:product, pictures: [image.dup], brief: pdf.dup)
     assert product.valid?
   end
 
@@ -115,21 +103,20 @@ class ValidationTest < ActiveSupport::TestCase
       validates :brief, attachment_size: { greater_than: 200.bytes }
     end
 
-    product = Product.new(
-      pictures: [image_attachment(50.kilobytes), image_attachment(150.kilobytes)],
-      brief: pdf_attachment(100.bytes)
-    )
+    small_image = build(:image, :processed, size: 50.kilobytes)
+    big_image = build(:image, :processed, size: 150.kilobytes)
+    small_pdf = build(:pdf, :processed, size: 100.bytes)
+    big_pdf = build(:pdf, :processed, size: 300.bytes)
+
+    product = build(:product, pictures: [small_image.dup, big_image.dup], brief: small_pdf.dup)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:size, :greater_than, count: humanize_size(100.kilobytes))
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:size, :greater_than, count: humanize_size(200.bytes))
 
-    product = Product.new(
-      pictures: [image_attachment(150.kilobytes)],
-      brief: pdf_attachment(300.bytes)
-    )
+    product = build(:product, pictures: [big_image.dup], brief: big_pdf.dup)
     assert product.valid?
   end
 
@@ -139,21 +126,20 @@ class ValidationTest < ActiveSupport::TestCase
       validates :brief, attachment_size: { less_than: 400.bytes }
     end
 
-    product = Product.new(
-      pictures: [image_attachment(250.kilobytes), image_attachment(150.kilobytes)],
-      brief: pdf_attachment(500.bytes)
-    )
+    small_image = build(:image, :processed, size: 150.kilobytes)
+    big_image = build(:image, :processed, size: 250.kilobytes)
+    small_pdf = build(:pdf, :processed, size: 300.bytes)
+    big_pdf = build(:pdf, :processed, size: 500.bytes)
+
+    product = build(:product, pictures: [big_image.dup, small_image.dup], brief: big_pdf.dup)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:size, :less_than, count: humanize_size(200.kilobytes))
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:size, :less_than, count: humanize_size(400.bytes))
 
-    product = Product.new(
-      pictures: [image_attachment(150.kilobytes)],
-      brief: pdf_attachment(300.bytes)
-    )
+    product = build(:product, pictures: [small_image.dup], brief: small_pdf.dup)
     assert product.valid?
   end
 
@@ -163,21 +149,20 @@ class ValidationTest < ActiveSupport::TestCase
       validates :brief, attachment_size: { equal_to: 300.bytes }
     end
 
-    product = Product.new(
-      pictures: [image_attachment(250.kilobytes), image_attachment(150.kilobytes)],
-      brief: pdf_attachment(100.bytes)
-    )
+    small_image = build(:image, :processed, size: 150.kilobytes)
+    big_image = build(:image, :processed, size: 250.kilobytes)
+    small_pdf = build(:pdf, :processed, size: 100.bytes)
+    big_pdf = build(:pdf, :processed, size: 300.bytes)
+
+    product = build(:product, pictures: [big_image.dup, small_image.dup], brief: small_pdf.dup)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:size, :equal_to, count: humanize_size(150.kilobytes))
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:size, :equal_to, count: humanize_size(300.bytes))
 
-    product = Product.new(
-      pictures: [image_attachment(150.kilobytes)],
-      brief: pdf_attachment(300.bytes)
-    )
+    product = build(:product, pictures: [small_image.dup], brief: big_pdf.dup)
     assert product.valid?
   end
 
@@ -187,21 +172,20 @@ class ValidationTest < ActiveSupport::TestCase
       validates :brief, attachment_size: { other_than: 400.bytes }
     end
 
-    product = Product.new(
-      pictures: [image_attachment(200.kilobytes), image_attachment(150.kilobytes)],
-      brief: pdf_attachment(400.bytes)
-    )
+    small_image = build(:image, :processed, size: 150.kilobytes)
+    big_image = build(:image, :processed, size: 200.kilobytes)
+    small_pdf = build(:pdf, :processed, size: 300.bytes)
+    big_pdf = build(:pdf, :processed, size: 400.bytes)
+
+    product = build(:product, pictures: [big_image.dup, small_image.dup], brief: big_pdf.dup)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:size, :other_than, count: humanize_size(200.kilobytes))
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:size, :other_than, count: humanize_size(400.bytes))
 
-    product = Product.new(
-      pictures: [image_attachment(150.kilobytes)],
-      brief: pdf_attachment(300.bytes)
-    )
+    product = build(:product, pictures: [small_image.dup], brief: small_pdf.dup)
     assert product.valid?
   end
 
@@ -211,32 +195,30 @@ class ValidationTest < ActiveSupport::TestCase
       validates :brief, attachment_size: { in: 200.bytes..400.bytes }
     end
 
-    product = Product.new(
-      pictures: [image_attachment(250.kilobytes), image_attachment(150.kilobytes)],
-      brief: pdf_attachment(500.bytes)
-    )
+    small_image = build(:image, :processed, size: 50.kilobytes)
+    medium_image = build(:image, :processed, size: 150.kilobytes)
+    big_image = build(:image, :processed, size: 250.kilobytes)
+    small_pdf = build(:pdf, :processed, size: 100.bytes)
+    medium_pdf = build(:pdf, :processed, size: 300.bytes)
+    big_pdf = build(:pdf, :processed, size: 500.bytes)
+
+    product = build(:product, pictures: [big_image.dup, medium_image.dup], brief: big_pdf)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:size, :less_than_or_equal_to, count: humanize_size(200.kilobytes))
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:size, :less_than_or_equal_to, count: humanize_size(400.bytes))
 
-    product = Product.new(
-      pictures: [image_attachment(50.kilobytes), image_attachment(150.kilobytes)],
-      brief: pdf_attachment(100.bytes)
-    )
+    product = build(:product, pictures: [small_image.dup, medium_image.dup], brief: small_pdf.dup)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:size, :greater_than_or_equal_to, count: humanize_size(100.kilobytes))
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:size, :greater_than_or_equal_to, count: humanize_size(200.bytes))
 
-    product = Product.new(
-      pictures: [image_attachment(150.kilobytes)],
-      brief: pdf_attachment(300.bytes)
-    )
+    product = build(:product, pictures: [medium_image.dup], brief: medium_pdf.dup)
     assert product.valid?
   end
 
@@ -246,32 +228,30 @@ class ValidationTest < ActiveSupport::TestCase
       validates :brief, attachment_size: { within: 200.bytes..400.bytes }
     end
 
-    product = Product.new(
-      pictures: [image_attachment(250.kilobytes), image_attachment(150.kilobytes)],
-      brief: pdf_attachment(500.bytes)
-    )
+    small_image = build(:image, :processed, size: 50.kilobytes)
+    medium_image = build(:image, :processed, size: 150.kilobytes)
+    big_image = build(:image, :processed, size: 250.kilobytes)
+    small_pdf = build(:pdf, :processed, size: 100.bytes)
+    medium_pdf = build(:pdf, :processed, size: 300.bytes)
+    big_pdf = build(:pdf, :processed, size: 500.bytes)
+
+    product = build(:product, pictures: [big_image.dup, medium_image.dup], brief: big_pdf.dup)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:size, :less_than_or_equal_to, count: humanize_size(200.kilobytes))
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:size, :less_than_or_equal_to, count: humanize_size(400.bytes))
 
-    product = Product.new(
-      pictures: [image_attachment(50.kilobytes), image_attachment(150.kilobytes)],
-      brief: pdf_attachment(100.bytes)
-    )
+    product = build(:product, pictures: [small_image.dup, medium_image.dup], brief: small_pdf.dup)
     assert_not product.valid?
     assert product.errors.added?(:pictures, :invalid)
     assert product.pictures.first.errors.added?(:size, :greater_than_or_equal_to, count: humanize_size(100.kilobytes))
-    assert product.pictures.second.valid?
+    assert product.pictures.second.errors.none?
     assert product.errors.added?(:brief, :invalid)
     assert product.brief.errors.added?(:size, :greater_than_or_equal_to, count: humanize_size(200.bytes))
 
-    product = Product.new(
-      pictures: [image_attachment(150.kilobytes)],
-      brief: pdf_attachment(300.bytes)
-    )
+    product = build(:product, pictures: [medium_image.dup], brief: medium_pdf.dup)
     assert product.valid?
   end
 

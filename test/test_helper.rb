@@ -13,16 +13,6 @@ class ActiveSupport::TestCase
 
   private
 
-  def assert_raises_message(message, &block)
-    begin
-      block.call
-    rescue => e
-      assert_equal message, e.message
-    else
-      raise "Expected to raise #{message} but none raised"
-    end
-  end
-
   def assert_path(path)
     response = fetch(path)
     assert_equal '200', response.code
@@ -42,28 +32,12 @@ class ActiveSupport::TestCase
     Net::HTTP.get_response URI.parse(url)
   end
 
-  def pdf_attachment(size=nil)
-    Attachs::Attachment.new pdf_attributes(size)
-  end
-
-  def image_attachment(size=nil)
-    Attachs::Attachment.new image_attributes(size)
-  end
-
   def pdf_file
     File.new pdf_path
   end
 
   def image_file
     File.new image_path
-  end
-
-  def pdf_attributes(size=nil)
-    { content_type: 'application/pdf', size: size }
-  end
-
-  def image_attributes(size=nil)
-    { content_type: 'image/jpeg', size: size }
   end
 
   def tmp_path

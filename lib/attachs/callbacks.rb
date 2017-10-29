@@ -19,7 +19,7 @@ module Attachs
       if AVAILABLE_NAMES.include?(name)
         (registry[name][expression] ||= []) << block
       else
-        raise "Callbacks available are: #{AVAILABLE_NAMES.join(', ')}"
+        raise CallbackNotFound
       end
     end
 
