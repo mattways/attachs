@@ -9,12 +9,16 @@ module Attachs
           def validate_each(record, attribute, attachment_or_collection)
             if record.class.reflections[attribute.to_s].macro == :has_many
               attachment_or_collection.each do |attachment|
-                validate_attachment record, attachment
-                propagate_error record, attribute, attachment
+                if attachment.persistable?
+                  validate_attachment record, attachment
+                  propagate_error record, attribute, attachment
+                end
               end
             else
-              validate_attachment record, attachment_or_collection
-              propagate_error record, attribute, attachment_or_collection
+              if attachment_or_collection.persistable?
+                validate_attachment record, attachment_or_collection
+                propagate_error record, attribute, attachment_or_collection
+              end
             end
           end
 

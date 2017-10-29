@@ -131,6 +131,22 @@ module Attachs
       end
     end
 
+    def persistable?
+      if new_record? && (changed - %w(record_id record_type record_attribute)).none?
+        false
+      else
+        true
+      end
+    end
+
+    def changed_for_autosave?
+      if !persistable?
+        false
+      else
+        super
+      end
+    end
+
     def respond_to_missing?(name, include_private=false)
       name.to_s.ends_with?('=') || extras.has_key?(name) || super
     end

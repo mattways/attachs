@@ -25,5 +25,5 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'pg', '~> 0.21'
   s.add_development_dependency 'mocha', '~> 1.2'
-  #s.add_development_dependency 'makers', '~> 5.1'
+  s.add_development_dependency 'makers', '~> 5.1'
 end

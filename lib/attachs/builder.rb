@@ -14,8 +14,8 @@ module Attachs
 
     def define(attribute, options={})
       define_association attribute
-      if !multiple?
-        override_setter attribute
+      unless multiple?
+        override_accessors attribute
       end
       model.include concern
       model.attachments[attribute] = options
@@ -53,12 +53,17 @@ module Attachs
       end
     end
 
-    def override_setter(attribute)
+    def override_accessors(attribute)
       concern.class_eval do
-        define_method "#{attribute}=" do |value|
-          attachment = super(value)
-          attachment.record_attribute = attribute
-          attachment
+        %W(#{attribute}= create_#{attribute} build_#{attribute}).each do |name|
+          define_method name do |attributes={}|
+            attachment = super(attributes)
+            attachment.record_attribute = attribute
+            attachment
+          end
+        end
+        define_method attribute do
+          super() || send("build_#{attribute}")
         end
       end
     end
