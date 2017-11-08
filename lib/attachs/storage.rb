@@ -13,7 +13,7 @@ module Attachs
     def process(local_path, remote_paths, content_type, options)
       processor = build_processor(local_path, content_type)
       if processor
-        remote_paths.each do |style, path|
+        remote_paths.except(:original).each do |style, path|
           file = build_tempfile
           processor.process file.path, options[style]
           upload file.path, path, content_type
@@ -28,9 +28,9 @@ module Attachs
         expiration: (begins_at + configuration.expiration_policy).utc.iso8601,
         conditions: [
           { bucket: configuration.bucket },
-          ['key', key],
+          { key: key.to_s },
           { acl: 'private' },
-          ['Content-Type', 'application/octet-stream'],
+          { 'Content-Type' => 'application/octet-stream' },
           ['content-length-range', 0, configuration.maximum_size_policy]
         ]
       }

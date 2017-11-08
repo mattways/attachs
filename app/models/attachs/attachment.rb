@@ -22,7 +22,7 @@ module Attachs
     belongs_to :record, polymorphic: true, required: false
 
     validates_presence_of :record_type, :record_attribute, :requested_at
-    validate :record_type_must_be_valid, :record_attribute_must_be_valid, :record_must_not_change
+    validate :record_type_must_be_valid, :record_attribute_must_be_valid
     validate :must_be_processed, if: :attached?
 
     with_options if: :processed? do |a|

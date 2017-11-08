@@ -51,11 +51,21 @@ module Attachs
           options
         )
       end
+      #model.accepts_nested_attributes_for attribute, update_only: false, allow_destroy: true
     end
 
     def override_accessors(attribute)
       concern.class_eval do
-        %W(#{attribute}= create_#{attribute} build_#{attribute}).each do |name|
+        define_method "#{attribute}=" do |value|
+          if value.is_a?(Numeric) || value.is_a?(String)
+            attachment = super(Attachs::Attachment.find(value))
+          else
+            attachment = super
+          end
+          attachment.record_attribute = attribute
+          attachment
+        end
+        %W(create_#{attribute} build_#{attribute}).each do |name|
           define_method name do |attributes={}|
             attachment = super(attributes)
             attachment.record_attribute = attribute
