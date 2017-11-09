@@ -3,7 +3,7 @@ module Attachs
     class << self
 
       def detect_content_type(path)
-        run "file -Ib '#{path}'" do |output|
+        run "file -ib '#{path}'" do |output|
           output.split(';').first
         end
       end
