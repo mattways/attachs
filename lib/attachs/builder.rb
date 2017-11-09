@@ -30,6 +30,7 @@ module Attachs
     def define_association(attribute)
       options = {
         class_name: 'Attachs::Attachment',
+        foreign_type: :record_base,
         dependent: :nullify,
         as: :record
       }
@@ -62,12 +63,14 @@ module Attachs
           else
             attachment = super
           end
+          attachment.record_type = self.class.name
           attachment.record_attribute = attribute
           attachment
         end
         %W(create_#{attribute} build_#{attribute}).each do |name|
           define_method name do |attributes={}|
             attachment = super(attributes)
+            attachment.record_type = self.class.name
             attachment.record_attribute = attribute
             attachment
           end
