@@ -1,6 +1,5 @@
 module Attachs
-  class ProcessJob < ActiveJob::Base
-    queue_as :default
+  class ProcessJob < ApplicationJob
 
     def perform(attachment)
       attachment.process

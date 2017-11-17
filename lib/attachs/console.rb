@@ -3,7 +3,12 @@ module Attachs
     class << self
 
       def detect_content_type(path)
-        run "file -ib '#{path}'" do |output|
+        if RUBY_PLATFORM =~ /freebsd/
+          options = '-ib'
+        else
+          options = '-Ib'
+        end
+        run "file #{options} '#{path}'" do |output|
           output.split(';').first
         end
       end

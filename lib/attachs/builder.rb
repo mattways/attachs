@@ -52,17 +52,19 @@ module Attachs
           options
         )
       end
-      #model.accepts_nested_attributes_for attribute, update_only: false, allow_destroy: true
+      model.accepts_nested_attributes_for attribute, allow_destroy: true
     end
 
     def override_accessors(attribute)
       concern.class_eval do
         define_method "#{attribute}=" do |value|
-          if value.is_a?(Numeric) || value.is_a?(String)
+          case value
+          when Numeric,String
             attachment = super(Attachs::Attachment.find(value))
           else
             attachment = super
           end
+          # I need to repeat this?
           attachment.record_type = self.class.name
           attachment.record_attribute = attribute
           attachment

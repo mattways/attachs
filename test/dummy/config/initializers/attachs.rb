@@ -16,9 +16,11 @@ Attachs.configure do |config|
 
   config.after_process /^image\// do |file, attachment|
     width, height = read_dimensions(file.path)
-    attachment.width = width
-    attachment.height = height
-    attachment.ratio = (height.to_d / width.to_d).to_f
+    attachment.extras.merge!(
+      width: width,
+      height: height,
+      ratio: (height.to_d / width.to_d).to_f
+    )
   end
 
 end

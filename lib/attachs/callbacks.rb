@@ -1,7 +1,7 @@
 module Attachs
   class Callbacks
 
-    AVAILABLE_NAMES = %i(before_process after_process)
+    NAMES = %i(before_process after_process)
 
     def process(name, file, attachment)
       if registry.has_key?(name)
@@ -16,7 +16,7 @@ module Attachs
     end
 
     def add(name, expression, &block)
-      if AVAILABLE_NAMES.include?(name)
+      if NAMES.include?(name)
         (registry[name][expression] ||= []) << block
       else
         raise CallbackNotFound
@@ -28,7 +28,7 @@ module Attachs
     def registry
       @registry ||= begin
         hash = {}
-        AVAILABLE_NAMES.each do |name|
+        NAMES.each do |name|
           hash[name] = {}
         end
         hash

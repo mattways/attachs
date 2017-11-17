@@ -3,7 +3,8 @@ require 'test_helper'
 class AttachmentTest < ActiveSupport::TestCase
 
   test 'extras' do
-    attachment = build(:image, width: 300)
+    attachment = build(:image)
+    attachment.extras[:width] = 300
     assert_equal 300, attachment.width
     assert_equal Hash['width', 300], attachment.extras
 

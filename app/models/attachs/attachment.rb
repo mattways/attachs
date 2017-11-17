@@ -1,8 +1,6 @@
 module Attachs
   class Attachment < ActiveRecord::Base
 
-    ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789'
-    ENCODING = '8kluw1mtri2xncsp649obvezgd57qy3fj0ah'
     STATES = %w(uploading processing processed)
 
     self.table_name = 'attachments'
@@ -56,6 +54,10 @@ module Attachs
       !uploading?
     end
 
+    def default_path?
+      options.has_key? :default_path
+    end
+
     def description
       if attached?
         key = "attachments.#{record_type.underscore}.#{record_attribute}"
@@ -67,36 +69,59 @@ module Attachs
       end
     end
 
+    def fetch(style=nil)
+      if processed?
+        style ||= :original
+        if styles.include?(style)
+          storage.fetch generate_path(style)
+        end
+      elsif persisted?
+        storage.fetch id.to_s
+      end
+    end
+
     def url(style=nil)
       style ||= :original
-      if styles.include?(style) && path = generate_path(style)
-        storage.url path
+      if styles.include?(style)
+        if processed?
+          storage.url generate_path(style)
+        elsif default_path?
+          storage.url generate_default_path(style)
+        end
       end
     end
 
     def urls
-      hash = generate_paths
-      hash.each do |style, path|
-        hash[style] = storage.url(path)
+      hash = {}
+      if processed?
+        generate_paths.each do |style, path|
+          hash[style] = storage.url(path)
+        end
+      elsif default_path?
+        styles.each do |style|
+          path = generate_default_path(style)
+          hash[style] = storage.url(path)
+        end
       end
       hash
     end
 
     def process
       unless processed?
-        file = storage.fetch(id.to_s)
+        file = fetch
         self.size = file.size
         self.content_type = Console.detect_content_type(file.path)
         self.extension = MIME::Types[content_type].first.extensions.first
         self.state = 'processed'
         self.processed_at = Time.zone.now
-        configuration.callbacks.process :before, file, self
+        configuration.callbacks.process :before_process, file, self
         storage.process file.path, generate_paths, content_type, style_options
-        configuration.callbacks.process :after, file, self
+        configuration.callbacks.process :after_process, file, self
         save
       end
     end
 
+=begin
     def reprocess
       if processed?
         upload = storage.fetch(current_paths[:original])
@@ -130,17 +155,20 @@ module Attachs
         end
       end
     end
+=end
 
-    def persistable?
-      if new_record? && (changed - %w(record_id record_type record_attribute)).none?
-        false
-      else
-        true
-      end
+    def saveable?
+      persisted? || (changed - %w(record_id record_type record_attribute)).any?
     end
+    alias_method :validable?, :saveable?
+
+    def unsaveable?
+      !saveable?
+    end
+    alias_method :unvalidable?, :unsaveable?
 
     def changed_for_autosave?
-      if !persistable?
+      if unsaveable?
         false
       else
         super
@@ -148,13 +176,11 @@ module Attachs
     end
 
     def respond_to_missing?(name, include_private=false)
-      name.to_s.ends_with?('=') || extras.has_key?(name) || super
+      extras.has_key?(name) || super
     end
 
     def method_missing(name, *args, &block)
-      if name.to_s.ends_with?('=')
-        extras[name.to_s[0..-2]] = args.first
-      elsif extras.has_key?(name.to_s)
+      if extras.has_key?(name.to_s)
         extras[name.to_s]
       else
         super
@@ -182,6 +208,7 @@ module Attachs
     end
 
     def record_must_not_change
+      # Needs work
       %w(record_id record_type record_attribute).each do |attribute|
         if send("#{attribute}_was").present? && send("#{attribute}_changed?")
           errors.add attribute, :immutable
@@ -227,26 +254,26 @@ module Attachs
       [:original] + options.fetch(:styles, {}).keys
     end
 
+    def generate_default_path(style)
+      options[:default_path].gsub ':style', style.to_s
+    end
+
     def generate_path(style)
-      if processed?
-        "#{id}/#{ofuscate(style).parameterize}" + ".#{extension}"
-      else
-        options[:default_path]
-      end
+      "#{id}/#{ofuscate(style).dasherize}" + ".#{extension}"
     end
 
     def generate_paths
       hash = {}
       styles.each do |style|
-        if path = generate_path(style)
-          hash[style] = path
-        end
+        hash[style] = generate_path(style)
       end
       hash
     end
 
     def ofuscate(value)
-      value.to_s.tr ALPHABET, ENCODING
+      alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789'
+      encoding = '8kluw1mtri2xncsp649obvezgd57qy3fj0ah'
+      value.to_s.tr alphabet, encoding
     end
 
     def ensure_requested_at
