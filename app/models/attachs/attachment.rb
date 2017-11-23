@@ -255,11 +255,19 @@ module Attachs
     end
 
     def generate_default_path(style)
-      options[:default_path].gsub ':style', style.to_s
+      prefix options[:default_path].gsub(':style', style.to_s)
     end
 
     def generate_path(style)
-      "#{id}/#{ofuscate(style).dasherize}" + ".#{extension}"
+      prefix "#{id}/#{ofuscate(style).dasherize}" + ".#{extension}"
+    end
+
+    def prefix(path)
+      if value = configuration.prefix.try(:remove, /^\//)
+        "#{value}/#{path}"
+      else
+        path
+      end
     end
 
     def generate_paths
