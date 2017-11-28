@@ -8,8 +8,8 @@ module Attachs
     before_validation :ensure_requested_at, on: :create
     after_commit :delete_files, on: :destroy
 
-    scope :attached, -> { where.not(record_id: nil) }
-    scope :unattached, -> { where(record_id: nil) }
+    scope :attached, -> { where.not(attachable_id: nil) }
+    scope :unattached, -> { where(attachable_id: nil) }
     scope :uploaded, -> { where.not(state: 'uploading') }
     scope :unprocessed, -> { where.not(state: 'processed') }
 
@@ -17,10 +17,10 @@ module Attachs
       scope name, -> { where(state: name) }
     end
 
-    belongs_to :record, polymorphic: true, required: false
+    belongs_to :attachable, polymorphic: true, required: false
 
-    validates_presence_of :record_type, :record_attribute, :requested_at
-    validate :record_type_must_be_valid, :record_attribute_must_be_valid
+    validates_presence_of :attachable_type, :attachable_attribute, :requested_at
+    validate :attachable_type_must_be_valid, :attachable_attribute_must_be_valid
     validate :must_be_processed, if: :attached?
 
     with_options if: :processed? do |a|
@@ -39,7 +39,7 @@ module Attachs
     end
 
     def attached?
-      record.present?
+      attachable.present?
     end
 
     def unattached?
@@ -60,7 +60,7 @@ module Attachs
 
     def description
       if attached?
-        key = "attachments.#{record_type.underscore}.#{record_attribute}"
+        key = "attachments.#{attachable_type.underscore}.#{attachable_attribute}"
         if I18n.exists?(key)
           I18n.t(key).gsub(/%\{[^\}]+\}/) do |match|
             interpolate match.remove(/%\{|\}/).to_sym
@@ -76,7 +76,7 @@ module Attachs
           storage.fetch generate_path(style)
         end
       elsif persisted?
-        storage.fetch id.to_s
+        storage.fetch key
       end
     end
 
@@ -117,8 +117,13 @@ module Attachs
         configuration.callbacks.process :before_process, file, self
         storage.process file.path, generate_paths, content_type, style_options
         configuration.callbacks.process :after_process, file, self
+        storage.delete key
         save
       end
+    end
+
+    def key
+      prefix to_param
     end
 
 =begin
@@ -136,7 +141,7 @@ module Attachs
         storage.process upload.path, paths, content_type, style_optionss
         self.processed_at = Time.zone.now
         save
-        record.touch
+        attachable.touch
       end
     end
 
@@ -151,14 +156,14 @@ module Attachs
         if missing_paths.any?
           upload = storage.fetch(current_paths[:original])
           storage.process upload.path, missing_paths, content_type, style_options
-          record.touch
+          attachable.touch
         end
       end
     end
 =end
 
     def saveable?
-      persisted? || (changed - %w(record_id record_type record_attribute)).any?
+      persisted? || (changed - %w(attachable_id attachable_type attachable_attribute)).any?
     end
     alias_method :validable?, :saveable?
 
@@ -195,21 +200,21 @@ module Attachs
       end
     end
 
-    def record_type_must_be_valid
-      unless record_model.try(:attachable?)
-        errors.add :record_type, :invalid
+    def attachable_type_must_be_valid
+      unless attachable_model.try(:attachable?)
+        errors.add :attachable_type, :invalid
       end
     end
 
-    def record_attribute_must_be_valid
-      unless record_model.try(:has_attachment?, record_attribute)
-        errors.add :record_attribute, :invalid
+    def attachable_attribute_must_be_valid
+      unless attachable_model.try(:has_attachment?, attachable_attribute)
+        errors.add :attachable_attribute, :invalid
       end
     end
 
-    def record_must_not_change
+    def attachable_must_not_change
       # Needs work
-      %w(record_id record_type record_attribute).each do |attribute|
+      %w(attachable_id attachable_type attachable_attribute).each do |attribute|
         if send("#{attribute}_was").present? && send("#{attribute}_changed?")
           errors.add attribute, :immutable
         end
@@ -227,20 +232,18 @@ module Attachs
         styles.each do |style|
           storage.delete path(style)
         end
-      else
-        storage.delete id
       end
     end
 
-    def record_model
-      if record_type.present?
-        record_type.classify.safe_constantize
+    def attachable_model
+      if attachable_type.present?
+        attachable_type.classify.safe_constantize
       end
     end
 
     def options
-      if record_model.present? && record_attribute.present?
-        record_model.attachments[record_attribute.to_sym]
+      if attachable_model.present? && attachable_attribute.present?
+        attachable_model.attachments[attachable_attribute.to_sym]
       else
         {}
       end
@@ -259,7 +262,7 @@ module Attachs
     end
 
     def generate_path(style)
-      prefix "#{id}/#{ofuscate(style).dasherize}" + ".#{extension}"
+      prefix "#{to_param}/#{ofuscate(style).dasherize}" + ".#{extension}"
     end
 
     def prefix(path)
@@ -290,9 +293,9 @@ module Attachs
 
     def interpolate(name)
       if configuration.interpolations.exists?(name)
-        configuration.interpolations.process name, record
-      elsif record.respond_to?(name)
-        record.send name
+        configuration.interpolations.process name, attachable
+      elsif attachable.respond_to?(name)
+        attachable.send name
       end
     end
 

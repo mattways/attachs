@@ -7,9 +7,9 @@ module Attachs
       registry.has_key? name
     end
 
-    def process(name, record)
+    def process(name, attachable)
       if exists?(name)
-        registry[name].call record
+        registry[name].call attachable
       else
         raise InterpolationNotFound
       end

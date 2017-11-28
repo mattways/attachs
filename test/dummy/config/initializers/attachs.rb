@@ -10,8 +10,8 @@ Attachs.configure do |config|
   config.maximum_size_policy = 5.megabytes
   config.expiration_policy = 5.minutes
 
-  config.interpolation :name do |record|
-    record.name
+  config.interpolation :name do |attachable|
+    attachable.name
   end
 
   config.after_process /^image\// do |file, attachment|

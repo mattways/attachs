@@ -40,7 +40,7 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   end
 
   def signed_policy
-    @signed_policy ||= storage.generate_signed_policy(attachment.requested_at, attachment.id)
+    @signed_policy ||= storage.generate_signed_policy(attachment.requested_at, attachment.key)
   end
 
   def policy

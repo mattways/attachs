@@ -1,9 +1,10 @@
 class CreateAttachments < ActiveRecord::Migration[5.1]
   def change
     create_table :attachments do |t|
-      t.integer :record_id
-      t.string :record_type
-      t.string :record_attribute
+      t.integer :attachable_id
+      t.string :attachable_type
+      t.string :attachable_type
+      t.string :attachable_attribute
       t.string :content_type
       t.string :extension
       t.integer :size
@@ -14,9 +15,10 @@ class CreateAttachments < ActiveRecord::Migration[5.1]
       t.timestamp :processed_at
     end
 
-    add_index :attachments, :record_id
-    add_index :attachments, :record_type
-    add_index :attachments, :record_attribute
+    add_index :attachments, :attachable_id
+    add_index :attachments, :attachable_base
+    add_index :attachments, :attachable_type
+    add_index :attachments, :attachable_attribute
     add_index :attachments, :position
     add_index :attachments, :state
     add_index :attachments, :requested_at

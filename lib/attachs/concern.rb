@@ -7,7 +7,7 @@ module Attachs
         :attachments,
         class_name: 'Attachs::Attachment',
         dependent: :nullify,
-        as: :record
+        as: :attachable
       )
     end
 

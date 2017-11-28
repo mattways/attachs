@@ -1,5 +1,6 @@
 Attachs.configure do |config|
 
+  config.prefix = '/media'
   config.convert_options = '-strip -quality 82'
   config.cache_control_header = 'max-age=315360000, public'
   config.expires_header = Time.parse('31 Dec 2037 23:55:55 GMT').httpdate

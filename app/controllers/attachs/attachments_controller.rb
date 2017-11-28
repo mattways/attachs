@@ -20,13 +20,13 @@ module Attachs
 
     def attachment_params
       params.require(:attachment).permit(
-        :record_type,
-        :record_attribute
+        :attachable_type,
+        :attachable_attribute
       )
     end
 
     def generate_signed_policy(attachment)
-      Attachs.storage.generate_signed_policy attachment.requested_at, attachment.id
+      Attachs.storage.generate_signed_policy attachment.requested_at, attachment.key
     end
 
   end

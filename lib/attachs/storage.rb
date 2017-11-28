@@ -18,9 +18,8 @@ module Attachs
           processor.process file.path, options[style]
           upload file.path, path, content_type
         end
-      else
-        upload local_path, remote_paths[:original], content_type
       end
+      upload local_path, remote_paths[:original], content_type
     end
 
     def generate_signed_policy(begins_at, key)
