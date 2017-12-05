@@ -60,13 +60,19 @@ module Attachs
         define_method "#{attribute}=" do |value|
           case value
           when Numeric,String
-            attachment = super(Attachs::Attachment.find(value))
+            if value.present?
+              attachment = super(Attachs::Attachment.find(value))
+            else
+              attachment = nil
+            end
           else
-            attachment = super
+            attachment = super(value)
           end
-          # I need to repeat this?
-          attachment.attachable_type = self.class.name
-          attachment.attachable_attribute = attribute
+          if attachment
+            # I need to repeat this?
+            attachment.attachable_type = self.class.name
+            attachment.attachable_attribute = attribute
+          end
           attachment
         end
         %W(create_#{attribute} build_#{attribute}).each do |name|
