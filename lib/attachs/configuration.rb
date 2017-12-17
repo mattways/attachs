@@ -4,6 +4,7 @@ module Attachs
     attr_accessor(
       :convert_options,
       :base_url,
+      :default_path,
       :prefix,
       :region,
       :bucket,

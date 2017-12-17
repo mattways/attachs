@@ -55,7 +55,7 @@ module Attachs
     end
 
     def default_path?
-      options.has_key? :default_path
+      options.has_key?(:default_path) || !configuration.default_path.nil?
     end
 
     def description
@@ -258,7 +258,8 @@ module Attachs
     end
 
     def generate_default_path(style)
-      prefix options[:default_path].gsub(':style', style.to_s)
+      path = (options[:default_path] || configuration.default_path)
+      prefix path.gsub(':style', style.to_s)
     end
 
     def generate_path(style)
