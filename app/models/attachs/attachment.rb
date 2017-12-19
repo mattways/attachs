@@ -5,6 +5,8 @@ module Attachs
 
     self.table_name = 'attachments'
 
+    obfuscates_id
+
     before_validation :ensure_requested_at, on: :create
     after_commit :delete_files, on: :destroy
 
