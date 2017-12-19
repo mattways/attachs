@@ -23,16 +23,16 @@ module Attachs
             super
           end
 
-          def validate_attachment(attachable, attachment)
+          def validate_attachment(record, attachment)
             unless attachment.blank?
               CHECKS.each do |name, operator|
                 if options.has_key?(name)
                   other = options[name]
                   case other
                   when Symbol
-                    other = attachable.send(other)
+                    other = record.send(other)
                   when Proc
-                    other = other.call(attachable)
+                    other = other.call(record)
                   end
                   unless attachment.size.send(operator, other)
                     attachment.errors.add :size, name, count: humanize_size(other)

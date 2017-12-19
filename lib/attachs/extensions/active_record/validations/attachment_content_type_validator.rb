@@ -6,7 +6,7 @@ module Attachs
 
         class AttachmentContentTypeValidator < AttachmentValidator
 
-          def validate_attachment(attachable, attachment)
+          def validate_attachment(record, attachment)
             unless attachment.blank?
               if options.has_key?(:is)
                 if options[:is] != attachment.content_type

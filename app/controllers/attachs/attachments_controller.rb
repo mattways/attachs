@@ -20,8 +20,8 @@ module Attachs
 
     def attachment_params
       params.require(:attachment).permit(
-        :attachable_type,
-        :attachable_attribute
+        :record_type,
+        :record_attribute
       )
     end
 

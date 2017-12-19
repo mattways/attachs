@@ -7,7 +7,7 @@ module Attachs
         :attachments,
         class_name: 'Attachs::Attachment',
         dependent: :nullify,
-        as: :attachable
+        as: :record
       )
     end
 
@@ -24,7 +24,7 @@ module Attachs
         @attachments ||= {}
       end
 
-      def attachable?
+      def record?
         attachments.any?
       end
 

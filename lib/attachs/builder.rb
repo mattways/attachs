@@ -30,25 +30,25 @@ module Attachs
     def define_association(attribute)
       options = {
         class_name: 'Attachs::Attachment',
-        foreign_type: :attachable_base,
+        foreign_type: :record_base,
         dependent: :nullify,
-        as: :attachable
+        as: :record
       }
       if multiple?
         model.has_many(
           attribute,
-          -> { where(attachable_attribute: attribute).order(position: :asc) },
+          -> { where(record_attribute: attribute).order(position: :asc) },
           options.merge(
-            after_add: ->(attachable, attachment) {
-              attachment.attachable_type = attachable.class.name
-              attachment.attachable_attribute = attribute
+            after_add: ->(record, attachment) {
+              attachment.record_type = record.class.name
+              attachment.record_attribute = attribute
             }
           )
         )
       else
         model.has_one(
           attribute,
-          -> { where(attachable_attribute: attribute) },
+          -> { where(record_attribute: attribute) },
           options
         )
       end
@@ -70,16 +70,16 @@ module Attachs
           end
           if attachment
             # I need to repeat this?
-            attachment.attachable_type = self.class.name
-            attachment.attachable_attribute = attribute
+            attachment.record_type = self.class.name
+            attachment.record_attribute = attribute
           end
           attachment
         end
         %W(create_#{attribute} build_#{attribute}).each do |name|
           define_method name do |attributes={}|
             attachment = super(attributes)
-            attachment.attachable_type = self.class.name
-            attachment.attachable_attribute = attribute
+            attachment.record_type = self.class.name
+            attachment.record_attribute = attribute
             attachment
           end
         end
