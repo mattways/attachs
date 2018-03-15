@@ -5,7 +5,7 @@ module Attachs
         extend ActiveSupport::Concern
 
         def image_tag(source, options={})
-          if source.is_a?(Attachs::Attachment)
+          if source.is_a?(Attachment)
             attachment = source
             style = options.delete(:style)
             source = attachment.url(style)

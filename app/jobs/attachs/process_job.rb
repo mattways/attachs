@@ -1,5 +1,5 @@
 module Attachs
-  class ProcessJob < ApplicationJob
+  class ProcessJob < Attachs::ApplicationJob
 
     def perform(attachment)
       attachment.process

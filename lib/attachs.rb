@@ -38,7 +38,7 @@ module Attachs
 
     %i(clear reprocess fix_missings).each do |name|
       define_method name do |*args|
-        Attachs::Attachment.send name, *args
+        Attachment.send name, *args
       end
     end
 

@@ -1,1 +1,1 @@
-{ id: @attachment.to_param, key: @attachment.key, policy: @policy, signature: @signature }
+@attachment.slice(:id, :key).merge policy: @policy, signature: @signature

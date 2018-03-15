@@ -1,1 +1,1 @@
-{ id: @attachment.to_param, state: @attachment.state, urls: @attachment.urls }
+@attachment.slice :id, :state, :urls

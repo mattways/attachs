@@ -1,4 +1,5 @@
 module Attachs
+
   class Error < StandardError
   end
 
@@ -13,4 +14,5 @@ module Attachs
 
   class InterpolationExists < Error
   end
+
 end

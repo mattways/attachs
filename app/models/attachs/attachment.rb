@@ -5,8 +5,6 @@ module Attachs
 
     self.table_name = 'attachments'
 
-    obfuscates_id
-
     before_validation :ensure_requested_at, on: :create
     after_commit :delete_files, on: :destroy
 
@@ -58,6 +56,13 @@ module Attachs
 
     def default_path?
       options.has_key?(:default_path) || !configuration.default_path.nil?
+    end
+
+    def record_type=(value)
+      if value
+        self.record_base = value.constantize.base_class 
+      end
+      super value
     end
 
     def description
@@ -183,12 +188,12 @@ module Attachs
     end
 
     def respond_to_missing?(name, include_private=false)
-      extras.has_key?(name) || super
+      metadata.has_key?(name) || super
     end
 
     def method_missing(name, *args, &block)
-      if extras.has_key?(name.to_s)
-        extras[name.to_s]
+      if metadata.has_key?(name.to_s)
+        metadata[name.to_s]
       else
         super
       end
@@ -211,15 +216,6 @@ module Attachs
     def record_attribute_must_be_valid
       unless record_model.try(:has_attachment?, record_attribute)
         errors.add :record_attribute, :invalid
-      end
-    end
-
-    def record_must_not_change
-      # Needs work
-      %w(record_id record_type record_attribute).each do |attribute|
-        if send("#{attribute}_was").present? && send("#{attribute}_changed?")
-          errors.add attribute, :immutable
-        end
       end
     end
 

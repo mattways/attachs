@@ -1,19 +1,19 @@
 module Attachs
-  class AttachmentsController < ApplicationController
+  class AttachmentsController < Attachs::ApplicationController
 
     def create
-      @attachment = Attachs::Attachment.create(attachment_params)
+      @attachment = Attachment.create(attachment_params)
       @policy, @signature = generate_signed_policy(@attachment)
     end
 
     def queue
-      @attachment = Attachs::Attachment.uploading.find(params[:id])
+      @attachment = Attachment.uploading.find(params[:id])
       @attachment.processing!
       ProcessJob.perform_later @attachment
     end
 
     def show
-      @attachment = Attachs::Attachment.uploaded.find(params[:id])
+      @attachment = Attachment.uploaded.find(params[:id])
     end
 
     private

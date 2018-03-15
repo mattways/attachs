@@ -3,47 +3,54 @@ module Attachs
 
     attr_reader :model, :concern
 
-    def initialize(model, multiple)
+    def initialize(model)
       @model = model
-      @multiple = multiple
       @concern = Module.new do
         extend ActiveSupport::Concern
         include Concern
       end
     end
 
-    def define(attribute, options={})
-      define_association attribute
-      unless multiple?
+    def define(multiple, attribute, options={})
+      define_association multiple, attribute
+      define_normalizer attribute
+      unless multiple
         override_accessors attribute
       end
       model.include concern
-      model.attachments[attribute] = options
-    end
-
-    def multiple?
-      @multiple == true
+      model.attachments[attribute] = options.merge(multiple: multiple)
     end
 
     private
 
-    def define_association(attribute)
+    def define_normalizer(attribute)
+      concern.class_eval do
+        private
+        define_method "normalize_#{attribute}" do |attachment|
+          if attachment
+            attachment.assign_attributes(
+              record_attribute: attribute,
+              record_type: self.class.name
+            )
+          end
+          attachment
+        end
+      end
+    end
+
+    def define_association(multiple, attribute)
       options = {
         class_name: 'Attachs::Attachment',
         foreign_type: :record_base,
         dependent: :nullify,
+				autosave: true,
         as: :record
       }
-      if multiple?
+      if multiple
         model.has_many(
           attribute,
           -> { where(record_attribute: attribute).order(position: :asc) },
-          options.merge(
-            after_add: ->(record, attachment) {
-              attachment.record_type = record.class.name
-              attachment.record_attribute = attribute
-            }
-          )
+          options.merge(after_add: :"normalize_#{attribute}")
         )
       else
         model.has_one(
@@ -58,29 +65,22 @@ module Attachs
     def override_accessors(attribute)
       concern.class_eval do
         define_method "#{attribute}=" do |value|
-          case value
-          when Numeric,String
+          send "normalize_#{attribute}", super(value)
+        end
+        define_method "#{attribute}_id=" do |value|
+          send(
+            "#{attribute}=", 
             if value.present?
-              attachment = super(Attachs::Attachment.find(value))
-            else
-              attachment = nil
+              Attachment.find(value)
             end
-          else
-            attachment = super(value)
-          end
-          if attachment
-            # I need to repeat this?
-            attachment.record_type = self.class.name
-            attachment.record_attribute = attribute
-          end
-          attachment
+          )
+        end
+        define_method "#{attribute}_id" do
+          send(attribute).try :id
         end
         %W(create_#{attribute} build_#{attribute}).each do |name|
           define_method name do |attributes={}|
-            attachment = super(attributes)
-            attachment.record_type = self.class.name
-            attachment.record_attribute = attribute
-            attachment
+            send "normalize_#{attribute}", super(attributes)
           end
         end
         define_method attribute do

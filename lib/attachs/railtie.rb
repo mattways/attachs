@@ -4,7 +4,7 @@ module Attachs
     initializer 'attachs.action_view' do
       ActiveSupport.on_load :action_view do
         ::ActionView::Base.include(
-          Attachs::Extensions::ActionView::Base
+          Extensions::ActionView::Base
         )
       end
     end
@@ -12,8 +12,8 @@ module Attachs
     initializer 'attachs.active_record' do
       ActiveSupport.on_load :active_record do
         ::ActiveRecord::Base.include(
-          Attachs::Extensions::ActiveRecord::Base,
-          Attachs::Extensions::ActiveRecord::Validations
+          Extensions::ActiveRecord::Base,
+          Extensions::ActiveRecord::Validations
         )
       end
     end

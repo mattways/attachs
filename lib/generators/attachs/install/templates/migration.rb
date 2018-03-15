@@ -10,7 +10,7 @@ class CreateAttachments < ActiveRecord::Migration[5.1]
       t.integer :size
       t.integer :position, default: 0
       t.string :state, default: 'uploading'
-      t.jsonb :extras, default: {}
+      t.jsonb :metadata, default: {}
       t.timestamp :requested_at
       t.timestamp :processed_at
     end
