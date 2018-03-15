@@ -1,1 +1,1 @@
-@attachment.slice :id, :state, :urls
+@attachment.slice(:state, :urls).merge id: @attachment.token

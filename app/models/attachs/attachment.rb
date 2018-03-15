@@ -1,6 +1,8 @@
 module Attachs
   class Attachment < ActiveRecord::Base
 
+    obfuscates_id
+
     STATES = %w(uploading processing processed)
 
     self.table_name = 'attachments'
