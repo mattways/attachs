@@ -7,7 +7,7 @@ module Attachs
         def image_tag(source, options={})
           if source.is_a?(Attachment)
             attachment = source
-            style = options.delete(:style)
+            style = (options.delete(:style) || :original)
             source = attachment.url(style)
             unless options.has_key?(:alt)
               options[:alt] = attachment.description
