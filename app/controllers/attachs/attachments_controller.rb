@@ -1,5 +1,5 @@
 module Attachs
-  class AttachmentsController < ActionController::Base
+  class AttachmentsController < Attachs::ApplicationController
 
     def create
       @attachment = Attachment.create!(attachment_params)
