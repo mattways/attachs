@@ -4,16 +4,9 @@ module Attachs
     attr_accessor(
       :convert_options,
       :base_url,
-      :default_path,
+      :fallback,
       :prefix,
-      :region,
-      :bucket,
-      :cache_control_header,
-      :expires_header,
-      :access_key_id,
-      :secret_access_key,
-      :maximum_size_policy,
-      :expiration_policy
+      :maximum_size
     )
 
     def callbacks

@@ -1,63 +1,46 @@
 module Attachs
   class Attachment < ActiveRecord::Base
 
-    obfuscates_id
-
-    STATES = %w(uploading processing processed)
-
     self.table_name = 'attachments'
 
-    before_validation :ensure_requested_at, on: :create
+    after_commit :process_upload, on: :create
     after_commit :delete_files, on: :destroy
 
     scope :attached, -> { where.not(record_id: nil) }
     scope :unattached, -> { where(record_id: nil) }
-    scope :uploaded, -> { where.not(state: 'uploading') }
-    scope :unprocessed, -> { where.not(state: 'processed') }
-
-    STATES.each do |name|
-      scope name, -> { where(state: name) }
-    end
+    scope :processed, -> { where.not(processed_at: nil) }
+    scope :unprocessed, -> { where(processed_at: nil) }
 
     belongs_to :record, polymorphic: true, required: false
 
-    validates_presence_of :record_type, :record_attribute, :requested_at
-    validate :record_type_must_be_valid, :record_attribute_must_be_valid
-    validate :must_be_processed, if: :attached?
+    validates_presence_of :record_type, :record_base, :record_attribute
+    validate :record_type_must_be_valid, :record_base_must_be_valid, :record_attribute_must_be_valid
 
-    with_options if: :processed? do |a|
-      a.validates_presence_of :extension, :content_type, :size, :processed_at
-      a.validates_numericality_of :size, greater_than: 0, only_integer: true
-      a.validates_time_of :processed_at, after: :requested_at
+    with_options if: :attached? do
+      validate :must_be_processed
     end
 
-    STATES.each do |name|
-      define_method "#{name}?" do
-        state == name
-      end
-      define_method "#{name}!" do
-        update! state: name
-      end
+    with_options if: :processed? do
+      validates_presence_of :extension, :content_type, :size
+      validates_numericality_of :size, greater_than: 0, only_integer: true
+    end
+
+    attr_accessor :upload
+
+    def unattached?
+      record_id.nil?
     end
 
     def attached?
-      record.present?
-    end
-
-    def unattached?
-      !attached?
+      !unattached?
     end
 
     def unprocessed?
-      !processed?
+      processed_at.nil?
     end
 
-    def uploaded?
-      !uploading?
-    end
-
-    def default_path?
-      options.has_key?(:default_path) || !configuration.default_path.nil?
+    def processed?
+      !unprocessed?
     end
 
     def record_type=(value)
@@ -78,101 +61,33 @@ module Attachs
       end
     end
 
-    def fetch(style=nil)
-      if processed?
-        style ||= :original
-        if styles.include?(style)
-          storage.fetch generate_path(style)
-        end
-      elsif persisted?
-        storage.fetch key
-      end
-    end
-
-    def url(style=nil)
-      style ||= :original
-      if styles.include?(style)
-        if processed?
-          storage.url generate_path(style)
-        elsif default_path?
-          storage.url generate_default_path(style)
-        end
-      end
+    def url(style=:original)
+      storage.url generate_path(style, unprocessed?)
     end
 
     def urls
       hash = {}
-      if processed?
-        generate_paths.each do |style, path|
-          hash[style] = storage.url(path)
-        end
-      elsif default_path?
-        styles.each do |style|
-          path = generate_default_path(style)
-          hash[style] = storage.url(path)
-        end
+      generate_paths(unprocessed?).each do |style, path|
+        hash[style] = storage.url(path)
       end
       hash
     end
 
-    def process
-      unless processed?
-        file = fetch
-        self.size = file.size
-        self.content_type = Console.detect_content_type(file.path)
+    def process(path)
+      if unprocessed?
+        self.size = File.size(path) 
+        self.content_type = Console.content_type(path)
         self.extension = MIME::Types[content_type].first.extensions.first
-        self.state = 'processed'
-        self.processed_at = Time.zone.now
-        configuration.callbacks.process :before_process, file, self
-        storage.process file.path, generate_paths, content_type, style_options
-        configuration.callbacks.process :after_process, file, self
-        storage.delete key
+        self.processed_at = Time.now
+        configuration.callbacks.process :before_process, path, self
+        storage.process id, path, generate_paths, content_type, styles_options
+        configuration.callbacks.process :after_process, path, self
         save
       end
     end
-
-    def key
-      prefix to_param
-    end
-
-=begin
-    def reprocess
-      if processed?
-        upload = storage.fetch(current_paths[:original])
-        new_paths = generate_paths
-        (paths.values - new_paths.values).each do |path|
-          self.old_paths |= [path]
-        end
-        (new_paths.values - paths.values).each do |path|
-          storage.delete path
-        end
-        self.current_paths = new_paths
-        storage.process upload.path, paths, content_type, style_optionss
-        self.processed_at = Time.zone.now
-        save
-        record.touch
-      end
-    end
-
-    def fix_missings
-      if processed?
-        missing_paths = {}
-        paths.except(:original).each do |style, path|
-          unless storage.exists?(path)
-            missing_paths[style] = path
-          end
-        end
-        if missing_paths.any?
-          upload = storage.fetch(current_paths[:original])
-          storage.process upload.path, missing_paths, content_type, style_options
-          record.touch
-        end
-      end
-    end
-=end
 
     def saveable?
-      persisted? || (changed - %w(record_id record_type record_attribute)).any?
+      persisted? || !upload.nil?
     end
     alias_method :validable?, :saveable?
 
@@ -182,11 +97,15 @@ module Attachs
     alias_method :unvalidable?, :unsaveable?
 
     def changed_for_autosave?
-      if unsaveable?
-        false
-      else
-        super
-      end
+      unsaveable? ? false : super
+    end
+
+    private
+
+    delegate :storage, :configuration, to: :Attachs
+
+    def process_upload
+      ProcessJob.perform_later upload.path, self
     end
 
     def respond_to_missing?(name, include_private=false)
@@ -201,17 +120,15 @@ module Attachs
       end
     end
 
-    private
-
-    %i(storage configuration).each do |name|
-      define_method name do
-        Attachs.send name
+    def record_type_must_be_valid
+      unless record_model.try(:attachable?)
+        errors.add :record_type, :invalid
       end
     end
 
-    def record_type_must_be_valid
-      unless record_model.try(:record?)
-        errors.add :record_type, :invalid
+    def record_base_must_be_valid
+      if record_model.base_class != record_base.safe_constantize
+        errors.add :record_base, :invalid
       end
     end
 
@@ -230,7 +147,7 @@ module Attachs
     def delete_files
       if processed?
         styles.each do |style|
-          storage.delete path(style)
+          storage.delete generate_path(style)
         end
       end
     end
@@ -249,47 +166,41 @@ module Attachs
       end
     end
 
-    def style_options
+    def styles_options
       options.fetch :styles, {}
     end
 
     def styles
-      [:original] + options.fetch(:styles, {}).keys
+      [:original] + styles_options.keys
     end
 
-    def generate_default_path(style)
-      path = (options[:default_path] || configuration.default_path)
-      prefix path.gsub(':style', style.to_s)
-    end
-
-    def generate_path(style)
-      prefix "#{to_param}/#{ofuscate(style).dasherize}" + ".#{extension}"
-    end
-
-    def prefix(path)
-      if value = configuration.prefix.try(:remove, /^\//)
-        "#{value}/#{path}"
+    def generate_path(style, fallback=false)
+      if fallback
+        template = (options[:fallback] || configuration.fallback)
+        template.gsub ':style', style.to_s
       else
-        path
+        name = obfuscate(id, style)
+        "#{id}/#{name}.#{extension}"
       end
     end
 
-    def generate_paths
+    def obfuscate(id, style)
+      salt = Rails.application.secrets.hashids_salt
+      hash = Hashids.new("#{salt}|#{id}", 40)
+      alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789_'
+      indices = []
+      style.to_s.chars.each do |char|
+        indices << alphabet.index(char)
+      end
+      hash.encode indices
+    end
+
+    def generate_paths(fallback=false)
       hash = {}
       styles.each do |style|
-        hash[style] = generate_path(style)
+        hash[style] = generate_path(style, fallback)
       end
       hash
-    end
-
-    def ofuscate(value)
-      alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789'
-      encoding = '8kluw1mtri2xncsp649obvezgd57qy3fj0ah'
-      value.to_s.tr alphabet, encoding
-    end
-
-    def ensure_requested_at
-      self.requested_at ||= Time.zone.now
     end
 
     def interpolate(name)
@@ -312,12 +223,6 @@ module Attachs
             attachment.send name
           end
         end
-      end
-
-      private
-
-      def storage
-        Attachs.storage
       end
 
     end

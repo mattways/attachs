@@ -2,17 +2,6 @@ module Attachs
   module Concern
     extend ActiveSupport::Concern
 
-    included do
-      has_many(
-        :attachments,
-        class_name: 'Attachs::Attachment',
-        dependent: :nullify,
-        as: :record
-      )
-    end
-
-    private
-
     module ClassMethods
 
       def inherited(subclass)
@@ -24,7 +13,7 @@ module Attachs
         @attachments ||= {}
       end
 
-      def record?
+      def attachable?
         attachments.any?
       end
 

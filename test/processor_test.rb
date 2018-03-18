@@ -8,17 +8,17 @@ class ProcessorTest < ActiveSupport::TestCase
 
   test 'force' do
     processor.process destination_path, '300x100!'
-    assert_equal [300, 100], console.read_dimensions(destination_path)
+    assert_equal [300, 100], console.dimensions(destination_path)
   end
 
   test 'cover' do
     processor.process destination_path, '400x100#'
-    assert_equal [400, 100], console.read_dimensions(destination_path)
+    assert_equal [400, 100], console.dimensions(destination_path)
   end
 
   test 'contain' do
     processor.process destination_path, '300x100'
-    assert_equal [149, 100], console.read_dimensions(destination_path)
+    assert_equal [149, 100], console.dimensions(destination_path)
   end
 
   private

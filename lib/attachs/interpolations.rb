@@ -1,8 +1,6 @@
 module Attachs
   class Interpolations
 
-    RESERVED = %i(id extension)
-
     def exists?(name)
       registry.has_key? name
     end
@@ -16,9 +14,7 @@ module Attachs
     end
 
     def add(name, &block)
-      if RESERVED.include?(name)
-        raise InterpolationReserved
-      elsif exists?(name)
+      if exists?(name)
         raise InterpolationExists
       else
         registry[name] = block

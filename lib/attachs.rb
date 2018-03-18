@@ -1,6 +1,4 @@
-require 'tuning'
 require 'open3'
-require 'aws-sdk-s3'
 require 'mime/types'
 require 'attachs/extensions/action_view/base'
 require 'attachs/extensions/active_record/validations/attachment_validator'
@@ -24,6 +22,8 @@ require 'attachs/version'
 module Attachs
   class << self
 
+    delegate :clear, :reprocess, :fix_missings, to: :Attachment
+
     def configure
       yield configuration
     end
@@ -34,12 +34,6 @@ module Attachs
 
     def configuration
       @configuration ||= Configuration.new
-    end
-
-    %i(clear reprocess fix_missings).each do |name|
-      define_method name do |*args|
-        Attachment.send name, *args
-      end
     end
 
   end

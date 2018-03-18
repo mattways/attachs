@@ -3,12 +3,12 @@ module Attachs
 
     NAMES = %i(before_process after_process)
 
-    def process(name, file, attachment)
+    def process(name, path, attachment)
       if registry.has_key?(name)
         registry[name].each do |expression, blocks|
           if attachment.content_type =~ expression
             blocks.each do |block|
-              Console.instance_exec file, attachment, &block
+              Console.instance_exec path, attachment, &block
             end
           end
         end

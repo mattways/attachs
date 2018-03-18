@@ -7,11 +7,11 @@ class ConsoleTest < ActiveSupport::TestCase
   end
 
   test 'detect content type' do
-    assert_equal 'image/jpeg', console.detect_content_type(image_path)
+    assert_equal 'image/jpeg', console.content_type(image_path)
   end
 
   test 'read dimensions' do
-    assert_equal [400, 269], console.read_dimensions(image_path)
+    assert_equal [400, 269], console.dimensions(image_path)
   end
 
   test 'identical' do

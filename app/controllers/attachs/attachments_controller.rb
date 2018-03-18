@@ -1,32 +1,18 @@
 module Attachs
-  class AttachmentsController < Attachs::ApplicationController
+  class AttachmentsController < ActionController::Base
 
     def create
-      @attachment = Attachment.create(attachment_params)
-      @policy, @signature = generate_signed_policy(@attachment)
-    end
-
-    def queue
-      @attachment = Attachment.uploading.find(params[:id])
-      @attachment.processing!
-      ProcessJob.perform_later @attachment
+      @attachment = Attachment.create!(attachment_params)
     end
 
     def show
-      @attachment = Attachment.uploaded.find(params[:id])
+      @attachment = Attachment.unattached.find(params[:id])
     end
 
     private
 
     def attachment_params
-      params.require(:attachment).permit(
-        :record_type,
-        :record_attribute
-      )
-    end
-
-    def generate_signed_policy(attachment)
-      Attachs.storage.generate_signed_policy attachment.requested_at, attachment.key
+      params.require(:attachment).permit(:record_type, :record_attribute, :upload)
     end
 
   end
