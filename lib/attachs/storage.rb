@@ -18,7 +18,9 @@ module Attachs
           processor.process expand_path(path), options[style]
         end
       end
-      move upload_path, expand_path(style_paths[:original])
+      original_path = expand_path(style_paths[:original])
+      move upload_path, original_path
+      fix_permissions_and_ownership original_path
     end
 
     def destroy(path)
@@ -59,6 +61,11 @@ module Attachs
     def remove(path)
       Rails.logger.info "Deleting: #{path}"
       FileUtils.rm path
+    end
+
+    def fix_permissions_and_ownership(path)
+      File.chown nil, Process.gid, path
+      File.chmod 0644, path
     end
 
     def find_each
