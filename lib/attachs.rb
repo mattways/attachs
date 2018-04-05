@@ -1,5 +1,6 @@
 require 'open3'
 require 'mime/types'
+require 'hashids'
 require 'attachs/extensions/action_view/base'
 require 'attachs/extensions/active_record/validations/attachment_validator'
 require 'attachs/extensions/active_record/validations/attachment_content_type_validator'
