@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rails', '~> 5.1'
   s.add_dependency 'mime-types', '~> 3.1'
-  s.add_dependency 'hashids'
 
   s.add_development_dependency 'pg', '~> 0.21'
   s.add_development_dependency 'mocha', '~> 1.2'

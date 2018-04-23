@@ -179,20 +179,15 @@ module Attachs
         template = (options[:fallback] || configuration.fallback)
         template.gsub ':style', style.to_s
       else
-        name = obfuscate(id, style)
+        name = obfuscate(style)
         "#{id}/#{name}.#{extension}"
       end
     end
 
-    def obfuscate(id, style)
-      salt = Rails.application.secrets.hashids_salt
-      hash = Hashids.new("#{salt}|#{id}", 40)
+    def obfuscate(style)
       alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789_'
-      indices = []
-      style.to_s.chars.each do |char|
-        indices << alphabet.index(char)
-      end
-      hash.encode indices
+      encoding = '8kluw1mtri2xncsp649obvezgd57qy3fj0ahx'
+      style.to_s.tr alphabet, encoding
     end
 
     def generate_paths(fallback=false)
