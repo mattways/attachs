@@ -2,12 +2,7 @@ module Attachs
   class Storage
 
     def url(path)
-      base_url = configuration.base_url
-      if base_url.present?
-        Pathname.new(base_url).join(path).to_s
-      else
-        Pathname.new('/').join(prefix).join(path).to_s
-      end
+      Pathname.new(base_url || '/').join(prefix).join(path).to_s
     end
 
     def process(id, upload_path, style_paths, content_type, options)
