@@ -2,7 +2,7 @@ module Attachs
   class Storage
 
     def url(path)
-      Pathname.new(base_url || '/').join(prefix).join(path).to_s
+      Pathname.new(Attachs.configuration.base_url || '/').join(prefix).join(path).to_s
     end
 
     def process(id, upload_path, style_paths, content_type, options)
