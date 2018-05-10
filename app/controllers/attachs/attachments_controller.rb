@@ -8,7 +8,7 @@ module Attachs
     def show
       @attachment = Attachment.find(params[:id])
       fresh_when @attachment, public: true
-      send_file @attachment.location(params[:style]), disposition: :inline
+      send_file @attachment.location(params[:style]), type: @attachment.content_type, disposition: :inline
     end
 
   end
