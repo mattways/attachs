@@ -1,5 +1,8 @@
 Attachs::Engine.routes.draw do
 
-  resources :attachments, constraints: { format: 'json' }, only: %i(create show)
+  scope Attachs.configuration.prefix, controller: :attachments do
+    root action: :create, via: :post
+    get ':id/:style', action: :show, via: :get
+  end
 
 end

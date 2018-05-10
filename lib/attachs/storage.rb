@@ -5,6 +5,10 @@ module Attachs
       Pathname.new(Attachs.configuration.base_url || '/').join(prefix).join(path).to_s
     end
 
+    def expand_path(path)
+      base_path.join(path).to_s
+    end
+
     def process(id, upload_path, style_paths, content_type, options)
       ensure_folder id
       processor = build_processor(upload_path, content_type)
@@ -33,15 +37,11 @@ module Attachs
     delegate :configuration, to: :Attachs
 
     def base_path
-      Rails.root.join('public').join(prefix)
+      Rails.root.join 'storage'
     end
 
     def prefix
       configuration.prefix || ''
-    end
-
-    def expand_path(path)
-      base_path.join(path).to_s
     end
 
     def ensure_folder(id)
@@ -64,7 +64,7 @@ module Attachs
     end
 
     def find_each
-      Dir[base_path.join('*/*/**')].each do |path|
+      Dir[base_path.join('*/**')].each do |path|
         yield path
       end
     end

@@ -61,6 +61,10 @@ module Attachs
       end
     end
 
+    def location(style=:original)
+      storage.expand_path "#{id}/#{style}.#{extension}"
+    end
+
     def url(style=:original)
       storage.url generate_path(style, unprocessed?)
     end

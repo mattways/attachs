@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  mount Attachs::Engine => '/attachments'
+  mount Attachs::Engine => '/'
 end
