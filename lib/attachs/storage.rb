@@ -1,29 +1,28 @@
 module Attachs
   class Storage
 
-    def url(path)
-      Pathname.new(Attachs.configuration.base_url || '/').join(prefix).join(path).to_s
+    def url(slug)
+      Pathname.new(Attachs.configuration.base_url || '/').join('files').join(slug).to_s
     end
 
-    def expand_path(path)
-      base_path.join(path).to_s
+    def path(slug)
+      base_path.join(slug).to_s
     end
 
-    def process(id, upload_path, style_paths, content_type, options)
+    def process(id, source_path, slug, content_type, options)
       ensure_folder id
-      processor = build_processor(upload_path, content_type)
-      if processor
-        style_paths.except(:original).each do |style, path|
-          processor.process expand_path(path), options[style]
-        end
+      destination_path = path(slug)
+      if options
+        processor = build_processor(source_path, content_type)
+        processor.process destination_path, options
+      else
+        move source_path, destination_path
       end
-      original_path = expand_path(style_paths[:original])
-      move upload_path, original_path
-      fix_permissions_and_ownership original_path
+      fix_permissions_and_ownership destination_path
     end
 
-    def destroy(path)
-      delete expand_path(path)
+    def destroy(slug)
+      delete path(slug)
     end
 
     def clear
@@ -38,10 +37,6 @@ module Attachs
 
     def base_path
       Rails.root.join 'storage'
-    end
-
-    def prefix
-      configuration.prefix || ''
     end
 
     def ensure_folder(id)

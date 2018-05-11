@@ -5,8 +5,8 @@ module Attachs
       :convert_options,
       :base_url,
       :fallback,
-      :prefix,
-      :maximum_size
+      :maximum_size,
+      :default_styles
     )
 
     def callbacks

@@ -8,7 +8,6 @@ require 'attachs/extensions/active_record/base'
 require 'attachs/processors/base'
 require 'attachs/processors/image'
 require 'attachs/builder'
-require 'attachs/callbacks'
 require 'attachs/concern'
 require 'attachs/configuration'
 require 'attachs/console'
@@ -21,8 +20,6 @@ require 'attachs/version'
 
 module Attachs
   class << self
-
-    delegate :clear, :reprocess, :fix_missings, to: :Attachment
 
     def configure
       yield configuration

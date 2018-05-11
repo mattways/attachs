@@ -1,7 +1,4 @@
 es:
-  attachments:
-    business:
-      logo: "Logo de %{name}"
   errors:
     messages:
       immutable: "no puede cambiar"

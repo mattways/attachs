@@ -10,7 +10,6 @@ class CreateAttachments < ActiveRecord::Migration[5.1]
       t.integer :size
       t.integer :position, default: 0
       t.jsonb :metadata, default: {}
-      t.timestamp :processed_at
 
       t.timestamps
     end
@@ -20,6 +19,5 @@ class CreateAttachments < ActiveRecord::Migration[5.1]
     add_index :attachments, :record_base
     add_index :attachments, :record_attribute
     add_index :attachments, :position
-    add_index :attachments, :processed_at
   end
 end

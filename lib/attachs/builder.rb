@@ -65,7 +65,7 @@ module Attachs
     def override_accessors(attribute)
       concern.class_eval do
         define_method "#{attribute}=" do |value|
-          send "normalize_#{attribute}", super(value)
+          super send("normalize_#{attribute}", value)
         end
         define_method "#{attribute}_id=" do |value|
           send(

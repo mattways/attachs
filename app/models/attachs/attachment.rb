@@ -3,29 +3,34 @@ module Attachs
 
     self.table_name = 'attachments'
 
-    after_commit :process_upload, on: :create
-    after_commit :delete_files, on: :destroy
+    after_create :process_blob
+    after_destroy :delete_files
 
     scope :attached, -> { where.not(record_id: nil) }
     scope :unattached, -> { where(record_id: nil) }
-    scope :processed, -> { where.not(processed_at: nil) }
-    scope :unprocessed, -> { where(processed_at: nil) }
 
     belongs_to :record, polymorphic: true, required: false
 
-    validates_presence_of :record_type, :record_base, :record_attribute
-    validate :record_type_must_be_valid, :record_base_must_be_valid, :record_attribute_must_be_valid
-
     with_options if: :attached? do
-      validate :must_be_processed
+      validates_presence_of :record_type, :record_base, :record_attribute
+      validate :record_type_must_be_valid, :record_base_must_be_valid, :record_attribute_must_be_valid
     end
 
-    with_options if: :processed? do
-      validates_presence_of :extension, :content_type, :size
-      validates_numericality_of :size, greater_than: 0, only_integer: true
-    end
+    validates_presence_of :extension, :content_type, :size
+    validates_numericality_of :size, greater_than: 0, only_integer: true
 
-    attr_accessor :upload
+    alias_method :processed?, :persisted?
+
+    attr_reader :blob_path
+
+    def blob_path=(value)
+      unless persisted?
+        self.size = File.size(value)
+        self.content_type = Console.content_type(value)
+        self.extension = MIME::Types[content_type].first.extensions.first
+        @blob_path = value
+      end
+    end
 
     def unattached?
       record_id.nil?
@@ -33,21 +38,6 @@ module Attachs
 
     def attached?
       !unattached?
-    end
-
-    def unprocessed?
-      processed_at.nil?
-    end
-
-    def processed?
-      !unprocessed?
-    end
-
-    def record_type=(value)
-      if value
-        self.record_base = value.constantize.base_class 
-      end
-      super value
     end
 
     def description
@@ -61,37 +51,24 @@ module Attachs
       end
     end
 
-    def location(style=:original)
-      storage.expand_path "#{id}/#{style}.#{extension}"
+    def path(style=:original)
+      storage.path generate_slug(style)
     end
 
     def url(style=:original)
-      storage.url generate_path(style, unprocessed?)
+      storage.url generate_slug(style)
     end
 
     def urls
       hash = {}
-      generate_paths(unprocessed?).each do |style, path|
+      generate_slugs.each do |style, path|
         hash[style] = storage.url(path)
       end
       hash
     end
 
-    def process(path)
-      if unprocessed?
-        self.size = File.size(path) 
-        self.content_type = Console.content_type(path)
-        self.extension = MIME::Types[content_type].first.extensions.first
-        self.processed_at = Time.now
-        configuration.callbacks.process :before_process, path, self
-        storage.process id, path, generate_paths, content_type, styles_options
-        configuration.callbacks.process :after_process, path, self
-        save
-      end
-    end
-
     def saveable?
-      persisted? || !upload.nil?
+      persisted? || !blob_path.nil?
     end
     alias_method :validable?, :saveable?
 
@@ -104,12 +81,23 @@ module Attachs
       unsaveable? ? false : super
     end
 
+    def process(style)
+      source_path = (blob_path || path(:original))
+      storage.process id, source_path, generate_slug(style), content_type, styles_options[style]
+    end
+
+    def style(hash)
+      styles.find do |style|
+        hash == generate_hash(style)
+      end
+    end
+
     private
 
     delegate :storage, :configuration, to: :Attachs
 
-    def process_upload
-      ProcessJob.perform_later upload.path, self
+    def process_blob
+      process :original
     end
 
     def respond_to_missing?(name, include_private=false)
@@ -142,16 +130,10 @@ module Attachs
       end
     end
 
-    def must_be_processed
-      unless processed?
-        errors.add :base, :unprocessed
-      end
-    end
-
     def delete_files
       if processed?
         styles.each do |style|
-          storage.delete generate_path(style)
+          storage.delete generate_slug(style)
         end
       end
     end
@@ -170,34 +152,32 @@ module Attachs
       end
     end
 
+    def default_styles
+      configuration.default_styles || {}
+    end
+
     def styles_options
-      options.fetch :styles, {}
+      options.fetch(:styles, {}).merge default_styles
     end
 
     def styles
       [:original] + styles_options.keys
     end
 
-    def generate_path(style, fallback=false)
-      if fallback
-        template = (options[:fallback] || configuration.fallback)
-        template.gsub ':style', style.to_s
-      else
-        name = obfuscate(style)
-        "#{id}/#{name}.#{extension}"
-      end
+    def generate_hash(style)
+      options = styles_options[style]
+      Digest::MD5.hexdigest("#{id}#{style}#{options}").to_i(16).to_s(36)
     end
 
-    def obfuscate(style)
-      alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789_'
-      encoding = '8kluw1mtri2xncsp649obvezgd57qy3fj0ahx'
-      style.to_s.tr alphabet, encoding
+    def generate_slug(style)
+      hash = generate_hash(style)
+      "#{id}/#{hash}.#{extension}"
     end
 
-    def generate_paths(fallback=false)
+    def generate_slugs
       hash = {}
       styles.each do |style|
-        hash[style] = generate_path(style, fallback)
+        hash[style] = generate_slug(style)
       end
       hash
     end
@@ -214,14 +194,6 @@ module Attachs
 
       def clear
         unattached.where('request_at < ?', (Time.zone.now - 1.day)).find_each &:destroy
-      end
-
-      %i(reprocess fix_missings).each do |name|
-        define_method name do
-          processed.find_each do |attachment|
-            attachment.send name
-          end
-        end
       end
 
     end

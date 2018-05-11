@@ -1,8 +1,8 @@
 Attachs::Engine.routes.draw do
 
-  scope Attachs.configuration.prefix, controller: :attachments do
-    root action: :create, via: :post
-    get ':id/:style', action: :show, via: :get
+  scope path: :files, controller: :files do
+    root action: :create, via: :post, as: :files
+    get ':id/:hash', action: :show, as: :file
   end
 
 end
