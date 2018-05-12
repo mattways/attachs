@@ -5,6 +5,7 @@ module Attachs
       blob = params[:blob]
       Rails.logger.info request.headers.to_h.keys
       Rails.logger.info params
+      Rails.logger.info request.headers['HTTP_X_FILE']
       @attachment = Attachment.create!(blob_path: blob.path)
     end
 
