@@ -3,6 +3,8 @@ module Attachs
 
     def create
       blob = params[:blob]
+      Rails.logger.info request.headers.to_h.keys
+      Rails.logger.info params
       @attachment = Attachment.create!(blob_path: blob.path)
     end
 
