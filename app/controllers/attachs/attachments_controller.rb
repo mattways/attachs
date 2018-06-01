@@ -1,5 +1,5 @@
 module Attachs
-  class FilesController < Attachs::ApplicationController
+  class AttachmentsController < Attachs::ApplicationController
 
     before_action :set_attachment, except: :create
 

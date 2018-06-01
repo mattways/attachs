@@ -1,9 +1,13 @@
 Attachs::Engine.routes.draw do
 
-  scope path: :files, controller: :files do
-    root action: :create, via: :post
-    post ':id(/:chunk)', action: :upload
-    get ':id/:hash', action: :show, as: :file
+  scope controller: :attachments do
+    scope path: :files do
+      get ':id/:hash', action: :show, as: ''
+    end
+    scope path: :uploads, format: false do
+      root action: :create, via: :post, as: ''
+      post ':id(/:chunk)', action: :upload, as: ''
+    end
   end
 
 end
