@@ -1,1 +1,1 @@
-@attachment.slice :id, :urls
+@attachment.slice :id

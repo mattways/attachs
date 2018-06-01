@@ -6,23 +6,45 @@ module Attachs
     end
 
     def path(slug)
-      base_path.join(slug).to_s
+      expand_path(slug).to_s
     end
 
-    def process(id, source_path, slug, content_type, options)
+    def exists?(slug)
+      File.exists? expand_path(slug)
+    end
+
+    def store(id, chunk, source_path)
       ensure_folder id
-      destination_path = path(slug)
-      if options
-        processor = build_processor(source_path, content_type)
-        processor.process destination_path, options
-      else
-        move source_path, destination_path
+      destination_path = base_path.join(id).join(chunk) 
+      move source_path, destination_path
+    end
+
+    def join(id, basename)
+      folder_path = base_path.join(id)
+      upload_path = folder_path.join('upload')
+      pattern = folder_path.join('*')
+      Dir[pattern].sort.each do |path|
+        File.write upload_path, File.read(path), mode: 'a'
+        delete path
       end
+      size = File.size(upload_path)
+      content_type = Console.content_type(upload_path)
+      extension = MIME::Types[content_type].first.extensions.first
+      move upload_path, folder_path.join("#{basename}.#{extension}")
+      [size, content_type, extension]
+    end
+
+    def process(source_slug, destination_slug, content_type, options)
+      source_path = expand_path(source_slug)
+      destination_path = expand_path(destination_slug)
+      processor = build_processor(source_path, content_type)
+      processor.process destination_path, options
       fix_permissions_and_ownership destination_path
+      destination_path.to_s
     end
 
     def destroy(slug)
-      delete path(slug)
+      delete expand_path(slug)
     end
 
     def clear
@@ -39,6 +61,10 @@ module Attachs
       Rails.root.join 'storage'
     end
 
+    def expand_path(slug)
+      base_path.join slug
+    end
+
     def ensure_folder(id)
       FileUtils.mkdir_p base_path.join(id)
     end
@@ -48,7 +74,7 @@ module Attachs
       FileUtils.mv current_path, new_path
     end
 
-    def remove(path)
+    def delete(path)
       Rails.logger.info "Deleting: #{path}"
       FileUtils.rm path
     end
@@ -59,7 +85,7 @@ module Attachs
     end
 
     def find_each
-      Dir[base_path.join('*/**')].each do |path|
+      Dir[base_path.join('*').join('**')].each do |path|
         yield path
       end
     end

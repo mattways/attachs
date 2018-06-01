@@ -3,7 +3,6 @@ module Attachs
 
     self.table_name = 'attachments'
 
-    after_create :process_blob
     after_destroy :delete_files
 
     scope :attached, -> { where.not(record_id: nil) }
@@ -16,18 +15,13 @@ module Attachs
       validate :record_type_must_be_valid, :record_base_must_be_valid, :record_attribute_must_be_valid
     end
 
-    validates_presence_of :extension, :content_type, :size
-    validates_numericality_of :size, greater_than: 0, only_integer: true
-
-    alias_method :processed?, :persisted?
-
-    attr_reader :blob_path
+    with_options if: :processed? do
+      validates_presence_of :extension, :content_type, :size
+      validates_numericality_of :size, greater_than: 0, only_integer: true
+    end
 
     def blob_path=(value)
       unless persisted?
-        self.size = File.size(value)
-        self.content_type = Console.content_type(value)
-        self.extension = MIME::Types[content_type].first.extensions.first
         @blob_path = value
       end
     end
@@ -51,17 +45,13 @@ module Attachs
       end
     end
 
-    def path(style=:original)
-      storage.path generate_slug(style)
-    end
-
     def url(style=:original)
-      storage.url generate_slug(style)
+      storage.url build_slug(style)
     end
 
     def urls
       hash = {}
-      generate_slugs.each do |style, path|
+      build_slugs.each do |style, path|
         hash[style] = storage.url(path)
       end
       hash
@@ -81,24 +71,36 @@ module Attachs
       unsaveable? ? false : super
     end
 
-    def process(style)
-      source_path = (blob_path || path(:original))
-      storage.process id, source_path, generate_slug(style), content_type, styles_options[style]
+    def store(chunk, path)
+      storage.store id, chunk, path
     end
 
-    def style(hash)
-      styles.find do |style|
+    def join
+      self.size, self.content_type, self.extension = storage.join(id, generate_hash(:original))
+      self.processed = true
+      save!
+    end
+
+    def process(style)
+      storage.process build_slug(:original), build_slug(style), content_type, styles_options[style]
+    end
+
+    def ensure_style(hash, format)
+      style = styles.find do |style|
         hash == generate_hash(style)
+      end
+      if style
+        slug = build_slug(style)
+        if File.extname(slug)[1..-1] == format && !storage.exists?(slug)
+          process style
+        end
+        storage.path slug
       end
     end
 
     private
 
     delegate :storage, :configuration, to: :Attachs
-
-    def process_blob
-      process :original
-    end
 
     def respond_to_missing?(name, include_private=false)
       metadata.has_key?(name) || super
@@ -133,7 +135,7 @@ module Attachs
     def delete_files
       if processed?
         styles.each do |style|
-          storage.delete generate_slug(style)
+          storage.delete build_slug(style)
         end
       end
     end
@@ -169,15 +171,15 @@ module Attachs
       Digest::MD5.hexdigest("#{id}#{style}#{options}").to_i(16).to_s(36)
     end
 
-    def generate_slug(style)
+    def build_slug(style)
       hash = generate_hash(style)
       "#{id}/#{hash}.#{extension}"
     end
 
-    def generate_slugs
+    def build_slugs
       hash = {}
       styles.each do |style|
-        hash[style] = generate_slug(style)
+        hash[style] = build_slug(style)
       end
       hash
     end
