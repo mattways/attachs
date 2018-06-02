@@ -1,10 +1,6 @@
 module Attachs
   class Storage
 
-    def url(slug)
-      Pathname.new(Attachs.configuration.base_url || '/').join('files').join(slug).to_s
-    end
-
     def path(slug)
       expand_path(slug).to_s
     end

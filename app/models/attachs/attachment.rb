@@ -12,18 +12,12 @@ module Attachs
 
     with_options if: :attached? do
       validates_presence_of :record_type, :record_base, :record_attribute
-      validate :record_type_must_be_valid, :record_base_must_be_valid, :record_attribute_must_be_valid
+      validate :record_type_must_be_valid, :record_base_must_be_valid, :record_attribute_must_be_valid, :must_be_processed
     end
 
     with_options if: :processed? do
       validates_presence_of :extension, :content_type, :size
       validates_numericality_of :size, greater_than: 0, only_integer: true
-    end
-
-    def blob_path=(value)
-      unless persisted?
-        @blob_path = value
-      end
     end
 
     def unattached?
@@ -32,6 +26,10 @@ module Attachs
 
     def attached?
       !unattached?
+    end
+
+    def unprocessed?
+      !processed?
     end
 
     def description
@@ -46,19 +44,26 @@ module Attachs
     end
 
     def url(style=:original)
-      storage.url build_slug(style)
+      if processed?
+        slug = build_slug(style)
+        "#{Attachs.configuration.base_url}/storage/#{slug}"
+      else
+        template = (options[:fallback] || configuration.fallback)
+        slug = template.gsub(':style', style.to_s)
+        ActionController::Base.helpers.image_path slug
+      end
     end
 
     def urls
       hash = {}
-      build_slugs.each do |style, path|
-        hash[style] = storage.url(path)
+      styles.each do |style|
+        hash[style] = url(style)
       end
       hash
     end
 
     def saveable?
-      persisted? || !blob_path.nil?
+      persisted?
     end
     alias_method :validable?, :saveable?
 
@@ -111,6 +116,12 @@ module Attachs
         metadata[name.to_s]
       else
         super
+      end
+    end
+
+    def must_be_processed
+      unless processed?
+        errors.add :processed, :invalid
       end
     end
 
@@ -174,14 +185,6 @@ module Attachs
     def build_slug(style)
       hash = generate_hash(style)
       "#{id}/#{hash}.#{extension}"
-    end
-
-    def build_slugs
-      hash = {}
-      styles.each do |style|
-        hash[style] = build_slug(style)
-      end
-      hash
     end
 
     def interpolate(name)
