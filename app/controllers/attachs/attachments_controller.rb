@@ -17,7 +17,8 @@ module Attachs
             case request.body
             when StringIO
               tmp = Tempfile.new
-              tmp.write request.body
+              tmp.binmode
+              tmp.write request.body.string
               tmp.path
             when Tempfile
               request.body.path
