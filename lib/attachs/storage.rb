@@ -26,8 +26,9 @@ module Attachs
       size = File.size(upload_path)
       content_type = Console.content_type(upload_path)
       extension = MIME::Types[content_type].first.extensions.first
-      move upload_path, folder_path.join("#{basename}.#{extension}")
-      [size, content_type, extension]
+      destination_path = folder_path.join("#{basename}.#{extension}") 
+      move upload_path, destination_path
+      [size, content_type, extension, destination_path]
     end
 
     def process(source_slug, destination_slug, content_type, options)

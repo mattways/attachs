@@ -9,9 +9,6 @@ module Attachs
   class InterpolationNotFound < Error
   end
 
-  class InterpolationReserved < Error
-  end
-
   class InterpolationExists < Error
   end
 

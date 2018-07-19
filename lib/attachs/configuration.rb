@@ -21,7 +21,7 @@ module Attachs
       interpolations.add *args, &block
     end
 
-    %i(before_process after_process).each do |name|
+    %i(after_join).each do |name|
       define_method name do |expression, &block|
         callbacks.add name, expression, &block
       end

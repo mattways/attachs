@@ -81,7 +81,8 @@ module Attachs
     end
 
     def join
-      self.size, self.content_type, self.extension = storage.join(id, generate_hash(:original))
+      self.size, self.content_type, self.extension, path = storage.join(id, generate_hash(:original))
+      configuration.callbacks.process :after_join, path, self
       self.processed = true
       save!
     end
